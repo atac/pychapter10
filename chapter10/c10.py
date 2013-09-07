@@ -1,28 +1,21 @@
 from packet import Packet
-import atexit,os
+import os
+
 
 class C10(object):
-    '''
-    A file wrapper that parses Chapter 10 packets.
-    '''
+    """A Chapter 10 parser packets."""
 
-    def __init__(self,file):
-        '''
-        Takes a file or filename and reads packets.
-        '''
+    def __init__(self, f):
+        """Takes a file or filename and reads packets."""
 
-        # initialize the superclass
         object.__init__(self)
 
-        # open a file if a string was given
-        if type(file) == str:
-            file = open(file,'rb')
-            atexit.register(file.close)
+        if type(f) == str:
+            f = open(f, 'rb')
 
-        # save a reference to the file object
-        self.file = file
+        self.file = f
 
-        # read packets until end-of-file (EOF)
+        # Parse packets until the file is empty.
         self.packets = []
         self.size = 0
         while True:
@@ -33,12 +26,10 @@ class C10(object):
             except EOFError:
                 break
 
-    def analyze(self):
-        print '''File: %s
-Packets: %s
-Total size: %s bytes''' % (os.path.abspath(self.file.name),
-                           len(self.packets),
-                           self.size)
+    def repr(self):
+        return '<C10: {} bytes {} packets>'.format(
+            os.path.abspath(self.file.name),
+            self.size, len(self))
 
     def __len__(self):
         return len(self.packets)
