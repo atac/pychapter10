@@ -8,7 +8,7 @@ def main(filename='samples/MSN001R1.ch10'):
     d['obj'] = file
     shell = InteractiveConsole(d,'<shell>')
     shell.interact()
-    
+
 if __name__=='__main__':
     if len(sys.argv) > 1:
         main(sys.argv[1])

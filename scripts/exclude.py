@@ -11,19 +11,19 @@ def copyPacket(packet,src,dst):
     '''
     Take a packet and copy it from an input file to an output file.
     '''
-    
+
     # remember the old file position
     oldPos = src.tell()
-    
+
     # go to the start of the packet
     src.seek(packet.filePos)
-    
+
     # read it out
     raw = src.read(packet.length)
-    
+
     # then write it out
     dst.write(raw)
-    
+
     # finally, return the source to its original position
     src.seek(oldPos)
 
@@ -37,7 +37,7 @@ if __name__=='__main__':
                       help='set the verbosity of the script output: \
 0 (silent), 1 (normal), or 2 (verbose)')
     options,args = parser.parse_args()
-    
+
     # validate the file arguments
     if len(args) != 2:
         parser.print_usage()
@@ -57,21 +57,21 @@ if __name__=='__main__':
             if options.exclude:
                 s += ' excluding channel %s' % options.exclude
             print s
-        
+
         # open our two files
         src = open(args[0],'rb')
         dst = open(args[1],'wb')
-        
+
         try:
-            
+
             # mainloop
             while True:
-                
+
                 try:
-                    
+
                     # read the packet
                     packet = Packet(src)
-        
+
                     # only copy if it's not an exclude
                     if not options.exclude or \
                             options.exclude != packet.channel:
@@ -85,15 +85,15 @@ if __name__=='__main__':
                     elif options.exclude and options.verbosity == 2:
                         print '\tdiscriminating against packet in channel %s' \
                             % options.exclude
-                
+
                 # quit the mainloop when we reach the end of the file
                 except EOFError:
                     break
-        
+
         # ensure the source and output files get closed even in case
         # of an error
         finally:
             src.close()
             dst.close()
-            
+
         print 'Finished'

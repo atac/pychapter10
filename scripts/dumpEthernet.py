@@ -10,7 +10,7 @@ def main(inFile='samples/MSN001R1.ch10',outFile='output.pcap'):
                     out.write(message.full())
     finally:
         out.close()
-        
+
 if __name__=='__main__':
     args = list(args)
     args.remove(args[0])

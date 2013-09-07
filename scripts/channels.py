@@ -13,26 +13,26 @@ if __name__=='__main__':
 
     else:
         ids = list()
-        
+
         f = open(args[0],'rb')
         try:
-            
+
             # mainloop
             while True:
-                
+
                 # keep reading packets until there are no more to read
                 try:
-                
+
                     packet = Packet(f)
                     if packet.channel not in ids:
                         ids.append(packet.channel)
-                    
+
                     # remove the packet from memory
                     del packet
 
                 except EOFError:
                     break
-                
+
             # print out the ids
             ids.sort()
             print 'Channel IDs:'
