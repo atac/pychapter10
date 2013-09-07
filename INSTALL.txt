@@ -1,0 +1,16 @@
+Installing the library:
+	
+	1. Install Python 2.5 or greater from http://python.org/download
+	2. Open a command prompt (terminal or console on *nix systems)
+	3. "cd" (change directory) to the directory this file is in
+	4. As an administrator ("sudo" on *nix) run the command "setup.py install"
+		if this doesn't work try adding "python" to the beginning.
+	5. You can now import the library as "chapter10" or run any of the utility
+		scripts straight from the commandline
+		
+Running the tests:
+	
+	The tests depend on "samples/MSN001R1.ch10" existing.
+
+	From the project directory run "runtests.py" or
+		"python runtests.py" to run the included test suite.
