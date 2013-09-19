@@ -3,7 +3,7 @@ import os
 
 
 class C10(object):
-    """A Chapter 10 parser packets."""
+    """A Chapter 10 parser."""
 
     def __init__(self, f):
         """Takes a file or filename and reads packets."""
