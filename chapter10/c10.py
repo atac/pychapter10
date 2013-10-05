@@ -1,5 +1,4 @@
 from packet import Packet
-import os
 
 
 class C10(object):
@@ -18,17 +17,20 @@ class C10(object):
         # Parse packets until the file is empty.
         self.packets = []
         self.size = 0
+        self.parse(self.file)
+
+    def parse(self, src):
         while True:
             try:
-                packet = Packet(self.file)
+                packet = Packet(src)
                 self.packets.append(packet)
                 self.size += len(packet)
             except EOFError:
                 break
 
-    def repr(self):
-        return '<C10: {} bytes {} packets>'.format(
-            os.path.abspath(self.file.name),
+    def __repr__(self):
+        return '<C10: {} {} bytes {} packets>'.format(
+            self.file,
             self.size, len(self))
 
     def __len__(self):
