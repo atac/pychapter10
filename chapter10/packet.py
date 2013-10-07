@@ -76,7 +76,7 @@ class Packet(object):
             self.time = secondary[:8]
 
         # Find out what type of data we have and init the data class.
-        datatype = map.get(self.dataType * 0x10, Base)
+        datatype = map.get(self.dataType, Base)
         self.body = datatype(self)
 
         # just skip past any footer data
