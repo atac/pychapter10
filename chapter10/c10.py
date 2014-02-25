@@ -20,6 +20,8 @@ class C10(object):
         self.parse()
 
     def parse(self):
+        """Parse packet headers until EOF."""
+
         while True:
             try:
                 packet = Packet(self.file)

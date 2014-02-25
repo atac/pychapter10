@@ -50,11 +50,11 @@ class PCM(Base):
 
         # If throughput mode
         if bits[20]:
-            read = f.read(self.packet.dataLength - 4)
+            read = f.read(self.packet.data_length- 4)
             s = BitArray(bytes=read)
         else:
-            print self.packet.dataLength
-            for i in range(self.packet.dataLength - 4 / frame_size):
+            print self.packet.data_length
+            for i in range(self.packet.data_length- 4 / frame_size):
                 frame = f.read(frame_size)
                 return
                 frames.append(frame)

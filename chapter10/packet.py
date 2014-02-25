@@ -1,6 +1,8 @@
-from datatypes import Base, map
+
 from array import array
 import struct
+
+from datatypes import Base, map
 
 
 class Packet(object):
@@ -8,74 +10,73 @@ class Packet(object):
 
     # The attribute names for header fields.
     HEADER_KEYS = (
-        ('Sync Pattern',                 'sync'),
-        ('Channel ID',                   'channel'),
-        ('Packet Length',                'length'),
-        ('Data Length',                  'data_length'),
-        ('Header Version',               'header_version'),
-        ('Sequence Number',              'sequence'),
-        ('Packet Flags',                 'flags'),
-        ('Data Type',                    'data_type'),
-        ('Relative Time Counter (low)',  'rtc_low'),
-        ('Relative Time Counter (high)', 'rtc_high'),
-        ('Header Checksum',              'checksum'),
+        'Sync Pattern',
+        'Channel ID',
+        'Packet Length',
+        'Data Length',
+        'Header Version',
+        'Sequence Number',
+        'Flags',
+        'Data Type',
+        'RTC Low',
+        'RTC High',
+        'Header Checksum'
     )
 
     def __init__(self, file):
         """Takes an open file object with its cursor at this packet."""
 
-        self.file = file
-
-        # Store the starting position of the packet within the file.
-        self.pos = file.tell()
-
-        # Read out the raw header.
+        # Mark our location in the file and read the header.
+        self.file, self.pos = file, file.tell()
         header = file.read(24)
 
         # Make sure we're not reading beyond the file length.
         if len(header.strip()) < 24:
             raise EOFError
 
-        # Store our header sums for the checksum.
-        a = array('H')
-        a.fromstring(header)
-        self.sums = sum(a[:11])
+        # Store the header sums.
+        self.header_sums = sum(array('H', header)[:-1])
+        #@todo: still don't completely get this
+        self.header_sums &= 0xffff
 
-        # Parse the header values into attributes.
+        # Parse the header values.
         values = struct.unpack('HHIIBBBBIHH', header)
         for i, field in enumerate(self.HEADER_KEYS):
-            setattr(self, field[1], values[i])
+            setattr(self, '_'.join(field.split()).lower(), values[i])
 
         # Read the secondary header (if any).
         if self.flags & 0x7:
-
             secondary = file.read(12)
 
             # Store our sums for checking later on.
-            a = array('H')
-            a.fromstring(secondary)
-            self.sums += sum(a[:-1])
+            self.secondary_sums = sum(array('H', secondary)[:-1])
+            self.secondary_sums &= 0xffff
 
-            #@todo: make this convert to an actual time object!
-            self.time = secondary[:8]
+            #@todo: make this convert to an actual time object
+            self.time, self.secondary_checksum = struct.unpack(
+                'qxxH', secondary)
 
-        # Find out what type of data we have and init the data class.
+        else:
+            self.time = None
+            self.secondary_sums, self.secondary_header = (None, None)
+
+        # Parse the body based on type.
         datatype = map.get(self.data_type, Base)
         self.body = datatype(self)
 
-        # Skip past any footer data
-        skip = len(self) - 24 - self.data_length
+        # Skip the packet trailer.
+        trailer = self.packet_length - 24 - self.data_length
         if self.flags & 0x7:
-            skip -= 12
-        file.seek(skip, 1)
+            trailer -= 12
+        file.seek(trailer, 1)
 
     def print_header(self):
         """Print out the header information."""
 
         print '-' * 80
-        for name, attr in self.HEADER_KEYS:
-            print name + str(getattr(self, attr)).rjust(
-                80 - len(name) - 2, '.')
+        for name in self.HEADER_KEYS:
+            attr = '_'.join(name.split()).lower()
+            print name + str(getattr(self, attr)).rjust(80 - len(name), '.')
         print self.check() and '(valid)' or '(error)'
         print '-' * 80
 
@@ -84,7 +85,7 @@ class Packet(object):
 
         pos = self.file.tell()
         self.file.seek(self.pos)
-        raw = self.file.read(self.length)
+        raw = self.file.read(self.packet_length)
         self.file.seek(pos)
 
         return raw
@@ -92,7 +93,11 @@ class Packet(object):
     def check(self):
         """Validate the packet using checksums and verifying fields."""
 
-        return (self.sums == self.checksum) and self.sync == 60197
+        if self.header_sums != self.header_checksum:
+            return False
+        elif self.sync_pattern != 60197:
+            return False
+        return True
 
     def __len__(self):
-        return self.length
+        return self.packet_length

@@ -73,7 +73,7 @@ class Ethernet(Base):
         #@todo: parse the type
 
         # skip past the actual body
-        self.packet.file.seek(self.packet.dataLength-2,1)
+        self.packet.file.seek(self.packet.data_length-2,1)
 
     def parse(self):
         '''
