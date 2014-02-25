@@ -1,31 +1,33 @@
 #!/usr/bin/env python
 
-"""Get a list of channel IDs for a chapter 10 file."""
+import sys
 
-from optparse import OptionParser
-from chapter10 import Packet
+from chapter10 import C10
 
 
 if __name__ == '__main__':
-    parser = OptionParser('%prog <inputfile>')
-    options, args = parser.parse_args()
-    if not len(args):
-        parser.print_usage()
+    if len(sys.argv) < 2:
+        print 'usage: channels.py <file>'
+        raise SystemExit
 
-    else:
-        ids = set()
+    channels = {}
 
-        with open(args[0], 'rb') as f:
-            while True:
-                try:
-                    packet = Packet(f)
-                    ids.add(packet.channel)
-                except EOFError:
-                    break
+    c = C10(sys.argv[1])
+    for packet in c:
+        if packet.channel_id not in channels:
+            channels[packet.channel_id] = {
+                'packets': 0, 'type': packet.data_type,
+                'id': packet.channel_id}
+        channels[packet.channel_id]['packets'] += 1
 
-            # print out the ids
-            ids = list(ids)
-            ids.sort()
-            print 'Channel IDs:'
-            for id in ids:
-                print '\t%s' % id
+    for channel in channels.values():
+        print '-' * 80
+        print 'Channel ID: %s' % channel['id']
+        print 'Data Type: %s' % hex(channel['type'])
+        print 'Packets: %s' % channel['packets']
+        print '-' * 80
+
+    print 'Summary for %s:' % sys.argv[1]
+    print '    Size: %s bytes' % c.size
+    print '    Packets: %s' % len(c)
+    print '    Channels: %s' % len(channels)
