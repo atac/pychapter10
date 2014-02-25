@@ -1,3 +1,5 @@
+import atexit
+
 from packet import Packet
 
 
@@ -7,22 +9,20 @@ class C10(object):
     def __init__(self, f):
         """Takes a file or filename and reads packets."""
 
-        object.__init__(self)
-
-        if type(f) == str:
+        if isinstance(f, str):
             f = open(f, 'rb')
+            atexit.register(f.close)
 
         self.file = f
 
         # Parse packets until the file is empty.
-        self.packets = []
-        self.size = 0
-        self.parse(self.file)
+        self.packets, self.size = [], 0
+        self.parse()
 
-    def parse(self, src):
+    def parse(self):
         while True:
             try:
-                packet = Packet(src)
+                packet = Packet(self.file)
                 self.packets.append(packet)
                 self.size += len(packet)
             except EOFError:
@@ -30,8 +30,7 @@ class C10(object):
 
     def __repr__(self):
         return '<C10: {} {} bytes {} packets>'.format(
-            self.file,
-            self.size, len(self))
+            self.file, self.size, len(self))
 
     def __len__(self):
         return len(self.packets)
