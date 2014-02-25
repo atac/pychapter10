@@ -37,7 +37,7 @@ class Packet(object):
         header = file.read(24)
 
         # Make sure we're not reading beyond the file length.
-        if not header:
+        if len(header.strip()) < 24:
             raise EOFError
 
         # Unpack the header.

@@ -1,44 +1,31 @@
-'''
-Read through a chapter 10 file and print out a list of channel IDs found in it.
-'''
+#!/usr/bin/env python
+
+"""Get a list of channel IDs for a chapter 10 file."""
 
 from optparse import OptionParser
 from chapter10 import Packet
 
-if __name__=='__main__':
+
+if __name__ == '__main__':
     parser = OptionParser('%prog <inputfile>')
-    options,args = parser.parse_args()
+    options, args = parser.parse_args()
     if not len(args):
         parser.print_usage()
 
     else:
-        ids = list()
+        ids = set()
 
-        f = open(args[0],'rb')
-        try:
-
-            # mainloop
+        with open(args[0], 'rb') as f:
             while True:
-
-                # keep reading packets until there are no more to read
                 try:
-
                     packet = Packet(f)
-                    if packet.channel not in ids:
-                        ids.append(packet.channel)
-
-                    # remove the packet from memory
-                    del packet
-
+                    ids.add(packet.channel)
                 except EOFError:
                     break
 
             # print out the ids
+            ids = list(ids)
             ids.sort()
             print 'Channel IDs:'
             for id in ids:
-                print '\t' + str(id)
-
-        # ensure the source file is closed even when an error is encountered
-        finally:
-            f.close()
+                print '\t%s' % id
