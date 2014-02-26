@@ -6,6 +6,6 @@ from pcm import PCM
 # (default is base)
 map = {
     0x00: Base,
-    0x09: PCM,
+    #0x09: PCM,
     #0x30: Ethernet,
 }
