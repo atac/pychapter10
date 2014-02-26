@@ -34,10 +34,8 @@ class Packet(object):
         if len(header.strip()) < 24:
             raise EOFError
 
-        # Store the header sums.
-        self.header_sums = sum(array('H', header)[:-1])
-        #@todo: still don't completely get this
-        self.header_sums &= 0xffff
+        # Store the header sums (masked to be a consistent bit length).
+        self.header_sums = sum(array('H', header)[:-1]) & 0xffff
 
         # Parse the header values.
         values = struct.unpack('HHIIBBBBIHH', header)
@@ -46,17 +44,15 @@ class Packet(object):
 
         # Read the secondary header (if any).
         self.time = None
-        self.secondary_sums, self.secondary_header = (None, None)
+        self.secondary_sums, self.secondary_checksum = (None, None)
         if self.flags & 0x7:
             secondary = file.read(12)
 
-            # Store our sums for checking later on.
-            self.secondary_sums = sum(array('H', secondary)[:-1])
-            self.secondary_sums &= 0xffff
+            # Store our sums for checking later on (masked for bit length).
+            self.secondary_sums = sum(array('H', secondary)[:-1]) & 0xffff
 
-            #@todo: make this convert to an actual time object
-            self.time, self.secondary_checksum = struct.unpack(
-                'qxxH', secondary)
+            self.time, self.secondary_checksum = struct.unpack('qxxH',
+                                                               secondary)
 
         # Parse the body based on type.
         datatype = map.get(self.data_type, Base)
