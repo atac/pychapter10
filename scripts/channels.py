@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+"""Display channel information for an IRIG 106 Chapter 10 file."""
+
 import sys
 
 from chapter10 import C10
