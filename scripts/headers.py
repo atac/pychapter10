@@ -10,4 +10,4 @@ if __name__ == '__main__':
         raise SystemExit
 
     for packet in C10(sys.argv[1]):
-        packet.printHeader()
+        packet.print_header()
