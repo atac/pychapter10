@@ -2,7 +2,7 @@
 from array import array
 import struct
 
-from datatypes import Base, map
+import datatypes
 
 
 class Packet(object):
@@ -55,7 +55,7 @@ class Packet(object):
                                                                secondary)
 
         # Parse the body based on type.
-        datatype = map.get(self.data_type, Base)
+        datatype = datatypes.get_handler(self.data_type)
         self.body = datatype(self)
 
         # Skip the packet trailer.

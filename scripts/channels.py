@@ -5,6 +5,7 @@
 import sys
 
 from chapter10 import C10
+from chapter10.datatypes import get_label
 
 
 if __name__ == '__main__':
@@ -25,7 +26,8 @@ if __name__ == '__main__':
     for channel in channels.values():
         print '-' * 80
         print 'Channel ID: %s' % channel['id']
-        print 'Data Type: %s' % hex(channel['type'])
+        print 'Data Type: %s (%s)' % (get_label(channel['type']),
+                                      hex(channel['type']))
         print 'Packets: %s' % channel['packets']
         print '-' * 80
 
