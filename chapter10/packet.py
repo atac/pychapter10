@@ -45,6 +45,8 @@ class Packet(object):
             setattr(self, '_'.join(field.split()).lower(), values[i])
 
         # Read the secondary header (if any).
+        self.time = None
+        self.secondary_sums, self.secondary_header = (None, None)
         if self.flags & 0x7:
             secondary = file.read(12)
 
@@ -55,10 +57,6 @@ class Packet(object):
             #@todo: make this convert to an actual time object
             self.time, self.secondary_checksum = struct.unpack(
                 'qxxH', secondary)
-
-        else:
-            self.time = None
-            self.secondary_sums, self.secondary_header = (None, None)
 
         # Parse the body based on type.
         datatype = map.get(self.data_type, Base)

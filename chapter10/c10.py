@@ -15,24 +15,18 @@ class C10(object):
 
         self.file = f
 
-        # Parse packets until the file is empty.
+        # Parse headers until EOF
         self.packets, self.size = [], 0
-        self.parse()
-
-    def parse(self):
-        """Parse packet headers until EOF."""
-
         while True:
             try:
-                packet = Packet(self.file)
-                self.packets.append(packet)
-                self.size += len(packet)
+                self.packets.append(Packet(f))
+                self.size += len(self.packets[-1])
             except EOFError:
                 break
 
     def __repr__(self):
         return '<C10: {} {} bytes {} packets>'.format(
-            self.file, self.size, len(self))
+            self.file.name, self.size, len(self))
 
     def __len__(self):
         return len(self.packets)
