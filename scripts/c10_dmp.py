@@ -5,15 +5,16 @@
 Options:
     -o OUT, --output OUT  The directory to place files [default: .].
     -t TYPE, --type TYPE  The types of data to export (csv, may be decimal or \
-hex eg: 0x40) [default: ]"""
+hex eg: 0x40) [default: ]
+    -f, --force           Overwrite existing files."""
 
-from array import array
+from itertools import chain
 import atexit
 import os
 
 from docopt import docopt
 
-from chapter10 import C10
+from chapter10 import C10, datatypes
 
 
 if __name__ == '__main__':
@@ -34,6 +35,9 @@ if __name__ == '__main__':
 
         filename = os.path.join(args['--output'], str(packet.channel_id))
 
+        if datatypes.format(packet.data_type)[0] == 8:
+            filename += '.mpg'
+
         # Ensure an output file is open (and will close) for a given channel.
         if filename not in out:
 
@@ -45,14 +49,12 @@ if __name__ == '__main__':
             out[filename] = open(filename, 'wb')
             atexit.register(out[filename].close)
 
-        data = packet.body.data[4:]
-
         # Special case for video.
-        if packet.data_type in (0x40, 0x41, 0x42):
-            a = array('H', data)
-            a.byteswap()
-            out[filename].write(a.tostring())
-            continue
+        if datatypes.format(packet.data_type)[0] == 8:
+            data = ''.join([p.data for p in packet.body.mpeg])
+
+        else:
+            data = packet.body.data[4:]
 
         # Write out raw packet body.
         out[filename].write(data)

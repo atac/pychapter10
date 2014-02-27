@@ -1,9 +1,9 @@
 from base import Base
-from ethernet import Ethernet
-from pcm import PCM
+from video import Video
+#from ethernet import Ethernet
+#from pcm import PCM
 
-# a dictionary of (<hex>, <class>) pairs mapping data types to python objects
-# (default is base)
+# Top level data types.
 TYPES = ('Computer Generated',
          'PCM',
          'Time',
@@ -20,14 +20,23 @@ TYPES = ('Computer Generated',
          'Ethernet')
 
 
+def format(data_type):
+    """Find the type index (see TYPES) and format number for a datatype."""
+
+    t = int(data_type / 8.0)
+    return (t, data_type - (t * 8))
+
+
 def get_handler(data_type):
     """Find an appropriate parser for a given data type."""
 
+    if format(data_type)[0] == 8:
+        return Video
     return Base
 
 
 def get_label(data_type):
     """Return a human readable format label."""
 
-    t = int(data_type / 8.0)
-    return '%s data, format %i' % (TYPES[t], data_type - (t * 8))
+    t, f = format(data_type)
+    return '%s (format %i)' % (TYPES[t], f)
