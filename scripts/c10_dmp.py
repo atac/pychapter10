@@ -51,7 +51,7 @@ if __name__ == '__main__':
 
         # Special case for video.
         if datatypes.format(packet.data_type)[0] == 8:
-            data = ''.join([p.data for p in packet.body.mpeg])
+            data = ''.join([p.data for p in packet.body.all])
 
         else:
             data = packet.body.data[4:]
