@@ -30,10 +30,10 @@ def format(data_type):
 def get_handler(data_type):
     """Find an appropriate parser for a given data type."""
 
-    type, format = format(data_type)
-    if type == 1:
+    t, f = format(data_type)
+    if t == 1:
         return PCM
-    elif type == 8:
+    elif t == 8:
         return Video
     return Base
 
