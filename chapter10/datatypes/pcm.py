@@ -1,7 +1,5 @@
-from array import array
 
-from base import Base
-from bitstring import BitArray
+from .base import Base, Data
 
 
 class PCM(Base):
@@ -19,43 +17,53 @@ class PCM(Base):
         'unpacked',
     )
 
-    frames = []
+    def parse(self):
+        Base.parse(self)
+
+        if self.format != 1:
+            raise NotImplementedError(
+                'PCM Format %s is reserved!' % self.format)
+
+        # Channel Specific Data Word (csdw).
+        self.iph = bool(self.csdw & (1 << 30))         # Intra-packet header
+        self.ma = bool(self.csdw & (1 << 29))          # Major frame indicator
+        self.mi = bool(self.csdw & (1 << 28))          # Minor frame indicator
+        self.mafs = int(self.csdw >> 26 & 0b11)        # Major frame status
+        self.mifs = int(self.csdw >> 24 & 0b11)        # Minor frame status
+        self.align = bool(self.csdw & (1 << 21))       # Alignment mode
+        self.throughput = bool(self.csdw & (1 << 20))  # Throughput mode
+        self.packed = bool(self.csdw & (1 << 19))      # Packed mode
+        self.unpacked = bool(self.csdw & (1 << 18))    # Unpacked mode
+        self.s_offset = int(self.csdw & 262143)        # Sync offset
+
+        # Throughput basically means we don't need to do anything.
+        if self.throughput:
+            return
+
+        # Figure the frame size for this packet (including IPH).
+        frame_size = 5  # Two words sync, three data.
+        if self.iph:
+            iph = 5
+
+            # Extra IPH word in 32 bit alignment.
+            if self.align:
+                iph += 1
+
+            frame_size += iph
+
+        self.frames, self.all = [], []
+        data = self.data[:]
+        for i in range(len(data) / frame_size):
+            if self.iph:
+                all.append(Data('IPH', data[:iph]))
+                data = data[iph:]
+            frame = Data('PCM Frame', data[:5])
+            self.frames.append(frame)
+            self.all.append(frame)
+            data = data[5:]
 
     def __iter__(self):
-        return iter(self.frames)
+        return iter(self.all)
 
-    def parse(self):
-        f = self.packet.file
-        channel_specific_data = array('H', f.read(4))
-        channel_specific_data.byteswap()
-        bits = BitArray(bytes=channel_specific_data.tostring())
-        self.iph = bits[30]
-        self.ma = bits[29]
-        self.mi = bits[28]
-        self.mafs = bits[26:27]
-        self.mifs = bits[24:25]
-        self.align = bits[21]
-        self.through = bits[20]
-        self.packed = bits[19]
-        self.unpacked = bits[18]
-        self.sync_offset = bits[0:17]
-
-        frames = []
-        frame_size = 5
-        # If IPH is set and not in throughput mode.
-        if bits[28] and not bits[20]:
-            frame_size += 5
-            if bits[21]:
-                frame_size += 1
-
-        # If throughput mode
-        if bits[20]:
-            read = f.read(self.packet.data_length- 4)
-            s = BitArray(bytes=read)
-        else:
-            print self.packet.data_length
-            for i in range(self.packet.data_length- 4 / frame_size):
-                frame = f.read(frame_size)
-                return
-                frames.append(frame)
-        self.frames = frames
+    def __len__(self):
+        return len(self.all)

@@ -1,7 +1,7 @@
 from base import Base
 from video import Video
-#from ethernet import Ethernet
-#from pcm import PCM
+from ethernet import Ethernet
+from pcm import PCM
 
 # Top level data types.
 TYPES = ('Computer Generated',
@@ -30,7 +30,10 @@ def format(data_type):
 def get_handler(data_type):
     """Find an appropriate parser for a given data type."""
 
-    if format(data_type)[0] == 8:
+    type, format = format(data_type)
+    if type == 1:
+        return PCM
+    elif type == 8:
         return Video
     return Base
 
