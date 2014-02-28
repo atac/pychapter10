@@ -1,13 +1,23 @@
 
-from array import array
-
 from .base import Base, Data
 
 
 class Video(Base):
     """Parse video (type 0x40-0x47)."""
 
-    data_attrs = Base.data_attrs + ('all', 'mpeg')
+    data_attrs = Base.data_attrs + (
+        'all',
+        'mpeg',
+        'et',
+        'iph',
+        'srs',
+        'klv',
+        'pl',
+        'ba',
+        'epl',
+        'md',
+        'tp',
+        'pc')
 
     def parse(self):
         """Process channel specific data word (cdsw) and parse data."""
@@ -42,6 +52,9 @@ class Video(Base):
             self.md = bool(self.csdw & (1 << 13))      # Bit rate mode
             self.tp = bool(self.csdw & (1 << 12))      # Bit stream type
             self.pc = int(self.csdw & 0b111111111111)  # Packet Count
+        else:
+            raise NotImplementedError(
+                'Video Format %s is reserved!' % self.format)
 
         # Track all chunks (IPHs and MPEG packets) as well as MPEG alone.
         self.all, self.mpeg = [], []
