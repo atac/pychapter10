@@ -5,7 +5,7 @@
 Options:
     -e CHANNEL..., --exclude CHANNEL...  Specify channels to ignore (csv) \
 [default: ].
-    -f --force    Overwrite existing files."""
+    -f --force                           Overwrite existing files."""
 
 import os
 

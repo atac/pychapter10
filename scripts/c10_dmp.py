@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Usage: c10_dmp.py <file> [options]
+"""usage: c10_dmp.py <file> [options]
 
 Options:
     -o OUT, --output OUT  The directory to place files [default: .].
@@ -8,7 +8,6 @@ Options:
 hex eg: 0x40) [default: ]
     -f, --force           Overwrite existing files."""
 
-from itertools import chain
 import atexit
 import os
 
@@ -51,7 +50,7 @@ if __name__ == '__main__':
 
         # Special case for video.
         if datatypes.format(packet.data_type)[0] == 8:
-            data = ''.join([p.data for p in packet.body.all])
+            data = ''.join([p.data for p in packet.body])
 
         else:
             data = packet.body.data[4:]
