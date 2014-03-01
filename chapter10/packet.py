@@ -91,6 +91,8 @@ class Packet(object):
             return False
         elif self.sync_pattern != 60197:
             return False
+        elif len(self.raw()) != self.packet_length:
+            return False
         return True
 
     def __len__(self):
