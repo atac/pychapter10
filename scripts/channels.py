@@ -15,7 +15,7 @@ if __name__ == '__main__':
 
     channels = {}
 
-    c = C10(sys.argv[1])
+    c = C10.load(sys.argv[1])
     for packet in c:
         if packet.channel_id not in channels:
             channels[packet.channel_id] = {
