@@ -42,4 +42,5 @@ def get_label(data_type):
     """Return a human readable format label."""
 
     t, f = format(data_type)
-    return '%s (format %i)' % (TYPES[t], f)
+    return '%s (format %i)' % ('unknown' if t > (len(TYPES) - 1)
+                               else TYPES[t], f)
