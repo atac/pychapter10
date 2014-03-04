@@ -1,4 +1,6 @@
 
+from array import array
+
 from .base import Base, Data
 
 
@@ -60,6 +62,10 @@ class Video(Base):
         self.all, self.mpeg = [], []
 
         data = self.data[:]
+        if getattr(self, 'ba', False):
+            data = array('H', data)
+            data.byteswap()
+            data = data.tostring()
         for i in range(len(data) / (188 + (8 if self.iph else 0))):
             if self.iph:
                 self.all.append(Data('IPH', data[:8]))
