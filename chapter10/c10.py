@@ -40,6 +40,8 @@ class C10(object):
                         self.packets.append(p)
                     else:
                         p.print_header()
+                elif not s:
+                    break
             except EOFError:
                 break
 
