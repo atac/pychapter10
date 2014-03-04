@@ -31,7 +31,7 @@ class Packet(object):
         header = file.read(24)
 
         # Make sure we're not reading beyond the file length.
-        if len(header.strip()) < 24:
+        if len(header) < 24:
             raise EOFError
 
         # Store the header sums (masked to be a consistent bit length).
