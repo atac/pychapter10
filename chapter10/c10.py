@@ -15,7 +15,7 @@ class C10(object):
 
         self.file = f
 
-        self.packets= []
+        self.packets = []
 
         if parse:
             self.parse_sequential()
@@ -32,17 +32,14 @@ class C10(object):
         while True:
             try:
                 pos = self.file.tell()
-                s = self.file.read(1024)
+                s = self.file.read(102400)
                 if '\x25\xeb' in s:
-                    i = pos + s.index('\x25\xeb')
-                    self.file.seek(i)
+                    self.file.seek(pos + s.find('\x25\xeb'))
                     p = Packet(self.file)
                     if p.check():
                         self.packets.append(p)
                     else:
-                        self.file.seek(pos + 2)
-                if not s:
-                    break
+                        p.print_header()
             except EOFError:
                 break
 
