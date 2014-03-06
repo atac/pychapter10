@@ -28,7 +28,7 @@ if __name__ == '__main__':
         os.makedirs(args['--output'])
 
     out = {}
-    for packet in C10(args['<file>']):
+    for packet in C10(args['<file>'], False):
         if types and packet.data_type not in types:
             continue
 
@@ -50,10 +50,9 @@ if __name__ == '__main__':
 
         # Special case for video.
         if datatypes.format(packet.data_type)[0] == 8:
-            data = ''.join([p.data for p in packet.body])
-
+            data = ''.join([p.data for p in packet.body.mpeg])
         else:
-            data = packet.body.data[4:]
+            data = packet.body.data
 
         # Write out raw packet body.
         out[filename].write(data)
