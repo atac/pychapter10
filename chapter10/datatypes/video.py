@@ -62,16 +62,16 @@ class Video(Base):
         self.all, self.mpeg = [], []
 
         data = self.data[:]
-        if getattr(self, 'ba', False):
-            data = array('H', data)
-            data.byteswap()
-            data = data.tostring()
+
         for i in range(len(data) / (188 + (8 if self.iph else 0))):
             if self.iph:
                 self.all.append(Data('IPH', data[:8]))
                 data = data[8:]
 
-            mpeg = Data('MPEG Packet', data[:188])
+            mpeg = array('H', data[:188])
+            if not getattr(self, 'ba', False):
+                mpeg.byteswap()
+            mpeg = Data('MPEG Packet', mpeg.tostring())
             self.all.append(mpeg)
             self.mpeg.append(mpeg)
             data = data[188:]
