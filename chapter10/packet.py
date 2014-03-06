@@ -58,12 +58,6 @@ class Packet(object):
         datatype = datatypes.get_handler(self.data_type)
         self.body = datatype(self)
 
-        # Skip the packet trailer.
-        trailer = self.packet_length - 24 - self.data_length
-        if self.flags & (1 << 7):
-            trailer -= 12
-        file.seek(trailer, 1)
-
     def print_header(self):
         """Print out the header information."""
 
@@ -90,8 +84,6 @@ class Packet(object):
         if self.header_sums != self.header_checksum:
             return False
         elif self.sync_pattern != 60197:
-            return False
-        elif len(self.raw()) != self.packet_length:
             return False
         return True
 
