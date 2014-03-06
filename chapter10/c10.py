@@ -2,6 +2,8 @@ import atexit
 
 from packet import Packet
 
+BUFFER_SIZE = 100000
+
 
 class C10(object):
     """A Chapter 10 parser."""
@@ -54,7 +56,7 @@ class C10(object):
         """Find the next sync pattern and attempt to read a packet."""
 
         pos = self.file.tell()
-        s = self.file.read(102400)
+        s = self.file.read(BUFFER_SIZE)
         if '\x25\xeb' in s:
             self.file.seek(pos + s.find('\x25\xeb'))
             p = Packet(self.file)
