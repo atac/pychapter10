@@ -31,17 +31,7 @@ class C10(object):
 
         while True:
             try:
-                pos = self.file.tell()
-                s = self.file.read(102400)
-                if '\x25\xeb' in s:
-                    self.file.seek(pos + s.find('\x25\xeb'))
-                    p = Packet(self.file)
-                    if p.check():
-                        self.packets.append(p)
-                    else:
-                        p.print_header()
-                elif not s:
-                    break
+                self.packets.append(self.find_and_parse())
             except EOFError:
                 break
 
@@ -53,6 +43,29 @@ class C10(object):
                 self.packets.append(Packet(self.file))
             except EOFError:
                 break
+
+    def next(self):
+        try:
+            return self.find_and_parse()
+        except EOFError:
+            raise StopIteration
+
+    def find_and_parse(self):
+        """Find the next sync pattern and attempt to read a packet."""
+
+        pos = self.file.tell()
+        s = self.file.read(102400)
+        if '\x25\xeb' in s:
+            self.file.seek(pos + s.find('\x25\xeb'))
+            p = Packet(self.file)
+            if p.check():
+                return p
+
+        elif not s:
+            raise EOFError
+
+        # Keep calling until we get a result or end.
+        return self.find_and_parse()
 
     def __repr__(self):
         return '<C10: {} {} bytes {} packets>'.format(
@@ -66,4 +79,4 @@ class C10(object):
         return len(self.packets)
 
     def __iter__(self):
-        return iter(self.packets)
+        return self
