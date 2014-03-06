@@ -14,9 +14,13 @@ if __name__ == '__main__':
         raise SystemExit
 
     channels = {}
+    packets = 0
+    size = 0
 
-    c = C10.load(sys.argv[1])
+    c = C10(sys.argv[1], False)
     for packet in c:
+        size += packet.packet_length
+        packets += 1
         if packet.channel_id not in channels:
             channels[packet.channel_id] = {
                 'packets': 0, 'type': packet.data_type,
@@ -32,6 +36,6 @@ if __name__ == '__main__':
         print '-' * 80
 
     print 'Summary for %s:' % sys.argv[1]
-    print '    Size: %s bytes' % c.size
-    print '    Packets: %s' % len(c)
+    print '    Size: %s bytes' % size
+    print '    Packets: %s' % packets
     print '    Channels: %s' % len(channels)
