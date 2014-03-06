@@ -22,7 +22,7 @@ class Base(object):
         self.start = self.packet.file.tell()
 
         # Skip to the packet trailer.
-        packet.file.seek(self.packet.data_length, 1)
+        packet.file.seek(self.start + self.packet.data_length)
 
         from . import format
         self.type, self.format = format(self.packet.data_type)
