@@ -4,8 +4,10 @@
 
 Options:
     -o OUT, --output OUT  The directory to place files [default: .].
+    -c CHANNEL..., --channel CHANNEL...  Specify channels to include(csv).
+    -e CHANNEL..., --exclude CHANNEL...  Specify channels to ignore (csv).
     -t TYPE, --type TYPE  The types of data to export (csv, may be decimal or \
-hex eg: 0x40) [default: ]
+hex eg: 0x40)
     -f, --force           Overwrite existing files."""
 
 import atexit
@@ -15,22 +17,18 @@ from docopt import docopt
 
 from chapter10 import C10, datatypes
 
+from walk import walk_packets
+
 
 if __name__ == '__main__':
     args = docopt(__doc__)
-
-    # Parse types (if given) into ints.
-    types = [t.strip() for t in args['--type'].split(',') if t.strip()]
-    types = [int(t, 16) if t.startswith('0x') else int(t) for t in types]
 
     # Ensure OUT exists.
     if not os.path.exists(args['--output']):
         os.makedirs(args['--output'])
 
     out = {}
-    for packet in C10(args['<file>']):
-        if types and packet.data_type not in types:
-            continue
+    for packet in walk_packets(C10(args['<file>']), args):
 
         filename = os.path.join(args['--output'], str(packet.channel_id))
 
