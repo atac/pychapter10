@@ -5,7 +5,7 @@ def walk_packets(c10, args={}):
 
     # Apply defaults.
     args['--type'] = args.get('--type', '') or ''
-    args['--channel'] = args.get('--channel', 'all') or 'all'
+    args['--channel'] = args.get('--channel', '') or ''
     args['--exclude'] = args.get('--exclude', '') or ''
 
     # Parse types (if given) into ints.
