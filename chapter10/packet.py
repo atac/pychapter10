@@ -45,7 +45,7 @@ class Packet(object):
         # Read the secondary header (if any).
         self.time = None
         self.secondary_sums, self.secondary_checksum = (None, None)
-        if self.flags & 0x7:
+        if self.flags & (1 << 7):
             secondary = file.read(12)
 
             # Store our sums for checking later on (masked for bit length).
@@ -60,7 +60,7 @@ class Packet(object):
 
         # Skip the packet trailer.
         trailer = self.packet_length - 24 - self.data_length
-        if self.flags & 0x7:
+        if self.flags & (1 << 7):
             trailer -= 12
         file.seek(trailer, 1)
 
