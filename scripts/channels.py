@@ -17,7 +17,7 @@ if __name__ == '__main__':
     packets = 0
     size = 0
 
-    c = C10(sys.argv[1], False)
+    c = C10(sys.argv[1])
     for packet in c:
         size += packet.packet_length
         packets += 1

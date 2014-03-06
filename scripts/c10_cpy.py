@@ -29,7 +29,7 @@ if __name__ == '__main__':
 
     exclude = [e.strip() for e in args['--exclude'].split(',')]
     with open(args['<dst>'], 'wb') as out:
-        for packet in C10(args['<src>'], False):
+        for packet in C10(args['<src>']):
             if str(packet.channel_id) in exclude:
                 continue
             elif types and packet.data_type not in types:

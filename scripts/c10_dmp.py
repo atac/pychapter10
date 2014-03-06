@@ -28,7 +28,7 @@ if __name__ == '__main__':
         os.makedirs(args['--output'])
 
     out = {}
-    for packet in C10(args['<file>'], False):
+    for packet in C10(args['<file>']):
         if types and packet.data_type not in types:
             continue
 

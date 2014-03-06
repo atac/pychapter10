@@ -8,7 +8,7 @@ BUFFER_SIZE = 100000
 class C10(object):
     """A Chapter 10 parser."""
 
-    def __init__(self, f, parse=True):
+    def __init__(self, f):
         """Takes a file or filename and reads packets."""
 
         if isinstance(f, str):
@@ -16,35 +16,6 @@ class C10(object):
             atexit.register(f.close)
 
         self.file = f
-
-        self.packets = []
-
-        if parse:
-            self.parse_sequential()
-
-    @classmethod
-    def load(cls, f):
-        c = cls(f, False)
-        c.parse_careful()
-        return c
-
-    def parse_careful(self):
-        """Search and parse packets one at a time."""
-
-        while True:
-            try:
-                self.packets.append(self.find_and_parse())
-            except EOFError:
-                break
-
-    def parse_sequential(self):
-        """Parse a file assuming valid packets in exact sequence."""
-
-        while True:
-            try:
-                self.packets.append(Packet(self.file))
-            except EOFError:
-                break
 
     def next(self):
         try:
@@ -57,14 +28,13 @@ class C10(object):
 
         pos = self.file.tell()
         s = self.file.read(BUFFER_SIZE)
-        if '\x25\xeb' in s:
+        if not s:
+            raise EOFError
+        elif '\x25\xeb' in s:
             self.file.seek(pos + s.find('\x25\xeb'))
             p = Packet(self.file)
             if p.check():
                 return p
-
-        elif not s:
-            raise EOFError
 
         # Keep calling until we get a result or end.
         return self.find_and_parse()
@@ -75,10 +45,10 @@ class C10(object):
 
     @property
     def size(self):
-        return sum(p.packet_length for p in self.packets)
+        return sum(p.packet_length for p in self)
 
     def __len__(self):
-        return len(self.packets)
+        return len([1 for i in self])
 
     def __iter__(self):
         return self
