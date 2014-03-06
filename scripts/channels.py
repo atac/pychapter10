@@ -1,24 +1,29 @@
 #!/usr/bin/env python
 
-"""Display channel information for an IRIG 106 Chapter 10 file."""
+"""usage: channels.py <file> [options]
 
-import sys
+Options:
+    -c CHANNEL..., --channel CHANNEL...  Specify channels to include(csv).
+    -e CHANNEL..., --exclude CHANNEL...  Specify channels to ignore (csv).
+    -t TYPE, --type TYPE  The types of data to show (csv, may be decimal or \
+hex eg: 0x40)."""
+
+from docopt import docopt
 
 from chapter10 import C10
 from chapter10.datatypes import get_label
 
+from walk import walk_packets
+
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        print 'usage: channels.py <file>'
-        raise SystemExit
+    args = docopt(__doc__)
 
     channels = {}
     packets = 0
     size = 0
 
-    c = C10(sys.argv[1])
-    for packet in c:
+    for packet in walk_packets(C10(args['<file>']), args):
         size += packet.packet_length
         packets += 1
         if packet.channel_id not in channels:
@@ -35,7 +40,7 @@ if __name__ == '__main__':
         print 'Packets: %s' % channel['packets']
         print '-' * 80
 
-    print 'Summary for %s:' % sys.argv[1]
+    print 'Summary for %s:' % args['<file>']
     print '    Size: %s bytes' % size
     print '    Packets: %s' % packets
     print '    Channels: %s' % len(channels)

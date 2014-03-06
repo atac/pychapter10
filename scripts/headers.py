@@ -1,13 +1,21 @@
 #!/usr/bin/env python
 
-import sys
+"""usage: headers.py <file> [options]
+
+Options:
+    -c CHANNEL..., --channel CHANNEL...  Specify channels to include(csv).
+    -e CHANNEL..., --exclude CHANNEL...  Specify channels to ignore (csv).
+    -t TYPE, --type TYPE  The types of data to show (csv, may be decimal or \
+hex eg: 0x40)."""
+
+from docopt import docopt
 
 from chapter10 import C10
 
-if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        print 'usage: headers.py <file>'
-        raise SystemExit
+from walk import walk_packets
 
-    for packet in C10(sys.argv[1]):
+if __name__ == '__main__':
+    args = docopt(__doc__)
+
+    for packet in walk_packets(C10(args['<file>']), args):
         packet.print_header()
