@@ -32,15 +32,29 @@ if __name__ == '__main__':
                 'id': packet.channel_id}
         channels[packet.channel_id]['packets'] += 1
 
+    print 'Channel ID      Data Type                                   Packets'
+    print '-' * 80
     for channel in channels.values():
-        print '-' * 80
-        print 'Channel ID: %s' % channel['id']
-        print 'Data Type: %s (%s)' % (get_label(channel['type']),
-                                      hex(channel['type']))
-        print 'Packets: %s' % channel['packets']
-        print '-' * 80
+        print ('Channel %s' % channel['id']).ljust(15),
+        print ('%s - %s' % (hex(channel['type']),
+                            get_label(channel['type']))).ljust(35),
+        print ('%s packets' % channel['packets']).rjust(20)
 
+    unit = 'bytes'
+    if size > 1024:
+        size = size / 1024
+        unit = 'kb'
+
+        if size > 1024:
+            size = size / 1024
+            unit = 'mb'
+
+            if size > 1024:
+                size = size / 1024
+                unit = 'gb'
+
+    print '-' * 80
     print 'Summary for %s:' % args['<file>']
-    print '    Size: %s bytes' % size
+    print '    Size: %s %s' % (size, unit)
     print '    Packets: %s' % packets
     print '    Channels: %s' % len(channels)
