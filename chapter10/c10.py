@@ -33,6 +33,7 @@ class C10(object):
         elif '\x25\xeb' in s:
             self.file.seek(pos + s.find('\x25\xeb'))
             p = Packet(self.file)
+            self.file.seek(pos + p.packet_length)
             if p.check():
                 return p
 
@@ -40,15 +41,7 @@ class C10(object):
         return self.find_and_parse()
 
     def __repr__(self):
-        return '<C10: {} {} bytes {} packets>'.format(
-            self.file.name, self.size, len(self))
-
-    @property
-    def size(self):
-        return sum(p.packet_length for p in self)
-
-    def __len__(self):
-        return len([1 for i in self])
+        return '<C10: {}>'.format(self.file.name)
 
     def __iter__(self):
         return self
