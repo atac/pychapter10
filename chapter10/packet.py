@@ -47,6 +47,8 @@ class Packet(object):
         self.secondary_sums, self.secondary_checksum = (None, None)
         if self.flags & (1 << 7):
             secondary = file.read(12)
+            if len(secondary) < 12:
+                raise EOFError
 
             # Store our sums for checking later on (masked for bit length).
             self.secondary_sums = sum(array('H', secondary)[:-1]) & 0xffff
