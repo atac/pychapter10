@@ -4,7 +4,8 @@ from .base import Base, Data
 
 class PCM(Base):
 
-    data_attrs = (
+    data_attrs = Base.data_attrs + (
+        'all',
         'frames',
         'iph',
         'ma',
@@ -12,9 +13,10 @@ class PCM(Base):
         'mafs',
         'mifs',
         'align',
-        'through',
+        'throughput',
         'packed',
         'unpacked',
+        's_offset',
     )
 
     def parse(self):
@@ -36,6 +38,8 @@ class PCM(Base):
         self.unpacked = bool(self.csdw & (1 << 18))    # Unpacked mode
         self.s_offset = int(self.csdw & 262143)        # Sync offset
 
+        self.frames, self.all = [], []
+
         # Throughput basically means we don't need to do anything.
         if self.throughput:
             return
@@ -51,7 +55,6 @@ class PCM(Base):
 
             frame_size += iph
 
-        self.frames, self.all = [], []
         data = self.data[:]
         for i in range(len(data) / frame_size):
             if self.iph:
