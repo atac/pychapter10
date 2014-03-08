@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""usage: channels.py <file> [options]
+"""usage: c10_stat.py <file> [options]
 
 Options:
     -c CHANNEL..., --channel CHANNEL...  Specify channels to include(csv).
