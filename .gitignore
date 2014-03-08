@@ -1,3 +1,5 @@
 *.pyc
 Chapter10.egg-info
 *.c10
+build
+dist
