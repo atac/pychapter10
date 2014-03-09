@@ -22,6 +22,11 @@ try:
         options=dict(
             py2exe=dict(
                 packages=['chapter10'],
+                excludes=['_ssl', '_ctypes', '_hashlib', '_socket', 'bz2',
+                          'select', 'unicodedata'],
+                dll_excludes=['msvcr71.dll'],
+                ascii=True,
+                optimize=2,
             )
         )
     ))
