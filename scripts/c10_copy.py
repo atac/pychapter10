@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
-"""usage: c10_cpy.py <src> <dst> [options]
+"""usage: c10_copy.py <src> <dst> [options]
 
 Options:
     -c CHANNEL..., --channel CHANNEL...  Specify channels to include (csv).
     -e CHANNEL..., --exclude CHANNEL...  Specify channels to ignore (csv).
-    -t TYPE, --type TYPE  The types of data to export (csv, may be decimal or \
-hex eg: 0x40)
+    -t TYPE, --type TYPE                 The types of data to export (csv, may\
+ be decimal or hex eg: 0x40)
     -f --force                           Overwrite existing files."""
 
 import os

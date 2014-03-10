@@ -5,8 +5,8 @@
 Options:
     -c CHANNEL..., --channel CHANNEL...  Specify channels to include(csv).
     -e CHANNEL..., --exclude CHANNEL...  Specify channels to ignore (csv).
-    -t TYPE, --type TYPE  The types of data to show (csv, may be decimal or \
-hex eg: 0x40)."""
+    -t TYPE, --type TYPE                 The types of data to show (csv, may \
+be decimal or hex eg: 0x40)."""
 
 from docopt import docopt
 
