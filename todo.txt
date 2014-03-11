@@ -1,3 +1,10 @@
 
-datatypes/computer.py
-    Finish formats 2 and 3
+datatypes
+    computer.py - Finish formats 2 and 3
+    time.py - Add time word parsing
+    ethernet.py - Rewrite
+
+scripts
+    c10_check.py - Validator
+
+tests - better coverage for datatypes and top-level package
