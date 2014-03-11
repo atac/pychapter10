@@ -1,13 +1,14 @@
-from base import Base
-from computer import Computer
-from video import Video
-from ethernet import Ethernet
-from pcm import PCM
+from .base import Base
+from .computer import Computer
+from .time import Time
+from .video import Video
+from .ethernet import Ethernet
+from .pcm import PCM
 
 # Top level data types.
 TYPES = (('Computer Generated', Computer),
          ('PCM', PCM),
-         ('Time', Base),
+         ('Time', Time),
          ('Mil-STD-1553', Base),
          ('Analog', Base),
          ('Discrete', Base),
