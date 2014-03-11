@@ -1,6 +1,7 @@
 from .base import Base
 from .computer import Computer
 from .time import Time
+from .ms1553 import MS1553
 from .video import Video
 from .ethernet import Ethernet
 from .pcm import PCM
@@ -9,7 +10,7 @@ from .pcm import PCM
 TYPES = (('Computer Generated', Computer),
          ('PCM', PCM),
          ('Time', Time),
-         ('Mil-STD-1553', Base),
+         ('Mil-STD-1553', MS1553),
          ('Analog', Base),
          ('Discrete', Base),
          ('Message', Base),
