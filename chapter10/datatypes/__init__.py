@@ -1,23 +1,24 @@
 from base import Base
+from computer import Computer
 from video import Video
 from ethernet import Ethernet
 from pcm import PCM
 
 # Top level data types.
-TYPES = ('Computer Generated',
-         'PCM',
-         'Time',
-         'Mil-STD-1553',
-         'Analog',
-         'Discrete',
-         'Message',
-         'ARINC 429',
-         'Video',
-         'Image',
-         'UART',
-         'IEEE-1394',
-         'Parallel',
-         'Ethernet')
+TYPES = (('Computer Generated', Computer),
+         ('PCM', PCM),
+         ('Time', Base),
+         ('Mil-STD-1553', Base),
+         ('Analog', Base),
+         ('Discrete', Base),
+         ('Message', Base),
+         ('ARINC 429', Base),
+         ('Video', Video),
+         ('Image', Base),
+         ('UART', Base),
+         ('IEEE-1394', Base),
+         ('Parallel', Base),
+         ('Ethernet', Ethernet))
 
 
 def format(data_type):
@@ -31,11 +32,7 @@ def get_handler(data_type):
     """Find an appropriate parser for a given data type."""
 
     t, f = format(data_type)
-    if t == 1:
-        return PCM
-    elif t == 8:
-        return Video
-    return Base
+    return TYPES[t][1]
 
 
 def get_label(data_type):
@@ -43,4 +40,4 @@ def get_label(data_type):
 
     t, f = format(data_type)
     return '%s (format %i)' % ('unknown' if t > (len(TYPES) - 1)
-                               else TYPES[t], f)
+                               else TYPES[t][0], f)

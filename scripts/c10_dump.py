@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 
-"""usage: c10_dmp.py <file> [options]
+"""usage: c10_dump.py <file> [options]
 
 Options:
-    -o OUT, --output OUT  The directory to place files [default: .].
+    -o OUT, --output OUT                 The directory to place files \
+[default: .].
     -c CHANNEL..., --channel CHANNEL...  Specify channels to include(csv).
     -e CHANNEL..., --exclude CHANNEL...  Specify channels to ignore (csv).
-    -t TYPE, --type TYPE  The types of data to export (csv, may be decimal or \
-hex eg: 0x40)
-    -f, --force           Overwrite existing files."""
+    -t TYPE, --type TYPE                 The types of data to export (csv, may\
+ be decimal or hex eg: 0x40)
+    -f, --force                          Overwrite existing files."""
 
 import atexit
 import os
@@ -29,12 +30,16 @@ if __name__ == '__main__':
     out = {}
     for packet in walk_packets(C10(args['<file>']), args):
 
+        # Get filename
         filename = os.path.join(args['--output'], str(packet.channel_id))
 
-        if datatypes.format(packet.data_type)[0] == 8:
+        t, f = datatypes.format(packet.data_type)
+        if t == 0 and f == 1:
+            filename += packet.body.frmt == 0 and '.tmats' or '.xml'
+        elif t == 8:
             filename += '.mpg'
 
-        # Ensure an output file is open (and will close) for a given channel.
+        # Ensure an file is open (and will close) for a given channel.
         if filename not in out:
 
             # Don't overwrite without explicit direction.
@@ -45,8 +50,12 @@ if __name__ == '__main__':
             out[filename] = open(filename, 'wb')
             atexit.register(out[filename].close)
 
-        # Special case for video.
-        if datatypes.format(packet.data_type)[0] == 8:
+        # Only write TMATS once.
+        elif t == 0 and f == 1:
+            continue
+
+        # Do any data selection.
+        if t == 8:
             data = ''.join([p.data for p in packet.body.mpeg])
         else:
             data = packet.body.data
