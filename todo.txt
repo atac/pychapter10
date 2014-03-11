@@ -2,6 +2,7 @@
 datatypes
     computer.py - Finish formats 2 and 3
     time.py - Add time word parsing
+    ms1553.py - Finish message parsing
     ethernet.py - Rewrite
 
 scripts
