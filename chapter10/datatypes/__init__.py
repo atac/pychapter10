@@ -8,6 +8,7 @@ from .discrete import Discrete
 from .message import Message
 from .arinc429 import ARINC429
 from .video import Video
+from .image import Image
 #from .ethernet import Ethernet
 
 # Top level data types.
@@ -20,7 +21,7 @@ TYPES = (('Computer Generated', Computer),
          ('Message', Message),
          ('ARINC 429', ARINC429),
          ('Video', Video),
-         ('Image', Base),
+         ('Image', Image),
          ('UART', Base),
          ('IEEE-1394', Base),
          ('Parallel', Base),
