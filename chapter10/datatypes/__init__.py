@@ -4,6 +4,7 @@ from .time import Time
 from .ms1553 import MS1553
 from .analog import Analog
 from .discrete import Discrete
+from .arinc429 import ARINC429
 from .video import Video
 from .ethernet import Ethernet
 from .pcm import PCM
@@ -16,7 +17,7 @@ TYPES = (('Computer Generated', Computer),
          ('Analog', Analog),
          ('Discrete', Discrete),
          ('Message', Base),
-         ('ARINC 429', Base),
+         ('ARINC 429', ARINC429),
          ('Video', Video),
          ('Image', Base),
          ('UART', Base),
