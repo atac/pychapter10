@@ -4,6 +4,7 @@ from .time import Time
 from .ms1553 import MS1553
 from .analog import Analog
 from .discrete import Discrete
+from .message import Message
 from .arinc429 import ARINC429
 from .video import Video
 from .ethernet import Ethernet
@@ -16,7 +17,7 @@ TYPES = (('Computer Generated', Computer),
          ('Mil-STD-1553', MS1553),
          ('Analog', Analog),
          ('Discrete', Discrete),
-         ('Message', Base),
+         ('Message', Message),
          ('ARINC 429', ARINC429),
          ('Video', Video),
          ('Image', Base),
