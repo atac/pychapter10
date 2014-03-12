@@ -28,3 +28,9 @@ class ARINC429(Base):
             data = data[4:]
             self.words.append(words)
             self.all.append(words)
+
+    def __iter__(self):
+        return iter(self.all)
+
+    def __len__(self):
+        return len(self.all)

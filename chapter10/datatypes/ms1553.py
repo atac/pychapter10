@@ -67,3 +67,9 @@ class MS1553(Base):
             data = data[iph.length:]
             self.messages.append(message)
             self.all.append(message)
+
+    def __iter__(self):
+        return iter(self.all)
+
+    def __len__(self):
+        return len(self.all)

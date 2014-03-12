@@ -66,3 +66,9 @@ class Image(Base):
                     self.all.append(segment)
                 except IndexError:
                     break
+
+    def __iter__(self):
+        return iter(self.all)
+
+    def __len__(self):
+        return len(self.all)

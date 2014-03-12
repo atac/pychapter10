@@ -35,3 +35,9 @@ class Discrete(Base):
             data = data[4:]
             self.events.append(event)
             self.all.append(event)
+
+    def __iter__(self):
+        return iter(self.all)
+
+    def __len__(self):
+        return len(self.all)
