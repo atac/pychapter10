@@ -23,9 +23,10 @@ class Message(Base):
         self.counter = int(self.csdw & 0xf)
 
         # Type: complete
-        data = self.data[:]
-        self.messages, self.all = [], []
         if not self.type:
+            data = self.data[:]
+            self.messages, self.all = [], []
+
             for i in range(self.counter):
                 ipth = Data('IPTH', data[:8])
                 data = data[8:]
