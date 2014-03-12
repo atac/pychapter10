@@ -3,6 +3,7 @@ from .computer import Computer
 from .time import Time
 from .ms1553 import MS1553
 from .analog import Analog
+from .discrete import Discrete
 from .video import Video
 from .ethernet import Ethernet
 from .pcm import PCM
@@ -13,7 +14,7 @@ TYPES = (('Computer Generated', Computer),
          ('Time', Time),
          ('Mil-STD-1553', MS1553),
          ('Analog', Analog),
-         ('Discrete', Base),
+         ('Discrete', Discrete),
          ('Message', Base),
          ('ARINC 429', Base),
          ('Video', Video),
