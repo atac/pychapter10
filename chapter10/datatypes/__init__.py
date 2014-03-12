@@ -2,6 +2,7 @@ from .base import Base
 from .computer import Computer
 from .time import Time
 from .ms1553 import MS1553
+from .analog import Analog
 from .video import Video
 from .ethernet import Ethernet
 from .pcm import PCM
@@ -11,7 +12,7 @@ TYPES = (('Computer Generated', Computer),
          ('PCM', PCM),
          ('Time', Time),
          ('Mil-STD-1553', MS1553),
-         ('Analog', Base),
+         ('Analog', Analog),
          ('Discrete', Base),
          ('Message', Base),
          ('ARINC 429', Base),
@@ -20,7 +21,7 @@ TYPES = (('Computer Generated', Computer),
          ('UART', Base),
          ('IEEE-1394', Base),
          ('Parallel', Base),
-         ('Ethernet', Ethernet))
+         ('Ethernet', Base))
 
 
 def format(data_type):

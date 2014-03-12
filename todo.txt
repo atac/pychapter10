@@ -3,6 +3,7 @@ datatypes
     computer.py - Finish formats 2 and 3
     time.py - Add time word parsing
     ms1553.py - Finish message parsing
+    analog.py - Finish sample parsing (no data to test with)
     ethernet.py - Rewrite
 
 scripts
