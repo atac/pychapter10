@@ -42,7 +42,7 @@ class MS1553(Base):
     def parse(self):
         Base.parse(self)
 
-        if self.format == 0:
+        if self.format == 0 or self.format > 2:
             raise NotImplementedError('1553 Format %s is reserved!'
                                       % self.format)
 
