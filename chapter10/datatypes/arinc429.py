@@ -15,7 +15,7 @@ class ARINC429(Base):
             raise NotImplementedError('ARINC-429 format %s is reserved!'
                                       % self.format)
 
-        self.msg_count = int(self.csdw & 0xf)
+        self.msg_count = int(self.csdw & 0xffff)
 
         data = self.data[:]
         self.all, self.words = [], []

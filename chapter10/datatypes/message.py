@@ -20,7 +20,7 @@ class Message(Base):
                                       % self.format)
 
         self.type = int(self.csdw >> 16 & 0b11)
-        self.counter = int(self.csdw & 0xf)
+        self.counter = int(self.csdw & 0xffff)
 
         # Type: complete
         if not self.type:
@@ -36,7 +36,7 @@ class Message(Base):
                 data = data[4:]
                 self.all.append(ipdh)
 
-                length = int(struct.unpack('I', ipdh.data)[0] & 0xf)
+                length = int(struct.unpack('I', ipdh.data)[0] & 0xffff)
                 msg = Data('Message Data', data[length:])
                 data = data[length:]
                 self.messages.append(msg)

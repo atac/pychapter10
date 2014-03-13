@@ -27,7 +27,7 @@ class I1394(Base):
         if self.format == 0:
             self.pbt = int(self.csdw >> 29 & 0b111)  # Packet Body Type
             self.sy = int(self.csdw >> 25 & 0b1111)  # Synchronization Code
-            self.tc = int(self.csdw & 0xf)           # Transaction Count
+            self.tc = int(self.csdw & 0xffff)           # Transaction Count
 
             # Bus Status
             if self.pbt == 0:
@@ -53,7 +53,7 @@ class I1394(Base):
                     self.transactions.append(trans)
 
         elif self.format == 1:
-            self.ipc = int(self.csdw & 0xf)  # Intra Packet Count
+            self.ipc = int(self.csdw & 0xffff)  # Intra Packet Count
 
             while True:
                 try:
