@@ -10,6 +10,7 @@ from .arinc429 import ARINC429
 from .video import Video
 from .image import Image
 from .uart import UART
+from .i1394 import I1394
 #from .ethernet import Ethernet
 
 # Top level data types.
@@ -24,7 +25,7 @@ TYPES = (('Computer Generated', Computer),
          ('Video', Video),
          ('Image', Image),
          ('UART', UART),
-         ('IEEE-1394', Base),
+         ('IEEE-1394', I1394),
          ('Parallel', Base),
          ('Ethernet', Base))
 
