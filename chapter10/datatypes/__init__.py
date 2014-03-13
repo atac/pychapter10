@@ -11,6 +11,7 @@ from .video import Video
 from .image import Image
 from .uart import UART
 from .i1394 import I1394
+from .parallel import Parallel
 #from .ethernet import Ethernet
 
 # Top level data types.
@@ -26,7 +27,7 @@ TYPES = (('Computer Generated', Computer),
          ('Image', Image),
          ('UART', UART),
          ('IEEE-1394', I1394),
-         ('Parallel', Base),
+         ('Parallel', Parallel),
          ('Ethernet', Base))
 
 
