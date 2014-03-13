@@ -26,6 +26,9 @@ class Ethernet(Base):
             data = self.data[:]
             self.all, self.frames = [], []
             for i in range(self.frame_count):
+                if len(data) < 12:
+                    break
+
                 ipt = Data('Timestamp', data[:8])
                 data = data[8:]
                 self.all.append(ipt)
@@ -34,7 +37,6 @@ class Ethernet(Base):
                 data = data[4:]
                 self.all.append(iph)
 
-                print len(iph.data)
                 iph = struct.unpack('I', iph.data)[0]
                 length = int(iph & 0x1fff)
 
