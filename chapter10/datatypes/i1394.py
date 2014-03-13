@@ -11,6 +11,7 @@ class I1394(Base):
         'pbt',
         'sy',
         'tc',
+        'ipc',
     )
 
     def parse(self):
