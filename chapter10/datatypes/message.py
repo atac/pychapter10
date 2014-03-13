@@ -6,7 +6,7 @@ from .base import Base, Data
 
 class Message(Base):
     data_attrs = Base.data_attrs + (
-        'type',
+        'packet_type',
         'counter',
         'messages',
         'all',
@@ -19,28 +19,30 @@ class Message(Base):
             raise NotImplementedError('Message format %s is reserved!'
                                       % self.format)
 
-        self.type = int(self.csdw >> 16 & 0b11)
+        self.packet_type = int(self.csdw >> 16 & 0b11)
         self.counter = int(self.csdw & 0xffff)
 
         # Type: complete
-        if not self.type:
+        if not self.packet_type:
             data = self.data[:]
             self.messages, self.all = [], []
 
             for i in range(self.counter):
+
                 ipth = Data('IPTH', data[:8])
                 data = data[8:]
-                self.all.append(ipth)
 
                 ipdh = Data('IPDH', data[:4])
                 data = data[4:]
-                self.all.append(ipdh)
 
-                length = int(struct.unpack('I', ipdh.data)[0] & 0xffff)
+                iph = int(struct.unpack('I', ipdh.data)[0])
+                length = int(iph & 0xffff)
+                if len(data) < length:
+                    break
                 msg = Data('Message Data', data[length:])
                 data = data[length:]
                 self.messages.append(msg)
-                self.all.append(msg)
+                self.all += [ipth, ipdh, msg]
 
     def __iter__(self):
         return iter(self.all)
