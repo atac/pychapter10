@@ -1,5 +1,5 @@
 
-confirm 0xffff masks are correct
+Confirm 0xffff masks are correct
 
 datatypes
     computer.py - Finish formats 2 and 3
@@ -7,8 +7,9 @@ datatypes
     ms1553.py - Finish message parsing
     analog.py - Finish sample parsing (no data to test with)
     ethernet.py - Implement format 1
+    Implement TSPI/CTS parser
 
 scripts
     c10_check.py - Validator
 
-tests - better coverage for datatypes and top-level package
+tests - Better coverage for datatypes and top-level package
