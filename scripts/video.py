@@ -6,6 +6,8 @@ from PyQt4 import QtGui
 from mplayer.qt4 import QPlayerView
 import mplayer
 
+#from ui import Ui_MainWindow
+
 
 # Tell mplayer.py where mplayer actually is.
 mplayer.Player.exec_path = os.path.join(os.path.dirname(__file__),
@@ -14,15 +16,14 @@ mplayer.Player.exec_path = os.path.join(os.path.dirname(__file__),
 SCREEN_SIZE = (640, 480)
 
 
-class App(QtGui.QApplication):
+class Main(QtGui.QDialog):
     def __init__(self):
-        super(App, self).__init__([])
+        super(Main, self).__init__()
 
-        self.window = QtGui.QDialog()
-        self.window.setWindowTitle('CH10 Video Player')
+        self.setWindowTitle('CH10 Video Player')
 
         self.layout = QtGui.QGridLayout()
-        self.window.setLayout(self.layout)
+        self.setLayout(self.layout)
 
         self.videos = []
         for path in os.listdir('tmp'):
@@ -34,11 +35,11 @@ class App(QtGui.QApplication):
         else:
             height = SCREEN_SIZE[1]
             width = SCREEN_SIZE[0] * len(self.videos)
-        self.window.resize(width, height)
+        self.resize(width, height)
 
     def add_video(self, path):
-        v = QPlayerView(self.window, ('-nosound',))
-        v.eof.connect(self.closeAllWindows)
+        v = QPlayerView(self, ('-nosound',))
+        #v.eof.connect(self.closeAllWindows)
         v.resize(*SCREEN_SIZE)
         v.player.introspect()
         v.player.loadfile(path)
@@ -54,11 +55,10 @@ class App(QtGui.QApplication):
         self.layout.addWidget(v, x, y)
         self.videos.append(v)
 
-    def main(self):
-        self.window.show()
-        for v in self.videos:
-            v.player.pause()
-        sys.exit(self.exec_())
-
 if __name__ == '__main__':
-    App().main()
+    app = QtGui.QApplication([])
+    main = Main()
+    main.show()
+    for v in main.videos:
+        v.player.pause()
+    sys.exit(app.exec_())
