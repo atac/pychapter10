@@ -13,38 +13,55 @@ from ui import Ui_MainWindow
 mplayer.Player.exec_path = os.path.join(os.path.dirname(__file__),
                                         'mplayer-svn-36986', 'mplayer.exe')
 
-SCREEN_SIZE = (640, 480)
+INITIAL_RESOLUTION = (320, 240)
+TOOLBAR_OFFSET = 75
 
 
 class Main(QtGui.QMainWindow, Ui_MainWindow):
+    playing = False
+
     def __init__(self):
         super(Main, self).__init__(None)
 
         self.setupUi(self)
 
-        self.setWindowTitle('CH10 Video Player')
-
-        #self.grid = QtGui.QGridLayout(self.top)
-
+        # Load videos.
         self.videos = []
         for path in os.listdir('tmp'):
             self.add_video('tmp/%s' % path)
+        #self.adjust_size()
 
-        if len(self.videos) > 3:
-            width = SCREEN_SIZE[0] * 3
-            height = SCREEN_SIZE[1] * (len(self.videos) / 3)
-        else:
-            height = SCREEN_SIZE[1]
-            width = SCREEN_SIZE[0] * len(self.videos)
-        self.resize(width, height)
-        self.gridLayoutWidget.setGeometry(QtCore.QRect(0, 0, width, height))
+        # Connect events.
+        self.play_btn.clicked.connect(self.play)
+
+    def resizeEvent(self, e=None):
+        """Resize elements to match changing window size."""
+
+        super(Main, self).resizeEvent(e)
+
+        # Extend primary layout to match the window.
+        geo = self.geometry()
+        height, width = geo.height(), geo.width()
+        self.verticalLayoutWidget.setGeometry(
+            QtCore.QRect(0, 0, width, height))
+
+        # Resize the video layout to fill all but the toolbar.
+        geo = self.grid.geometry()
+        height, width = geo.height(), geo.width()
+        height -= TOOLBAR_OFFSET
+        self.grid.setGeometry(QtCore.QRect(0, 0, width, height))
+
+        # Resize and reposition the toolbar.
+        geo = self.playback.geometry()
+        self.playback.setGeometry(
+            QtCore.QRect(0, height, geo.width(), TOOLBAR_OFFSET))
 
     def add_video(self, path):
-        v = QPlayerView(self.gridLayoutWidget, ('-nosound',))
-        #v.eof.connect(self.closeAllWindows)
-        v.resize(*SCREEN_SIZE)
-        v.player.introspect()
-        v.player.loadfile(path)
+        """Add a video widget for a file."""
+
+        vid = QPlayerView(self.verticalLayoutWidget, ('-nosound',))
+        vid.player.introspect()
+        vid.player.loadfile(path)
         x, y = 0, self.grid.rowCount() - 1
         if y < 0:
             y = 0
@@ -54,13 +71,23 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
                 y += 1
                 break
             x += 1
-        self.grid.addWidget(v, x, y)
-        self.videos.append(v)
+        self.grid.addWidget(vid, x, y)
+        self.videos.append(vid)
+
+    def play(self):
+        """Play or pause all videos."""
+
+        if self.playing:
+            self.play_btn.setText('Play')
+            self.playing = False
+        else:
+            self.play_btn.setText('Pause')
+            self.playing = True
+        for vid in main.videos:
+            vid.player.pause()
 
 if __name__ == '__main__':
     app = QtGui.QApplication([])
     main = Main()
     main.show()
-    for v in main.videos:
-        v.player.pause()
     sys.exit(app.exec_())
