@@ -43,18 +43,7 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         geo = self.geometry()
         height, width = geo.height(), geo.width()
         self.verticalLayoutWidget.setGeometry(
-            QtCore.QRect(0, 0, width, height))
-
-        # Resize the video layout to fill all but the toolbar.
-        geo = self.grid.geometry()
-        height, width = geo.height(), geo.width()
-        height -= TOOLBAR_OFFSET
-        self.grid.setGeometry(QtCore.QRect(0, 0, width, height))
-
-        # Resize and reposition the toolbar.
-        geo = self.playback.geometry()
-        self.playback.setGeometry(
-            QtCore.QRect(0, height, geo.width(), TOOLBAR_OFFSET))
+            QtCore.QRect(0, 0, width, height - TOOLBAR_OFFSET))
 
     def add_video(self, path):
         """Add a video widget for a file."""
