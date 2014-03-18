@@ -35,4 +35,8 @@ try:
 except ImportError:
     pass
 
+import platform
+if platform.architecture()[0] == '64bit':
+    del kwargs['options']['py2exe']['bundle_files']
+
 setup(**kwargs)
