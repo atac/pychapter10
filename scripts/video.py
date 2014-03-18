@@ -10,12 +10,16 @@ from mplayer.qt4 import QPlayerView
 import mplayer
 
 from chapter10 import C10, datatypes
-from ui import Ui_MainWindow
+from ui.video import Ui_MainWindow
 
 
 # Tell mplayer.py where mplayer actually is.
-mplayer.Player.exec_path = os.path.join(os.path.dirname(__file__),
-                                        'mplayer.exe')
+try:
+    basedir = os.path.dirname(__file__)
+except NameError:
+    basedir = os.path.dirname(sys.executable)
+mplayer.Player.exec_path = os.path.join(basedir, 'mplayer.exe')
+print mplayer.Player.exec_path
 mplayer.Player.introspect()
 
 INITIAL_RESOLUTION = (320, 240)
@@ -73,10 +77,8 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
 
             progress.close()
 
-            print os.listdir(tmp)
             self.videos = []
             for path in os.listdir(tmp):
-                print path
                 self.add_video(os.path.join(tmp, path))
                 self.audio.addItem(os.path.basename(path))
 

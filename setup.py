@@ -17,15 +17,17 @@ try:
     kwargs.update(dict(
         console=['scripts/c10_stat.py',
                  'scripts/c10_dump.py',
-                 'scripts/c10_copy.py'],
+                 'scripts/c10_copy.py',
+                 'scripts/video.py'],
+        data_files=[('', ['scripts/mplayer.exe'])],
         zipfile=None,
         options=dict(
             py2exe=dict(
                 packages=['chapter10'],
-                excludes=['_ssl', '_ctypes', '_hashlib', '_socket', 'bz2',
-                          'select', 'unicodedata'],
+                includes=['PyQt4', 'sip', 'ui', 'encodings.utf_8'],
                 dll_excludes=['msvcr71.dll'],
                 ascii=True,
+                bundle_files=2,
                 optimize=2,
             )
         )
