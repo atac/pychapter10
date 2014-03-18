@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'scripts\video.ui'
 #
-# Created: Mon Mar 17 18:29:41 2014
+# Created: Tue Mar 18 10:24:13 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -35,7 +35,7 @@ class Ui_MainWindow(object):
         self.centralwidget.setSizePolicy(sizePolicy)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
         self.verticalLayoutWidget = QtGui.QWidget(self.centralwidget)
-        self.verticalLayoutWidget.setGeometry(QtCore.QRect(-1, -1, 891, 651))
+        self.verticalLayoutWidget.setGeometry(QtCore.QRect(0, 0, 891, 651))
         self.verticalLayoutWidget.setObjectName(_fromUtf8("verticalLayoutWidget"))
         self.verticalLayout = QtGui.QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setMargin(0)
@@ -43,9 +43,12 @@ class Ui_MainWindow(object):
         self.grid = QtGui.QGridLayout()
         self.grid.setObjectName(_fromUtf8("grid"))
         self.verticalLayout.addLayout(self.grid)
-        self.playback = QtGui.QHBoxLayout()
-        self.playback.setSizeConstraint(QtGui.QLayout.SetDefaultConstraint)
+        self.playback = QtGui.QVBoxLayout()
         self.playback.setObjectName(_fromUtf8("playback"))
+        self.horizontalSlider = QtGui.QSlider(self.verticalLayoutWidget)
+        self.horizontalSlider.setOrientation(QtCore.Qt.Horizontal)
+        self.horizontalSlider.setObjectName(_fromUtf8("horizontalSlider"))
+        self.playback.addWidget(self.horizontalSlider)
         self.play_btn = QtGui.QPushButton(self.verticalLayoutWidget)
         self.play_btn.setObjectName(_fromUtf8("play_btn"))
         self.playback.addWidget(self.play_btn)
@@ -74,7 +77,6 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "CH10 Video Player", None))
         self.play_btn.setText(_translate("MainWindow", "Play", None))
-        self.play_btn.setShortcut(_translate("MainWindow", "Space", None))
         self.menuFile.setTitle(_translate("MainWindow", "File", None))
         self.menuPlayback.setTitle(_translate("MainWindow", "Playback", None))
         self.actionOpen.setText(_translate("MainWindow", "Open", None))

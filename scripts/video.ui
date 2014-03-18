@@ -23,8 +23,8 @@
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>-1</x>
-      <y>-1</y>
+      <x>0</x>
+      <y>0</y>
       <width>891</width>
       <height>651</height>
      </rect>
@@ -34,17 +34,18 @@
       <layout class="QGridLayout" name="grid"/>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="playback">
-       <property name="sizeConstraint">
-        <enum>QLayout::SetDefaultConstraint</enum>
-       </property>
+      <layout class="QVBoxLayout" name="playback">
+       <item>
+        <widget class="QSlider" name="horizontalSlider">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
        <item>
         <widget class="QPushButton" name="play_btn">
          <property name="text">
           <string>Play</string>
-         </property>
-         <property name="shortcut">
-          <string>Space</string>
          </property>
         </widget>
        </item>
