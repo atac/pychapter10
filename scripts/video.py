@@ -38,10 +38,14 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         # Connect events.
         self.play_btn.clicked.connect(self.play)
         self.ticker.tick.connect(self.tick)
+        self.slider.sliderMoved.connect(self.seek)
+
+    def seek(self, to):
+        for vid in self.videos:
+            vid.seek(to, 1)
 
     def tick(self):
-        #self.videos[0].seek(50, 1)  # Percentage seek
-        print self.videos[0].time_pos, self.videos[0].length
+        self.slider.setValue(self.videos[0].percent_pos or 0)
 
     def resizeEvent(self, e=None):
         """Resize elements to match changing window size."""
@@ -58,10 +62,10 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         """Add a video widget for a file."""
 
         vid = QPlayerView(self.verticalLayoutWidget)
-        vid._player = mplayer.Player(
-            ('-msglevel', 'global=6', '-fixed-vo', '-fs',
-             '-nosound', '-wid', int(vid.winId())))
+        vid._player = mplayer.Player(('-msglevel', 'global=6', '-fixed-vo',
+                                      '-fs', '-wid', int(vid.winId())))
         vid.player.loadfile(path)
+        vid.player.volume = 0
         x, y = 0, self.grid.rowCount() - 1
         if y < 0:
             y = 0
@@ -73,7 +77,6 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
             x += 1
         self.grid.addWidget(vid, y, x)
         self.videos.append(vid.player)
-        #vid.player.osd(3)
 
     def play(self):
         """Play or pause all videos."""

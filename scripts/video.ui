@@ -36,7 +36,7 @@
      <item>
       <layout class="QVBoxLayout" name="playback">
        <item>
-        <widget class="QSlider" name="horizontalSlider">
+        <widget class="QSlider" name="slider">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>

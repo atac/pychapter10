@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'scripts\video.ui'
 #
-# Created: Tue Mar 18 10:24:13 2014
+# Created: Tue Mar 18 15:22:48 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -45,10 +45,10 @@ class Ui_MainWindow(object):
         self.verticalLayout.addLayout(self.grid)
         self.playback = QtGui.QVBoxLayout()
         self.playback.setObjectName(_fromUtf8("playback"))
-        self.horizontalSlider = QtGui.QSlider(self.verticalLayoutWidget)
-        self.horizontalSlider.setOrientation(QtCore.Qt.Horizontal)
-        self.horizontalSlider.setObjectName(_fromUtf8("horizontalSlider"))
-        self.playback.addWidget(self.horizontalSlider)
+        self.slider = QtGui.QSlider(self.verticalLayoutWidget)
+        self.slider.setOrientation(QtCore.Qt.Horizontal)
+        self.slider.setObjectName(_fromUtf8("slider"))
+        self.playback.addWidget(self.slider)
         self.play_btn = QtGui.QPushButton(self.verticalLayoutWidget)
         self.play_btn.setObjectName(_fromUtf8("play_btn"))
         self.playback.addWidget(self.play_btn)
