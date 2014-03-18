@@ -19,10 +19,8 @@ try:
 except NameError:
     basedir = os.path.dirname(sys.executable)
 mplayer.Player.exec_path = os.path.join(basedir, 'mplayer.exe')
-print mplayer.Player.exec_path
 mplayer.Player.introspect()
 
-INITIAL_RESOLUTION = (320, 240)
 TOOLBAR_OFFSET = 75
 
 
@@ -118,7 +116,8 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
 
         vid = QPlayerView(self.verticalLayoutWidget)
         vid._player = mplayer.Player(('-msglevel', 'global=6', '-fixed-vo',
-                                      '-fs', '-wid', int(vid.winId())))
+                                      '-really-quiet', '-fs', '-wid',
+                                      int(vid.winId())))
         vid.player.loadfile(path)
         vid.player.volume = 0
         x, y = 0, self.grid.rowCount() - 1
