@@ -1,4 +1,6 @@
 
+from tempfile import mkdtemp
+import atexit
 import os
 import sys
 import time
@@ -7,6 +9,7 @@ from PyQt4 import QtGui, QtCore
 from mplayer.qt4 import QPlayerView
 import mplayer
 
+from chapter10 import C10, datatypes
 from ui import Ui_MainWindow
 
 
@@ -31,11 +34,7 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         self.ticker = Ticker()
         self.ticker.start()
 
-        # Load videos.
         self.videos = []
-        for path in os.listdir('tmp'):
-            self.add_video('tmp/%s' % path)
-            self.audio.addItem(os.path.basename(path))
 
         # Connect events.
         self.play_btn.clicked.connect(self.play)
@@ -43,14 +42,50 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         self.audio.currentIndexChanged.connect(self.audio_source)
         self.slider.sliderMoved.connect(self.seek)
         self.volume.sliderMoved.connect(self.adjust_volume)
+        self.menubar.triggered.connect(self.menu_action)
 
         self.volume.setValue(40.0)
         self.audio_source(0)
+
+    def menu_action(self, action):
+        action = action.text()
+        if action == 'Open':
+            filename = QtGui.QFileDialog.getOpenFileName(
+                self, 'Load Chapter 10 File', os.curdir,
+                'Chapter 10 Files (*.c10 *.ch10);;All Files (*.*)')
+            progress = QtGui.QProgressDialog('Loading %s...' % filename,
+                                             'Cancel', 0, 100, self)
+            progress.setWindowTitle('Loading...')
+            progress.show()
+
+            tmp = mkdtemp()
+            out = {}
+            for packet in C10(str(filename)):
+                if datatypes.format(packet.data_type)[0] != 8:
+                    continue
+
+                path = os.path.join(tmp, str(packet.channel_id)) + '.mpg'
+                if path not in out:
+                    out[path] = open(path, 'wb')
+                    atexit.register(out[path].close)
+
+                out[path].write(''.join([p.data for p in packet.body.mpeg]))
+
+            progress.close()
+
+            print os.listdir(tmp)
+            self.videos = []
+            for path in os.listdir(tmp):
+                print path
+                self.add_video(os.path.join(tmp, path))
+                self.audio.addItem(os.path.basename(path))
 
     def adjust_volume(self, to):
         self.videos[self.audio_from].volume = float(to)
 
     def audio_source(self, index):
+        if not self.videos:
+            return
         self.videos[self.audio_from].volume = 0.0
         self.videos[index].volume = float(self.volume.value())
         self.audio_from = index
@@ -60,6 +95,8 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
             vid.seek(to, 1)
 
     def tick(self):
+        if not self.videos:
+            return
         self.slider.setValue(self.videos[0].percent_pos or 0)
         self.volume.setValue(int(self.videos[self.audio_from].volume))
 

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'scripts\video.ui'
 #
-# Created: Tue Mar 18 15:57:50 2014
+# Created: Tue Mar 18 16:26:51 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -72,11 +72,17 @@ class Ui_MainWindow(object):
         self.menubar = QtGui.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 893, 21))
         self.menubar.setObjectName(_fromUtf8("menubar"))
+        self.menuFile = QtGui.QMenu(self.menubar)
+        self.menuFile.setObjectName(_fromUtf8("menuFile"))
         MainWindow.setMenuBar(self.menubar)
         self.actionOpen = QtGui.QAction(MainWindow)
         self.actionOpen.setObjectName(_fromUtf8("actionOpen"))
         self.actionPlay_Pause = QtGui.QAction(MainWindow)
         self.actionPlay_Pause.setObjectName(_fromUtf8("actionPlay_Pause"))
+        self.open_file = QtGui.QAction(MainWindow)
+        self.open_file.setObjectName(_fromUtf8("open_file"))
+        self.menuFile.addAction(self.open_file)
+        self.menubar.addAction(self.menuFile.menuAction())
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -84,6 +90,9 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "CH10 Video Player", None))
         self.play_btn.setText(_translate("MainWindow", "Play", None))
+        self.menuFile.setTitle(_translate("MainWindow", "File", None))
         self.actionOpen.setText(_translate("MainWindow", "Open", None))
         self.actionPlay_Pause.setText(_translate("MainWindow", "Play / Pause", None))
+        self.open_file.setText(_translate("MainWindow", "Open", None))
+        self.open_file.setShortcut(_translate("MainWindow", "Ctrl+O", None))
 

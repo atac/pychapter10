@@ -83,6 +83,13 @@
      <height>21</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="open_file"/>
+   </widget>
+   <addaction name="menuFile"/>
   </widget>
   <action name="actionOpen">
    <property name="text">
@@ -92,6 +99,14 @@
   <action name="actionPlay_Pause">
    <property name="text">
     <string>Play / Pause</string>
+   </property>
+  </action>
+  <action name="open_file">
+   <property name="text">
+    <string>Open</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
    </property>
   </action>
  </widget>
