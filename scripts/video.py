@@ -15,7 +15,7 @@ from ui import Ui_MainWindow
 
 # Tell mplayer.py where mplayer actually is.
 mplayer.Player.exec_path = os.path.join(os.path.dirname(__file__),
-                                        'mplayer-svn-36986', 'mplayer.exe')
+                                        'mplayer.exe')
 mplayer.Player.introspect()
 
 INITIAL_RESOLUTION = (320, 240)

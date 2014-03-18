@@ -3,3 +3,4 @@ Chapter10.egg-info
 *.c10
 build
 dist
+scripts/mplayer/*
