@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>893</width>
-    <height>675</height>
+    <height>682</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,7 +26,7 @@
       <x>0</x>
       <y>0</y>
       <width>891</width>
-      <height>651</height>
+      <height>661</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
@@ -36,18 +36,38 @@
      <item>
       <layout class="QVBoxLayout" name="playback">
        <item>
-        <widget class="QSlider" name="slider">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="play_btn">
-         <property name="text">
-          <string>Play</string>
-         </property>
-        </widget>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item alignment="Qt::AlignBottom">
+          <widget class="QSlider" name="slider">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="play_btn">
+           <property name="text">
+            <string>Play</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="audio"/>
+         </item>
+         <item>
+          <widget class="QSlider" name="volume">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>
@@ -63,20 +83,6 @@
      <height>21</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuFile">
-    <property name="title">
-     <string>File</string>
-    </property>
-    <addaction name="actionOpen"/>
-   </widget>
-   <widget class="QMenu" name="menuPlayback">
-    <property name="title">
-     <string>Playback</string>
-    </property>
-    <addaction name="actionPlay_Pause"/>
-   </widget>
-   <addaction name="menuFile"/>
-   <addaction name="menuPlayback"/>
   </widget>
   <action name="actionOpen">
    <property name="text">

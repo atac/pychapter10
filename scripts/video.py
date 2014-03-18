@@ -21,6 +21,7 @@ TOOLBAR_OFFSET = 75
 
 class Main(QtGui.QMainWindow, Ui_MainWindow):
     playing = False
+    audio_from = 0
 
     def __init__(self):
         super(Main, self).__init__(None)
@@ -34,11 +35,25 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         self.videos = []
         for path in os.listdir('tmp'):
             self.add_video('tmp/%s' % path)
+            self.audio.addItem(os.path.basename(path))
 
         # Connect events.
         self.play_btn.clicked.connect(self.play)
         self.ticker.tick.connect(self.tick)
+        self.audio.currentIndexChanged.connect(self.audio_source)
         self.slider.sliderMoved.connect(self.seek)
+        self.volume.sliderMoved.connect(self.adjust_volume)
+
+        self.volume.setValue(40.0)
+        self.audio_source(0)
+
+    def adjust_volume(self, to):
+        self.videos[self.audio_from].volume = float(to)
+
+    def audio_source(self, index):
+        self.videos[self.audio_from].volume = 0.0
+        self.videos[index].volume = float(self.volume.value())
+        self.audio_from = index
 
     def seek(self, to):
         for vid in self.videos:
@@ -46,6 +61,7 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
 
     def tick(self):
         self.slider.setValue(self.videos[0].percent_pos or 0)
+        self.volume.setValue(int(self.videos[self.audio_from].volume))
 
     def resizeEvent(self, e=None):
         """Resize elements to match changing window size."""

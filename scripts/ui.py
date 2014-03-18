@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'scripts\video.ui'
 #
-# Created: Tue Mar 18 15:22:48 2014
+# Created: Tue Mar 18 15:57:50 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,7 +26,7 @@ except AttributeError:
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
-        MainWindow.resize(893, 675)
+        MainWindow.resize(893, 682)
         self.centralwidget = QtGui.QWidget(MainWindow)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Maximum, QtGui.QSizePolicy.Maximum)
         sizePolicy.setHorizontalStretch(0)
@@ -35,7 +35,7 @@ class Ui_MainWindow(object):
         self.centralwidget.setSizePolicy(sizePolicy)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
         self.verticalLayoutWidget = QtGui.QWidget(self.centralwidget)
-        self.verticalLayoutWidget.setGeometry(QtCore.QRect(0, 0, 891, 651))
+        self.verticalLayoutWidget.setGeometry(QtCore.QRect(0, 0, 891, 661))
         self.verticalLayoutWidget.setObjectName(_fromUtf8("verticalLayoutWidget"))
         self.verticalLayout = QtGui.QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setMargin(0)
@@ -45,31 +45,38 @@ class Ui_MainWindow(object):
         self.verticalLayout.addLayout(self.grid)
         self.playback = QtGui.QVBoxLayout()
         self.playback.setObjectName(_fromUtf8("playback"))
+        self.verticalLayout_2 = QtGui.QVBoxLayout()
+        self.verticalLayout_2.setObjectName(_fromUtf8("verticalLayout_2"))
         self.slider = QtGui.QSlider(self.verticalLayoutWidget)
         self.slider.setOrientation(QtCore.Qt.Horizontal)
         self.slider.setObjectName(_fromUtf8("slider"))
-        self.playback.addWidget(self.slider)
+        self.verticalLayout_2.addWidget(self.slider)
         self.play_btn = QtGui.QPushButton(self.verticalLayoutWidget)
         self.play_btn.setObjectName(_fromUtf8("play_btn"))
-        self.playback.addWidget(self.play_btn)
+        self.verticalLayout_2.addWidget(self.play_btn)
+        self.audio = QtGui.QComboBox(self.verticalLayoutWidget)
+        self.audio.setObjectName(_fromUtf8("audio"))
+        self.verticalLayout_2.addWidget(self.audio)
+        self.volume = QtGui.QSlider(self.verticalLayoutWidget)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.volume.sizePolicy().hasHeightForWidth())
+        self.volume.setSizePolicy(sizePolicy)
+        self.volume.setOrientation(QtCore.Qt.Vertical)
+        self.volume.setObjectName(_fromUtf8("volume"))
+        self.verticalLayout_2.addWidget(self.volume)
+        self.playback.addLayout(self.verticalLayout_2)
         self.verticalLayout.addLayout(self.playback)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 893, 21))
         self.menubar.setObjectName(_fromUtf8("menubar"))
-        self.menuFile = QtGui.QMenu(self.menubar)
-        self.menuFile.setObjectName(_fromUtf8("menuFile"))
-        self.menuPlayback = QtGui.QMenu(self.menubar)
-        self.menuPlayback.setObjectName(_fromUtf8("menuPlayback"))
         MainWindow.setMenuBar(self.menubar)
         self.actionOpen = QtGui.QAction(MainWindow)
         self.actionOpen.setObjectName(_fromUtf8("actionOpen"))
         self.actionPlay_Pause = QtGui.QAction(MainWindow)
         self.actionPlay_Pause.setObjectName(_fromUtf8("actionPlay_Pause"))
-        self.menuFile.addAction(self.actionOpen)
-        self.menuPlayback.addAction(self.actionPlay_Pause)
-        self.menubar.addAction(self.menuFile.menuAction())
-        self.menubar.addAction(self.menuPlayback.menuAction())
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -77,8 +84,6 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "CH10 Video Player", None))
         self.play_btn.setText(_translate("MainWindow", "Play", None))
-        self.menuFile.setTitle(_translate("MainWindow", "File", None))
-        self.menuPlayback.setTitle(_translate("MainWindow", "Playback", None))
         self.actionOpen.setText(_translate("MainWindow", "Open", None))
         self.actionPlay_Pause.setText(_translate("MainWindow", "Play / Pause", None))
 
