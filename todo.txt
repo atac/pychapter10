@@ -11,5 +11,6 @@ datatypes
 
 scripts
     c10_check.py - Validator
+    video.py - Finish cleaning up UI. Make cross-platform (unix)
 
 tests - Better coverage for datatypes and top-level package
