@@ -1,8 +1,6 @@
 
 import sys
 
-from cx_Freeze import setup, Executable
-
 kwargs = dict(
     name='Chapter10',
     version='0.1',
@@ -16,21 +14,29 @@ data format.',
             'optimize': 2,
         }
     },
-    executables=[
-        Executable('scripts/c10_stat.py', base='Console'),
-        Executable('scripts/c10_dump.py', base='Console'),
-        Executable('scripts/c10_copy.py', base='Console'),
-        Executable('scripts/video.py',
-                   base=sys.platform == 'win32' and 'Win32GUI' or None),
-    ],
     packages=[
         'chapter10',
         'chapter10.datatypes',
     ])
 
-if sys.platform == 'win32':
-    kwargs['options']['build_exe']['include_files'] = (
-        ('scripts/mplayer.exe', 'mplayer.exe'),
-    )
+try:
+    from cx_Freeze import setup, Executable
+
+    kwargs['executables'] = [
+        Executable('scripts/c10_stat.py', base='Console'),
+        Executable('scripts/c10_dump.py', base='Console'),
+        Executable('scripts/c10_copy.py', base='Console'),
+        Executable('scripts/video.py',
+                   base=sys.platform == 'win32' and 'Win32GUI' or None),
+    ]
+
+    if sys.platform == 'win32':
+        kwargs['options']['build_exe']['include_files'] = (
+            ('scripts/mplayer.exe', 'mplayer.exe'),
+        )
+
+except ImportError:
+    from distutils.core import setup
+
 
 setup(**kwargs)
