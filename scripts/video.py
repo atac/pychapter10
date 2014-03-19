@@ -1,4 +1,5 @@
 
+from subprocess import Popen
 from tempfile import mkdtemp
 import atexit
 import os
@@ -18,7 +19,13 @@ try:
     basedir = os.path.dirname(__file__)
 except NameError:
     basedir = os.path.dirname(sys.executable)
-mplayer.Player.exec_path = os.path.join(basedir, 'mplayer.exe')
+
+# Verify that MPlayer runs.
+try:
+    Popen(mplayer.Player.exec_path).wait()
+except OSError:
+    mplayer.Player.exec_path = os.path.join(basedir, 'mplayer.exe')
+
 mplayer.Player.introspect()
 
 TOOLBAR_OFFSET = 75
