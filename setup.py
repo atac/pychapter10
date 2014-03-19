@@ -12,13 +12,8 @@ kwargs = dict(
 data format.',
     options={
         'build_exe': {
-            'includes': 'atexit',
             'excludes': ['_ctypes', '_hashlib', '_socket', '_ssl', 'bz2'],
-            'append_script_to_exe': True,
             'optimize': 2,
-            'include_files': (
-                ('scripts/mplayer.exe', 'mplayer.exe'),
-            )
         }
     },
     executables=[
@@ -32,5 +27,10 @@ data format.',
         'chapter10',
         'chapter10.datatypes',
     ])
+
+if sys.platform == 'win32':
+    kwargs['options']['build_exe']['include_files'] = (
+        ('scripts/mplayer.exe', 'mplayer.exe'),
+    )
 
 setup(**kwargs)
