@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""usage: c10_dump.py <file> [options]
+__doc__ = """usage: c10_dump.py <file> [options]
 
 Options:
     -o OUT, --output OUT                 The directory to place files \

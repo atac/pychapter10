@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""usage: c10_copy.py <src> <dst> [options]
+__doc__ = """usage: c10_copy.py <src> <dst> [options]
 
 Options:
     -c CHANNEL..., --channel CHANNEL...  Specify channels to include (csv).
