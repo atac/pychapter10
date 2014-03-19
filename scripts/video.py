@@ -34,7 +34,6 @@ TOOLBAR_OFFSET = 75
 
 
 class Main(QtGui.QMainWindow, Ui_MainWindow):
-    playing = False
     audio_from = 0
     progress = None
 
@@ -64,23 +63,28 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
     def menu_action(self, action):
         action = action.text()
         if action == 'Open':
-            filename = QtGui.QFileDialog.getOpenFileName(
-                self, 'Load Chapter 10 File', os.curdir,
-                'Chapter 10 Files (*.c10 *.ch10);;All Files (*.*)')
-
-            self.loader = FileLoader(self, str(filename))
-            self.loader.done.connect(self.show_videos)
-            self.loader.start()
-
-            self.progress = QtGui.QProgressDialog('Loading...', 'Cancel',
-                                                  0, 100, self)
-            self.progress.setWindowTitle('Loading %s...' % filename)
-            self.progress.setModal(True)
-            self.progress.canceled.connect(self.cancel_load)
-            self.progress.show()
+            self.load_file()
 
         elif action == 'Exit':
             self.app.closeAllWindows()
+
+    def load_file(self, filename=None):
+        if filename is None:
+            filename = QtGui.QFileDialog.getOpenFileName(
+                self, 'Load Chapter 10 File', os.curdir,
+                'Chapter 10 Files (*.c10 *.ch10);;All Files (*.*)')
+            filename = str(filename)
+
+        self.loader = FileLoader(self, filename)
+        self.loader.done.connect(self.show_videos)
+        self.loader.start()
+
+        self.progress = QtGui.QProgressDialog(
+            'Loading', 'Cancel', 0, 100, self)
+        self.progress.setWindowTitle('Parsing %s' % os.path.basename(filename))
+        self.progress.setModal(True)
+        self.progress.canceled.connect(self.cancel_load)
+        self.progress.show()
 
     def cancel_load(self):
         self.progress.close()
@@ -162,16 +166,14 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
     def play(self):
         """Play or pause all videos."""
 
-        if self.playing:
-            self.play_btn.setText('Play')
-            self.playing = False
-        else:
-            self.play_btn.setText('Pause')
-            self.playing = True
         for vid in main.videos:
             vid.pause()
 
     def run(self):
+        if len(sys.argv) > 1:
+            self.load_file(sys.argv[1])
+        else:
+            self.load_file()
         self.show()
         sys.exit(self.app.exec_())
 

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'scripts\../ui\video.ui'
 #
-# Created: Wed Mar 19 11:24:31 2014
+# Created: Wed Mar 19 14:33:15 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -93,7 +93,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "CH10 Video Player", None))
-        self.play_btn.setText(_translate("MainWindow", "Play", None))
+        self.play_btn.setText(_translate("MainWindow", "Play / Pause", None))
         self.menuFile.setTitle(_translate("MainWindow", "File", None))
         self.actionOpen.setText(_translate("MainWindow", "Open", None))
         self.actionPlay_Pause.setText(_translate("MainWindow", "Play / Pause", None))
