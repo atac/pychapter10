@@ -28,8 +28,10 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
     playing = False
     audio_from = 0
 
-    def __init__(self):
+    def __init__(self, app):
         super(Main, self).__init__(None)
+
+        self.app = app
 
         self.setupUi(self)
 
@@ -80,8 +82,11 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
                 self.add_video(os.path.join(tmp, path))
                 self.audio.addItem(os.path.basename(path))
 
+        elif action == 'Exit':
+            self.app.closeAllWindows()
+
     def adjust_volume(self, to):
-        self.videos[self.audio_from].volume = float(to)
+        self.videos[self.audio_from].volume = float(to or 0)
 
     def audio_source(self, index):
         if not self.videos:
@@ -98,7 +103,7 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         if not self.videos:
             return
         self.slider.setValue(self.videos[0].percent_pos or 0)
-        self.volume.setValue(int(self.videos[self.audio_from].volume))
+        self.volume.setValue(int(self.videos[self.audio_from].volume or 0))
 
     def resizeEvent(self, e=None):
         """Resize elements to match changing window size."""
@@ -144,6 +149,10 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         for vid in main.videos:
             vid.pause()
 
+    def run(self):
+        self.show()
+        sys.exit(self.app.exec_())
+
 
 class Ticker(QtCore.QThread):
     """Use a seperate thread to trigger a mainloop function."""
@@ -156,7 +165,5 @@ class Ticker(QtCore.QThread):
             time.sleep(3)
 
 if __name__ == '__main__':
-    app = QtGui.QApplication([])
-    main = Main()
-    main.show()
-    sys.exit(app.exec_())
+    main = Main(QtGui.QApplication([]))
+    main.run()

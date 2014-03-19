@@ -88,6 +88,8 @@
      <string>File</string>
     </property>
     <addaction name="open_file"/>
+    <addaction name="separator"/>
+    <addaction name="exit"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -107,6 +109,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="exit">
+   <property name="text">
+    <string>Exit</string>
    </property>
   </action>
  </widget>

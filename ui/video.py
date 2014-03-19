@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'scripts\video.ui'
+# Form implementation generated from reading ui file 'scripts\../ui\video.ui'
 #
-# Created: Tue Mar 18 16:26:51 2014
+# Created: Tue Mar 18 19:13:43 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -81,7 +81,11 @@ class Ui_MainWindow(object):
         self.actionPlay_Pause.setObjectName(_fromUtf8("actionPlay_Pause"))
         self.open_file = QtGui.QAction(MainWindow)
         self.open_file.setObjectName(_fromUtf8("open_file"))
+        self.exit = QtGui.QAction(MainWindow)
+        self.exit.setObjectName(_fromUtf8("exit"))
         self.menuFile.addAction(self.open_file)
+        self.menuFile.addSeparator()
+        self.menuFile.addAction(self.exit)
         self.menubar.addAction(self.menuFile.menuAction())
 
         self.retranslateUi(MainWindow)
@@ -95,4 +99,5 @@ class Ui_MainWindow(object):
         self.actionPlay_Pause.setText(_translate("MainWindow", "Play / Pause", None))
         self.open_file.setText(_translate("MainWindow", "Open", None))
         self.open_file.setShortcut(_translate("MainWindow", "Ctrl+O", None))
+        self.exit.setText(_translate("MainWindow", "Exit", None))
 
