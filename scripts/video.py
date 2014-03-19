@@ -144,10 +144,9 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
 
         vid = QPlayerView(self.verticalLayoutWidget)
         vid._player = mplayer.Player(('-msglevel', 'global=6', '-fixed-vo',
-                                      '-really-quiet', '-fs', '-wid',
-                                      int(vid.winId())))
+                                      '-really-quiet', '-fs', '-volume', '0',
+                                      '-wid', int(vid.winId())))
         vid.player.loadfile(path)
-        vid.player.volume = 0
         x, y = 0, self.grid.rowCount() - 1
         if y < 0:
             y = 0
