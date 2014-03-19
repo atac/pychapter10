@@ -24,7 +24,8 @@ try:
 except OSError:
     mplayer.Player.exec_path = os.path.join(basedir, 'mplayer.exe')
 
-    # Force subprocess.Popen to use shell=True
+# Force subprocess.Popen to use shell=True on windows.
+if sys.platform == 'win32':
     subprocess.Popen = partial(subprocess.Popen, shell=True)
 
 mplayer.Player.introspect()
