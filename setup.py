@@ -17,8 +17,8 @@ try:
     kwargs.update(dict(
         console=['scripts/c10_stat.py',
                  'scripts/c10_dump.py',
-                 'scripts/c10_copy.py',
-                 'scripts/video.py'],
+                 'scripts/c10_copy.py'],
+        windows=['scripts/video.py'],
         data_files=[('', ['scripts/mplayer.exe'])],
         zipfile=None,
         options=dict(
