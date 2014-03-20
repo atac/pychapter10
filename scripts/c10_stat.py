@@ -18,22 +18,29 @@ from chapter10.walk import walk_packets
 if __name__ == '__main__':
     args = docopt(__doc__)
 
-    channels = {}
+    channels = []
     packets = 0
     size = 0
 
     for packet in walk_packets(C10(args['<file>']), args):
         size += packet.packet_length
         packets += 1
-        if packet.channel_id not in channels:
-            channels[packet.channel_id] = {
-                'packets': 0, 'type': packet.data_type,
-                'id': packet.channel_id}
-        channels[packet.channel_id]['packets'] += 1
+        channel_index = None
+        for i, channel in enumerate(channels):
+            if channel['id'] == packet.channel_id and \
+                    channel['type'] == packet.data_type:
+                channel_index = i
+                break
+        if channel_index is None:
+            channel_index = len(channels)
+            channels.append({'packets': 0,
+                            'type': packet.data_type,
+                            'id': packet.channel_id})
+        channels[channel_index]['packets'] += 1
 
     print 'Channel ID      Data Type' + 'Packets'.rjust(47)
     print '-' * 80
-    for channel in channels.values():
+    for channel in sorted(channels):
         print ('Channel %s' % channel['id']).ljust(15),
         print ('%s - %s' % (hex(channel['type']),
                             get_label(channel['type']))).ljust(35),
