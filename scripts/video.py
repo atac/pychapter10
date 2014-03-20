@@ -27,7 +27,7 @@ except OSError:
 
 # Force subprocess.Popen to use shell=True on windows.
 if sys.platform == 'win32':
-    subprocess.Popen = partial(subprocess.Popen, shell=True)
+    subprocess.Popen = partial(subprocess.Popen, shell=True, stdout=None)
 
 mplayer.Player.introspect()
 
@@ -35,17 +35,21 @@ TOOLBAR_OFFSET = 75
 
 
 # Force QtPlayer to use inherited constructor.
-mplayer.qt4.QtPlayer.__init__ = mplayer.Player.__init__
+qt4.QtPlayer.__init__ = mplayer.Player.__init__
 
 
-class VideoWidget(mplayer.qt4.QPlayerView):
+class VideoWidget(qt4.QPlayerView):
     def winId(self):
         """Generate an actual int for the player."""
 
-        ctypes.pythonapi.PyCObject_AsVoidPtr.restype = ctypes.c_void_p
-        ctypes.pythonapi.PyCObject_AsVoidPtr.argtypes = [ctypes.py_object]
-        return ctypes.pythonapi.PyCObject_AsVoidPtr(
-            mplayer.qt4.QPlayerView.winId(self))
+        id = qt4.QPlayerView.winId(self)
+        try:
+            id = int(id)
+        except TypeError:
+            ctypes.pythonapi.PyCObject_AsVoidPtr.restype = ctypes.c_void_p
+            ctypes.pythonapi.PyCObject_AsVoidPtr.argtypes = [ctypes.py_object]
+            id = ctypes.pythonapi.PyCObject_AsVoidPtr(id)
+        return id
 
 
 class Main(QtGui.QMainWindow, Ui_MainWindow):
@@ -150,7 +154,7 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         if self.videos:
             self.slider.setValue(self.videos[0].player.percent_pos or 0)
             self.volume.setValue(
-                    int(self.videos[self.audio_from].player.volume or 0))
+                int(self.videos[self.audio_from].player.volume or 0))
 
     def resizeEvent(self, e=None):
         """Resize elements to match changing window size."""
