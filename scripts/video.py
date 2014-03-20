@@ -130,7 +130,8 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
     def audio_source(self, index):
         if not self.videos:
             return
-        self.videos[self.audio_from].player.volume = 0.0
+        if self.audio_from:
+            self.videos[self.audio_from].player.volume = 0.0
         self.videos[index].player.volume = float(self.volume.value())
         self.audio_from = index
 
