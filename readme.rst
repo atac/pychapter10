@@ -12,9 +12,9 @@ Optional dependencies have explanations given.
 
 * Python 2.7 or greater
 * Docopt
-* `PySide <http://qt-project.org/wiki/Category:LanguageBindings::PySide>` (for native GUI applications)
+* `PySide <http://qt-project.org/wiki/Category:LanguageBindings::PySide>`_ (for native GUI applications)
 * pytest and Mock (for test suite)
-* `cx_Freeze <http://cx-freeze.sourceforge.net/index.html>` (for building binary executables)
+* `cx_Freeze <http://cx-freeze.sourceforge.net/index.html>`_ (for building binary executables)
 
 Installation
 ------------
@@ -23,7 +23,7 @@ To install the library run::
 
     python setup.py install_lib
 
-To automatically install dependencies using `pip <http://pip-installer.org>` use::
+To automatically install dependencies using `pip <http://pip-installer.org>`_ use::
 
     pip install -r requirements.txt
 
