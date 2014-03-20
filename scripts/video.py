@@ -109,6 +109,7 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         self.progress.close()
         self.progress = None
         self.loader.cancel = True
+        self.show()
 
     def show_videos(self, tmp):
         tmp = str(tmp)
@@ -232,7 +233,10 @@ class FileLoader(QtCore.QThread):
             self.pos = packet.pos
 
         for f in out.values():
-            f.close()
+            try:
+                f.close()
+            except:
+                pass
 
         self.done.emit(tmp)
         self.quit()
