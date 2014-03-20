@@ -10,7 +10,7 @@ kwargs = dict(
 data format.',
     options={
         'build_exe': {
-            'excludes': ['_ctypes', '_hashlib', '_socket', '_ssl', 'bz2'],
+            'excludes': ['_hashlib', '_socket', '_ssl', 'bz2'],
             'optimize': 2,
         }
     },
