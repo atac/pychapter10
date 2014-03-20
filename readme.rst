@@ -20,7 +20,6 @@ Installation
 ------------
 
 To install the library run::
-After installing pip (http://pip-installer.org) run::
 
     python setup.py install_lib
 
