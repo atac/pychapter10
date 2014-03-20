@@ -28,7 +28,7 @@ try:
 except ImportError:
     import Queue as queue
 
-from mplayer import mtypes, misc
+from . import mtypes, misc
 
 
 __all__ = ['Player', 'Step']

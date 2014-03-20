@@ -89,7 +89,6 @@ class _StdoutWrapper(_StderrWrapper):
         self._answers = queue.Queue()
 
     def _process_output(self, *args):
-        print 'activated'
         line = self._source.readline().decode('utf-8', 'ignore')
         if line:
             line = line.rstrip()

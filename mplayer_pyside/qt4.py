@@ -32,8 +32,8 @@ try:
 except ImportError:
     from PySide.QtGui import QWidget as _Container
 
-from mplayer.core import Player
-from mplayer import misc
+from .core import Player
+from . import misc
 
 
 __all__ = ['QtPlayer', 'QPlayerView']
