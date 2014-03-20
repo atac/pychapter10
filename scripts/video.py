@@ -108,28 +108,32 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
 
     def show_videos(self, tmp):
         tmp = str(tmp)
+        for vid in self.videos:
+            self.grid.removeWidget(vid)
         self.videos = []
+        self.audio.clear()
         for path in os.listdir(tmp):
             self.add_video(os.path.join(tmp, path))
             self.audio.addItem(os.path.basename(path))
 
         self.progress.close()
+        self.show()
 
     def adjust_volume(self, to):
-        self.videos[self.audio_from].volume = float(to or 0)
+        self.videos[self.audio_from].player.volume = float(to or 0)
 
     def audio_source(self, index):
         if not self.videos:
             return
-        self.videos[self.audio_from].volume = 0.0
-        self.videos[index].volume = float(self.volume.value())
+        self.videos[self.audio_from].player.volume = 0.0
+        self.videos[index].player.volume = float(self.volume.value())
         self.audio_from = index
 
     def seek(self, to):
         """Jump to an absolute index in all videos."""
 
         for vid in self.videos:
-            vid.seek(to, 1)
+            vid.player.seek(to, 1)
 
     def tick(self):
         """Called once a second."""
@@ -139,13 +143,14 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
             self.progress.setMaximum(self.loader.size)
             self.progress.setValue(self.loader.pos)
             self.progress.setLabelText('Read %s / %s mb'
-                                       % (self.loader.pos / 1024,
-                                          self.loader.size / 1024))
+                                       % (self.loader.pos / 1024 / 1024,
+                                          self.loader.size / 1024 / 1024))
 
         # Update seek and volume.
         if self.videos:
-            self.slider.setValue(self.videos[0].percent_pos or 0)
-            self.volume.setValue(int(self.videos[self.audio_from].volume or 0))
+            self.slider.setValue(self.videos[0].player.percent_pos or 0)
+            self.volume.setValue(
+                    int(self.videos[self.audio_from].player.volume or 0))
 
     def resizeEvent(self, e=None):
         """Resize elements to match changing window size."""
@@ -162,9 +167,6 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         """Add a video widget for a file."""
 
         vid = VideoWidget(self.verticalLayoutWidget, ('-volume', '0'))
-        #vid._player = mplayer.Player(('-msglevel', 'global=6', '-fixed-vo',
-        #                              '-really-quiet', '-fs', '-volume', '0',
-        #                              '-wid', int(vid.winId())))
         vid.player.loadfile(path)
         x, y = 0, self.grid.rowCount() - 1
         if y < 0:
@@ -176,20 +178,19 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
                 continue
             x += 1
         self.grid.addWidget(vid, y, x)
-        self.videos.append(vid.player)
+        self.videos.append(vid)
 
     def play(self):
         """Play or pause all videos."""
 
         for vid in main.videos:
-            vid.pause()
+            vid.player.pause()
 
     def run(self):
         if len(sys.argv) > 1:
             self.load_file(sys.argv[1])
         else:
             self.load_file()
-        self.show()
         sys.exit(self.app.exec_())
 
 
