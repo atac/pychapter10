@@ -21,8 +21,8 @@ By File
     * c10_check.py - Validator
     * c10_reindex.py - Walk a chapter 10 file and build a new index
     * video.py
-        * Finish cleaning up UI.
-        * Loading dialog should update and not freeze UI
-        * Make cross-platform (unix)
+        * Find what causes the UI hang after load and clean it up
+        * Minimize included mplayer and mplayer_pyside dependencies
+        * Include mplayer binaries for other platforms
 
 * tests - Better coverage for datatypes and top-level package

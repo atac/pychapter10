@@ -12,18 +12,19 @@ Optional dependencies have explanations given.
 
 * Python 2.7 or greater
 * Docopt
-* PyQt4 and mplayer.py (for video player)
+* PySide (for native GUI applications)
 * pytest and Mock (for test suite)
 * cx_Freeze (for building binary executables)
 
-Installation (using pip)
-------------------------
+Installation
+------------
 
+To install the library run::
 After installing pip (http://pip-installer.org) run::
 
-    pip install .
+    python setup.py install_lib
 
-To automatically install dependencies use::
+To automatically install dependencies using pip (http://pip-installer.org) use::
 
     pip install -r requirements.txt
 
