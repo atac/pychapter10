@@ -1,14 +1,15 @@
 
 from functools import partial
 from tempfile import mkdtemp
+import ctypes
 import os
 import subprocess
 import sys
 import time
 
-from PyQt4 import QtGui, QtCore
-from mplayer.qt4 import QPlayerView
-import mplayer
+from PySide import QtGui, QtCore
+from mplayer_pyside import qt4
+import mplayer_pyside as mplayer
 
 from chapter10 import C10, datatypes
 from ui.video import Ui_MainWindow
@@ -31,6 +32,20 @@ if sys.platform == 'win32':
 mplayer.Player.introspect()
 
 TOOLBAR_OFFSET = 75
+
+
+# Force QtPlayer to use inherited constructor.
+mplayer.qt4.QtPlayer.__init__ = mplayer.Player.__init__
+
+
+class VideoWidget(mplayer.qt4.QPlayerView):
+    def winId(self):
+        """Generate an actual int for the player."""
+
+        ctypes.pythonapi.PyCObject_AsVoidPtr.restype = ctypes.c_void_p
+        ctypes.pythonapi.PyCObject_AsVoidPtr.argtypes = [ctypes.py_object]
+        return ctypes.pythonapi.PyCObject_AsVoidPtr(
+            mplayer.qt4.QPlayerView.winId(self))
 
 
 class Main(QtGui.QMainWindow, Ui_MainWindow):
@@ -73,7 +88,7 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
             filename = QtGui.QFileDialog.getOpenFileName(
                 self, 'Load Chapter 10 File', os.curdir,
                 'Chapter 10 Files (*.c10 *.ch10);;All Files (*.*)')
-            filename = str(filename)
+            filename = str(filename[0])
 
         self.loader = FileLoader(self, filename)
         self.loader.done.connect(self.show_videos)
@@ -146,10 +161,10 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
     def add_video(self, path):
         """Add a video widget for a file."""
 
-        vid = QPlayerView(self.verticalLayoutWidget)
-        vid._player = mplayer.Player(('-msglevel', 'global=6', '-fixed-vo',
-                                      '-really-quiet', '-fs', '-volume', '0',
-                                      '-wid', int(vid.winId())))
+        vid = VideoWidget(self.verticalLayoutWidget, ('-volume', '0'))
+        #vid._player = mplayer.Player(('-msglevel', 'global=6', '-fixed-vo',
+        #                              '-really-quiet', '-fs', '-volume', '0',
+        #                              '-wid', int(vid.winId())))
         vid.player.loadfile(path)
         x, y = 0, self.grid.rowCount() - 1
         if y < 0:
@@ -181,7 +196,7 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
 class FileLoader(QtCore.QThread):
     """Parse video from a chapter 10 file into a temporary directory."""
 
-    done = QtCore.pyqtSignal(str)
+    done = QtCore.Signal(str)
 
     def __init__(self, parent, filename):
         super(FileLoader, self).__init__()
@@ -221,7 +236,7 @@ class FileLoader(QtCore.QThread):
 class Ticker(QtCore.QThread):
     """Emits a 'tick' signal once a second."""
 
-    tick = QtCore.pyqtSignal()
+    tick = QtCore.Signal()
 
     def run(self):
         while True:
