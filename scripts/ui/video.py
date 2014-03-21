@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'scripts\../ui\video.ui'
+# Form implementation generated from reading ui file 'scripts\ui\video.ui'
 #
-# Created: Thu Mar 20 11:56:48 2014
+# Created: Fri Mar 21 16:45:45 2014
 #      by: pyside-uic 0.2.15 running on PySide 1.2.1
 #
 # WARNING! All changes made in this file will be lost!
