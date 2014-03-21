@@ -11,6 +11,7 @@ By File
 
 * datatypes
     * computer.py
+        * Implement TMATS XML parser
         * Finish formats 2 (recording events)
         * Finish format 3 (index packets)
     * time.py - Add time word parsing
