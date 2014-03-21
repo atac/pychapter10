@@ -146,8 +146,13 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
 
         # Update progress dialog if loading a file.
         if self.progress and self.progress.isEnabled():
-            self.progress.setMaximum(self.loader.size)
-            self.progress.setValue(self.loader.pos)
+            try:
+                self.progress.setMaximum(self.loader.size)
+                self.progress.setValue(self.loader.pos)
+            except OverflowError:
+                self.progress.setMaximum(100)
+                self.progress.setValue(
+                    (float(self.loader.pos) / self.loader.size) * 100)
             self.progress.setLabelText('Read %s / %s mb'
                                        % (self.loader.pos / 1024 / 1024,
                                           self.loader.size / 1024 / 1024))
