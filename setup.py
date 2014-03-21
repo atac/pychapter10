@@ -1,4 +1,5 @@
 
+import os
 import sys
 
 kwargs = dict(
@@ -12,11 +13,15 @@ data format.',
         'build_exe': {
             'excludes': ['_hashlib', '_socket', '_ssl', 'bz2'],
             'optimize': 2,
-        }
+        },
+        'install_exe': {
+            'install_dir': os.path.join(os.path.dirname(__file__), 'bin'),
+        },
     },
     packages=[
         'chapter10',
         'chapter10.datatypes',
+        'mplayer_pyside',
     ])
 
 try:
