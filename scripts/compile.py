@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Compile all .ui files into .py using PyQt4."""
+"""Compile all .ui files into .py using PySide."""
 
 import glob
 import os
