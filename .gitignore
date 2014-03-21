@@ -4,3 +4,4 @@ Chapter10.egg-info
 build
 dist
 scripts/mplayer/*
+bin/*
