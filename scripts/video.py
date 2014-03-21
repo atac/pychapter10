@@ -95,8 +95,12 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
             filename = str(filename[0])
 
         self.loader = FileLoader(self, filename)
-        self.loader.done.connect(self.show_videos)
+        #self.loader.done.connect(self.show_videos)
         self.loader.start()
+
+        time.sleep(1)
+        self.show_videos(self.loader.tmp)
+        return
 
         self.progress = QtGui.QProgressDialog(
             'Loading', 'Cancel', 0, 100, self)
@@ -106,7 +110,8 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         self.progress.show()
 
     def cancel_load(self):
-        self.progress.close()
+        if self.progress:
+            self.progress.close()
         self.progress = None
         self.loader.cancel = True
         self.show()
@@ -121,7 +126,8 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
             self.add_video(os.path.join(tmp, path))
             self.audio.addItem(os.path.basename(path))
 
-        self.progress.close()
+        if self.progress:
+            self.progress.close()
         self.show()
 
     def adjust_volume(self, to):
@@ -160,8 +166,6 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         # Update seek and volume.
         if self.videos:
             self.slider.setValue(self.videos[0].player.percent_pos or 0)
-            self.volume.setValue(
-                int(self.videos[self.audio_from].player.volume or 0))
 
     def resizeEvent(self, e=None):
         """Resize elements to match changing window size."""
@@ -217,7 +221,7 @@ class FileLoader(QtCore.QThread):
         self.cancel = False
 
     def run(self):
-        tmp = mkdtemp()
+        self.tmp = mkdtemp()
         out = {}
         for packet in C10(self.filename):
 
@@ -231,7 +235,7 @@ class FileLoader(QtCore.QThread):
                 continue
 
             # Ensure a target path exists.
-            path = os.path.join(tmp, str(packet.channel_id)) + '.mpg'
+            path = os.path.join(self.tmp, str(packet.channel_id)) + '.mpg'
             if path not in out:
                 out[path] = open(path, 'wb')
 
@@ -244,7 +248,7 @@ class FileLoader(QtCore.QThread):
             except:
                 pass
 
-        self.done.emit(tmp)
+        self.done.emit(self.tmp)
         self.quit()
 
 
