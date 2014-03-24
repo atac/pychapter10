@@ -31,11 +31,8 @@ class TMATS(object):
 class NodeIndex(Data):
     def __init__(self, raw):
         Data.__init__(self, 'Node Index', raw)
-        self.data_type = struct.unpack('xB', raw[:2])[0]
-        self.channel_id = struct.unpack('H', raw[2:4])[0]
+        self.channel_id, self.data_type = struct.unpack('BH', raw[:4])
         self.offset = struct.unpack('Q', raw[4:])[0]
-
-        print self.data_type, self.channel_id, self.offset
 
 
 class Computer(Base):
