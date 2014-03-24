@@ -12,6 +12,10 @@ class Time(Base):
     def parse(self):
         Base.parse(self)
 
-        self.date_fmt = int(self.csdw >> 8 & 0xffff)
-        self.time_fmt = int(self.csdw >> 4 & 0xffff)
-        self.source = int(self.csdw & 0xffff)
+        if self.format != 1:
+            raise NotImplementedError('Time Data format %s is reserved!'
+                                      % self.format)
+
+        self.date_fmt = int(self.csdw >> 8 & 0xf)
+        self.time_fmt = int(self.csdw >> 4 & 0xf)
+        self.source = int(self.csdw & 0xf)

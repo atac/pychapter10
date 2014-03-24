@@ -1,19 +1,11 @@
 To Do
 =====
 
-General
--------
-
-* Confirm 0xffff masks are correct
-
 By File
 -------
 
 * datatypes
-    * computer.py
-        * Implement TMATS XML parser
-        * Finish formats 2 (recording events)
-        * Finish format 3 (index packets)
+    * computer.py - Implement TMATS XML parser
     * time.py - Add time word parsing
     * ms1553.py - Finish message parsing
     * analog.py - Finish sample parsing (no data to test with)

@@ -28,6 +28,17 @@ class TMATS(object):
                             if line[0].startswith(key)])
 
 
+class Event(Data):
+    def __init__(self, raw):
+        Data.__init__(self, 'Recording Event', raw)
+        raw = struct.unpack('I', raw)[0]
+        self.eo = bool(raw & (1 << 28))
+        self.event_count = int((raw >> 12) & 0xffff)
+        self.event_number = int(raw & 0xfff)
+
+        print self.eo, self.event_count, self.event_number
+
+
 class NodeIndex(Data):
     def __init__(self, raw):
         Data.__init__(self, 'Node Index', raw)
@@ -52,12 +63,13 @@ class Computer(Base):
         'all',
         'indices',
         'root_offset',
+        'events',
     )
 
     def parse(self):
         Base.parse(self)
 
-        self.all, self.indices = [], []
+        self.all, self.events, self.indices = [], [], []
 
         if self.format > 3:
             raise NotImplementedError(
@@ -69,6 +81,7 @@ class Computer(Base):
             self.srcc = bool(self.csdw & (1 << 8))  # Setup Rec Config Change
             self.version = int(self.csdw & (0xff))  # Ch10 Version
             self.tmats = TMATS(self.data)
+            return
 
         # Recording Event
         elif self.format == 2:
@@ -88,7 +101,8 @@ class Computer(Base):
                 self.file_size = struct.unpack('Q', self.data[:8])[0]
                 self.data = self.data[8:]
 
-            for i in xrange(self.iec):
+        if format != 0:
+            for i in xrange(getattr(self, 'iec', getattr(self, 'reec', 0))):
                 self.all.append(Data('Timestamp', data[:8]))
                 data = data[8:]
 
@@ -96,16 +110,23 @@ class Computer(Base):
                     self.all.append(Data('IPH', data[:8]))
                     data = data[8:]
 
-                if self.it == 0:
-                    index = Data('Root Index', data[:8])
-                    data = data[8:]
-                else:
-                    index = NodeIndex(data[:12])
-                    data = data[12:]
-                self.indices.append(index)
-                self.all.append(index)
+                if self.format == 2:
+                    event = Event(data[:4])
+                    self.events.append(event)
+                    self.all.append(event)
+                    data = data[4:]
 
-            if self.it == 0:
+                elif self.format == 3:
+                    if self.it == 0:
+                        index = Data('Root Index', data[:8])
+                        data = data[8:]
+                    elif self.it == 1:
+                        index = NodeIndex(data[:12])
+                        data = data[12:]
+                    self.indices.append(index)
+                    self.all.append(index)
+
+            if getattr(self, 'it', None) == 0:
                 self.root_offset = struct.unpack('Q', self.data[:8])[0]
 
     def __iter__(self):
