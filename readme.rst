@@ -10,10 +10,10 @@ Dependencies
 
 Optional dependencies have explanations given.
 
-* Python 2.7 or greater
-* Docopt
+* Python_ 2.7 or greater
+* Docopt_
 * PySide_ (for native GUI applications)
-* pytest and Mock (for test suite)
+* pytest_ and Mock_ (for test suite)
 * cx_Freeze_ (for building binary executables)
 
 Installation
@@ -41,3 +41,7 @@ and generate standalone binary executables for your platform.
 .. _cx_Freeze: http://cx-freeze.sourceforge.net/index.html
 .. _pip: http://pip-installer.org
 .. _Irig 106: http://irig106.org
+.. _Python: http://python.org
+.. _Docopt: http://docopt.org
+.. _pytest: http://pytest.org
+.. _Mock: http://www.voidspace.org.uk/python/mock/
