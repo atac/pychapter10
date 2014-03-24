@@ -175,9 +175,8 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
 
         # Extend primary layout to match the window.
         geo = self.geometry()
-        height, width = geo.height(), geo.width()
         self.verticalLayoutWidget.setGeometry(
-            QtCore.QRect(0, 0, width, height - TOOLBAR_OFFSET))
+            QtCore.QRect(0, 0, geo.width(), geo.height() - TOOLBAR_OFFSET))
 
     def add_video(self, path):
         """Add a video widget for a file."""
