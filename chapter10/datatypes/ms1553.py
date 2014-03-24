@@ -4,9 +4,9 @@ import struct
 from .base import Base, Data
 
 
-class IPH(object):
+class IPH(Data):
     def __init__(self, s, format):
-        self.s = s
+        Data.__init__(self, 'IPH', s)
 
         if format == 1:
             self.timestamp = s[:8]
@@ -26,9 +26,6 @@ class IPH(object):
             self.tm = bool(self.status & (0x1 << 13))  # Message Time Out
             self.se = bool(self.status & (0x1 << 6))   # Status Error
             self.ee = bool(self.status & (0x1 << 3))   # Echo Error
-
-    def __str__(self):
-        return self.s
 
 
 class MS1553(Base):
