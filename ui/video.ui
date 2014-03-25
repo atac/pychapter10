@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>804</width>
-    <height>533</height>
+    <width>801</width>
+    <height>848</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,45 +33,114 @@
      <item>
       <layout class="QGridLayout" name="grid"/>
      </item>
-     <item>
-      <layout class="QVBoxLayout" name="playback">
-       <item>
-        <layout class="QVBoxLayout" name="verticalLayout_2">
-         <item alignment="Qt::AlignBottom">
-          <widget class="QSlider" name="slider">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="play_btn">
-           <property name="text">
-            <string>Play / Pause</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="audio"/>
-         </item>
-         <item>
-          <widget class="QSlider" name="volume">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </item>
     </layout>
+   </widget>
+   <widget class="QGroupBox" name="playback">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>670</y>
+      <width>779</width>
+      <height>151</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Playback</string>
+    </property>
+    <widget class="QLabel" name="load_label_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>120</y>
+       <width>71</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Audio Source:</string>
+     </property>
+    </widget>
+    <widget class="QProgressBar" name="load_meter">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>761</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="value">
+      <number>24</number>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="audio">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>120</y>
+       <width>241</width>
+       <height>20</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="load_label">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>371</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Loading...</string>
+     </property>
+    </widget>
+    <widget class="QSlider" name="slider">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>60</y>
+       <width>761</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="play_btn">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>90</y>
+       <width>311</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Play / Pause</string>
+     </property>
+    </widget>
+    <widget class="QSlider" name="volume">
+     <property name="geometry">
+      <rect>
+       <x>340</x>
+       <y>90</y>
+       <width>22</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -79,7 +148,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>804</width>
+     <width>801</width>
      <height>21</height>
     </rect>
    </property>

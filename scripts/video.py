@@ -32,7 +32,7 @@ if sys.platform == 'win32':
 
 mplayer.Player.introspect()
 
-TOOLBAR_OFFSET = 75
+TOOLBAR_OFFSET = 200
 
 
 # Force QtPlayer to use inherited constructor.
@@ -55,7 +55,7 @@ class VideoWidget(qt4.QPlayerView):
 
 class Main(QtGui.QMainWindow, Ui_MainWindow):
     audio_from = 0
-    progress = None
+    loader = None
 
     def __init__(self, app):
         super(Main, self).__init__(None)
@@ -68,6 +68,7 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         self.ticker.start()
 
         self.videos = []
+        self.slider.setEnabled(False)
 
         # Connect events.
         self.play_btn.clicked.connect(self.play)
@@ -76,6 +77,7 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         self.slider.sliderMoved.connect(self.seek)
         self.volume.sliderMoved.connect(self.adjust_volume)
         self.menubar.triggered.connect(self.menu_action)
+        self.destroyed.connect(self.quit)
 
         self.volume.setValue(40.0)
         self.audio_source(0)
@@ -86,7 +88,15 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
             self.load_file()
 
         elif action == 'Exit':
-            self.app.closeAllWindows()
+            self.quit()
+
+    def quit(self):
+        if self.loader and not self.loader.finished:
+            self.loader.cancel = True
+            self.ticker.running = False
+            self.loader.wait()
+            self.ticker.wait()
+        self.app.closeAllWindows()
 
     def load_file(self, filename=None):
         if filename is None:
@@ -96,26 +106,10 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
             filename = str(filename[0])
 
         self.loader = FileLoader(self, filename)
-        #self.loader.done.connect(self.show_videos)
         self.loader.start()
 
         time.sleep(1)
         self.show_videos(self.loader.tmp)
-        return
-
-        self.progress = QtGui.QProgressDialog(
-            'Loading', 'Cancel', 0, 100, self)
-        self.progress.setWindowTitle('Parsing %s' % os.path.basename(filename))
-        self.progress.setModal(True)
-        self.progress.canceled.connect(self.cancel_load)
-        self.progress.show()
-
-    def cancel_load(self):
-        if self.progress:
-            self.progress.close()
-        self.progress = None
-        self.loader.cancel = True
-        self.show()
 
     def show_videos(self, tmp):
         tmp = str(tmp)
@@ -127,8 +121,6 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
             self.add_video(os.path.join(tmp, path))
             self.audio.addItem(os.path.basename(path))
 
-        if self.progress:
-            self.progress.close()
         self.show()
 
     def adjust_volume(self, to):
@@ -151,21 +143,26 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
     def tick(self):
         """Called once a second."""
 
-        # Update progress dialog if loading a file.
-        if self.progress and self.progress.isEnabled():
+        # Update progress if loading a file.
+        if self.loader and not self.loader.finished:
             try:
-                self.progress.setMaximum(self.loader.size)
-                self.progress.setValue(self.loader.pos)
+                self.load_meter.setMaximum(self.loader.size)
+                self.load_meter.setValue(self.loader.pos)
             except OverflowError:
-                self.progress.setMaximum(100)
-                self.progress.setValue(
+                self.load_meter.setMaximum(100)
+                self.load_meter.setValue(
                     (float(self.loader.pos) / self.loader.size) * 100)
-            self.progress.setLabelText('Read %s / %s mb'
-                                       % (self.loader.pos / 1024 / 1024,
-                                          self.loader.size / 1024 / 1024))
+            self.load_label.setText('Read %s / %s mb'
+                                    % (self.loader.pos / 1024 / 1024,
+                                       self.loader.size / 1024 / 1024))
+
+        else:
+            self.load_label.setText('Done')
 
         # Update seek and volume.
         if self.videos:
+            self.play_btn.setText(
+                'Play' if self.videos[0].player.paused else 'Pause')
             self.slider.setValue(self.videos[0].player.percent_pos or 0)
 
     def resizeEvent(self, e=None):
@@ -177,6 +174,8 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         geo = self.geometry()
         self.verticalLayoutWidget.setGeometry(
             QtCore.QRect(0, 0, geo.width(), geo.height() - TOOLBAR_OFFSET))
+
+        self.playback.move(0, geo.height() - TOOLBAR_OFFSET)
 
     def add_video(self, path):
         """Add a video widget for a file."""
@@ -212,15 +211,15 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
 class FileLoader(QtCore.QThread):
     """Parse video from a chapter 10 file into a temporary directory."""
 
-    done = QtCore.Signal(str)
-
     def __init__(self, parent, filename):
         super(FileLoader, self).__init__()
+        self.finished = True
         self.parent, self.filename = parent, filename
         self.size, self.pos = os.stat(filename).st_size, 0
         self.cancel = False
 
     def run(self):
+        self.finished = False
         self.tmp = mkdtemp()
         out = {}
         for packet in C10(self.filename):
@@ -248,19 +247,24 @@ class FileLoader(QtCore.QThread):
             except:
                 pass
 
-        self.done.emit(self.tmp)
         self.quit()
+
+    def quit(self):
+        self.finished = True
+        QtCore.QThread.quit(self)
 
 
 class Ticker(QtCore.QThread):
     """Emits a 'tick' signal once a second."""
 
     tick = QtCore.Signal()
+    running = True
 
     def run(self):
-        while True:
+        while self.running:
             self.tick.emit()
             time.sleep(1)
+        self.quit()
 
 if __name__ == '__main__':
     main = Main(QtGui.QApplication([]))
