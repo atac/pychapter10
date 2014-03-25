@@ -17,9 +17,7 @@ Scripts (/scripts)
 * c10_check.py - Validator
 * c10_reindex.py - Walk a chapter 10 file and build a new index
 * video.py
-    * Find what causes the UI hang after load and clean it up
-    * Reduce included mplayer and mplayer_pyside dependency footprint
-    * Include mplayer binaries for other platforms
+    * Reimplement seeking with new play-while-loading structure
 
 Tests (/tests)
 --------------
