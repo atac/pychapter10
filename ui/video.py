@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'scripts\../ui\video.ui'
 #
-# Created: Tue Mar 25 12:26:15 2014
+# Created: Tue Mar 25 13:01:47 2014
 #      by: pyside-uic 0.2.15 running on PySide 1.2.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -31,6 +31,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addLayout(self.grid)
         self.playback = QtGui.QGroupBox(self.centralwidget)
         self.playback.setGeometry(QtCore.QRect(10, 670, 779, 151))
+        self.playback.setTitle("")
         self.playback.setObjectName("playback")
         self.load_label_2 = QtGui.QLabel(self.playback)
         self.load_label_2.setGeometry(QtCore.QRect(10, 120, 71, 16))
@@ -86,7 +87,6 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QtGui.QApplication.translate("MainWindow", "CH10 Video Player", None, QtGui.QApplication.UnicodeUTF8))
-        self.playback.setTitle(QtGui.QApplication.translate("MainWindow", "Playback", None, QtGui.QApplication.UnicodeUTF8))
         self.load_label_2.setText(QtGui.QApplication.translate("MainWindow", "Audio Source:", None, QtGui.QApplication.UnicodeUTF8))
         self.load_label.setText(QtGui.QApplication.translate("MainWindow", "Loading...", None, QtGui.QApplication.UnicodeUTF8))
         self.play_btn.setText(QtGui.QApplication.translate("MainWindow", "Play / Pause", None, QtGui.QApplication.UnicodeUTF8))

@@ -158,6 +158,7 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
 
         else:
             self.load_label.setText('Done')
+            self.load_meter.setValue(100)
 
         # Update seek and volume.
         if self.videos:
