@@ -1,6 +1,11 @@
 To Do
 =====
 
+General
+-------
+
+* Replace usage of datatypes.base.Data with actual values.
+
 Data Types (/datatypes)
 -----------------------
 
@@ -17,7 +22,7 @@ Scripts (/scripts)
 * c10_check.py - Validator
 * c10_reindex.py - Walk a chapter 10 file and build a new index
 * video.py
-    * Reimplement seeking with new play-while-loading structure
+    * File looping and opening new files
 
 Tests (/tests)
 --------------
