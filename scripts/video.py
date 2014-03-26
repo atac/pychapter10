@@ -61,6 +61,8 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         super(Main, self).__init__(None)
 
         self.app = app
+        self.length = 0
+        self.start_offset = 0
 
         self.setupUi(self)
 
@@ -91,11 +93,6 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
             self.quit()
 
     def quit(self):
-        if self.loader and not self.loader.finished:
-            self.loader.cancel = True
-            self.ticker.running = False
-            self.loader.wait()
-            self.ticker.wait()
         self.app.closeAllWindows()
 
     def load_file(self, filename=None):
@@ -106,9 +103,10 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
             filename = str(filename[0])
 
         self.loader = FileLoader(self, filename)
+        self.loader.done.connect(self.finished_loading)
         self.loader.start()
 
-        time.sleep(1)
+        time.sleep(0.25)
         self.show_videos(self.loader.tmp)
 
     def show_videos(self, tmp):
@@ -122,6 +120,9 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
             self.audio.addItem(os.path.basename(path))
 
         self.show()
+
+        time.sleep(0.25)
+        self.start_offset = self.videos[0].player.time_pos
 
     def adjust_volume(self, to):
         self.videos[self.audio_from].player.volume = float(to or 0)
@@ -137,34 +138,56 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
     def seek(self, to):
         """Jump to an absolute index in all videos."""
 
+        t = (to / 100.0) * max(self.length - self.start_offset, 1)
+        pos = (self.videos[0].player.time_pos or 0) - self.start_offset
+        if pos > t:
+            offset = -(pos - t)
+        else:
+            offset = t - pos
         for vid in self.videos:
-            vid.player.seek(to, 1)
+            vid.player.seek(int(offset))
 
     def tick(self):
         """Called once a second."""
 
         # Update progress if loading a file.
         if self.loader and not self.loader.finished:
-            try:
-                self.load_meter.setMaximum(self.loader.size)
-                self.load_meter.setValue(self.loader.pos)
-            except OverflowError:
-                self.load_meter.setMaximum(100)
-                self.load_meter.setValue(
-                    (float(self.loader.pos) / self.loader.size) * 100)
+            percent = (float(self.loader.pos) / self.loader.size) * 100
+            self.load_meter.setValue(percent)
             self.load_label.setText('Read %s / %s mb'
                                     % (self.loader.pos / 1024 / 1024,
                                        self.loader.size / 1024 / 1024))
 
         else:
+            percent = 100
             self.load_label.setText('Done')
-            self.load_meter.setValue(100)
 
-        # Update seek and volume.
+        self.load_meter.setValue(percent)
+
+        # Update seek and play/pause button.
         if self.videos:
             self.play_btn.setText(
                 'Play' if self.videos[0].player.paused else 'Pause')
-            self.slider.setValue(self.videos[0].player.percent_pos or 0)
+
+            if self.loader.finished:
+                pos = self.videos[0].player.time_pos
+                if pos is not None:
+                    pos -= self.start_offset
+                    length = max(self.length - self.start_offset, 1)
+                    percent = pos / length * 100
+
+                    self.slider.setMaximum(100)
+                    self.slider.setValue(percent)
+
+    def finished_loading(self):
+        tmp = mplayer.Player((
+            '-vo', 'null', '-ao', 'null',
+            self.videos[0].player.path))
+        tmp.loadfile(self.videos[0].player.path)
+        tmp.seek(99, 1)
+        self.length = tmp.time_pos
+        tmp.quit()
+        self.slider.setEnabled(True)
 
     def resizeEvent(self, e=None):
         """Resize elements to match changing window size."""
@@ -212,6 +235,8 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
 class FileLoader(QtCore.QThread):
     """Parse video from a chapter 10 file into a temporary directory."""
 
+    done = QtCore.Signal()
+
     def __init__(self, parent, filename):
         super(FileLoader, self).__init__()
         self.finished = True
@@ -252,6 +277,7 @@ class FileLoader(QtCore.QThread):
 
     def quit(self):
         self.finished = True
+        self.done.emit()
         QtCore.QThread.quit(self)
 
 
