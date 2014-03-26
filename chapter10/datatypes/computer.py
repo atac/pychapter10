@@ -36,8 +36,6 @@ class Event(Data):
         self.event_count = int((raw >> 12) & 0xffff)
         self.event_number = int(raw & 0xfff)
 
-        print self.eo, self.event_count, self.event_number
-
 
 class NodeIndex(Data):
     def __init__(self, raw):
