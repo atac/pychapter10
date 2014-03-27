@@ -122,7 +122,7 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         self.show()
 
         time.sleep(0.25)
-        self.start_offset = self.videos[0].player.time_pos
+        self.start_offset = (self.videos[0].player.time_pos or 0)
 
     def adjust_volume(self, to):
         self.videos[self.audio_from].player.volume = float(to or 0)
