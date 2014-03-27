@@ -28,7 +28,7 @@ except OSError:
 
 # Force subprocess.Popen to use shell=True on windows.
 if sys.platform == 'win32':
-    subprocess.Popen = partial(subprocess.Popen, shell=True, stdout=None)
+    subprocess.Popen = partial(subprocess.Popen, shell=True)
 
 mplayer.Player.introspect()
 
@@ -79,7 +79,7 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         self.slider.sliderMoved.connect(self.seek)
         self.volume.sliderMoved.connect(self.adjust_volume)
         self.menubar.triggered.connect(self.menu_action)
-        self.destroyed.connect(self.quit)
+        self.destroyed.connect(self.closeEvent)
 
         self.volume.setValue(40.0)
         self.audio_source(0)
@@ -90,10 +90,16 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
             self.load_file()
 
         elif action == 'Exit':
-            self.quit()
+            self.closeEvent()
 
-    def quit(self):
+    def closeEvent(self, event=None):
+        self.ticker.running = False
+        self.ticker.wait()
+        if self.loader:
+            self.loader.quit()
+            self.loader.wait()
         self.app.closeAllWindows()
+        QtGui.QMainWindow.closeEvent(self, event)
 
     def load_file(self, filename=None):
         if filename is None:
@@ -113,6 +119,9 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         tmp = str(tmp)
         for vid in self.videos:
             self.grid.removeWidget(vid)
+            vid.player.quit()
+            vid.destroy()
+            del vid
         self.videos = []
         self.audio.clear()
         for path in os.listdir(tmp):
@@ -204,7 +213,8 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
     def add_video(self, path):
         """Add a video widget for a file."""
 
-        vid = VideoWidget(self.verticalLayoutWidget, ('-volume', '0'))
+        vid = VideoWidget(self.verticalLayoutWidget, ('-volume', '0', '-quiet',
+                                                      '-really-quiet'))
         vid.player.loadfile(path)
         x, y = 0, self.grid.rowCount() - 1
         if y < 0:
@@ -242,36 +252,36 @@ class FileLoader(QtCore.QThread):
         self.finished = True
         self.parent, self.filename = parent, filename
         self.size, self.pos = os.stat(filename).st_size, 0
-        self.cancel = False
 
     def run(self):
         self.finished = False
         self.tmp = mkdtemp()
         out = {}
-        for packet in C10(self.filename):
+        try:
+            for packet in C10(self.filename):
 
-            # Cancel if requested.
-            if self.cancel:
-                self.quit()
-                return
+                # Cancel if requested.
+                if self.finished:
+                    break
 
-            # Ignore non-video.
-            if datatypes.format(packet.data_type)[0] != 8:
-                continue
+                # Ignore non-video.
+                if datatypes.format(packet.data_type)[0] != 8:
+                    continue
 
-            # Ensure a target path exists.
-            path = os.path.join(self.tmp, str(packet.channel_id)) + '.mpg'
-            if path not in out:
-                out[path] = open(path, 'wb')
+                # Ensure a target path exists.
+                path = os.path.join(self.tmp, str(packet.channel_id)) + '.mpg'
+                if path not in out:
+                    out[path] = open(path, 'wb')
 
-            out[path].write(''.join([p.data for p in packet.body.mpeg]))
-            self.pos = packet.pos
+                for ts in packet.body.mpeg:
+                    out[path].write(ts.data)
+                self.pos = packet.pos
+        except ValueError:
+            pass
 
         for f in out.values():
-            try:
+            if not f.closed:
                 f.close()
-            except:
-                pass
 
         self.quit()
 
@@ -289,8 +299,11 @@ class Ticker(QtCore.QThread):
 
     def run(self):
         while self.running:
-            self.tick.emit()
-            time.sleep(1)
+            try:
+                self.tick.emit()
+            except RuntimeError:
+                break
+            time.sleep(0.5)
         self.quit()
 
 if __name__ == '__main__':
