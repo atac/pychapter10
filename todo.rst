@@ -1,3 +1,4 @@
+
 To Do
 =====
 
@@ -5,6 +6,7 @@ General
 -------
 
 * Replace usage of datatypes.base.Data with actual values.
+* Python 3 compatibility
 
 Data Types (/datatypes)
 -----------------------
