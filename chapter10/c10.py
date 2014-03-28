@@ -11,11 +11,18 @@ class C10(object):
     def __init__(self, f):
         """Takes a file or filename and reads packets."""
 
+        atexit.register(self.close)
         if isinstance(f, str):
             f = open(f, 'rb')
-            atexit.register(f.close)
-
         self.file = f
+
+    def close(self):
+        """Make sure we close our file if we can."""
+
+        try:
+            self.file.close()
+        except:
+            pass
 
     def next(self):
         try:
