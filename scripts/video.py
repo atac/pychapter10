@@ -108,6 +108,10 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
                 'Chapter 10 Files (*.c10 *.ch10);;All Files (*.*)')
             filename = str(filename[0])
 
+        if not filename:
+            self.show()
+            return
+
         self.loader = FileLoader(self, filename)
         self.loader.done.connect(self.finished_loading)
         self.loader.start()
@@ -175,8 +179,9 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
 
         # Update seek and play/pause button.
         if self.videos:
+            paused = self.videos[0].player.paused
             self.play_btn.setText(
-                'Play' if self.videos[0].player.paused else 'Pause')
+                'Play' if paused else 'Pause')
 
             if self.loader.finished:
                 pos = self.videos[0].player.time_pos
@@ -188,11 +193,17 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
                     self.slider.setMaximum(100)
                     self.slider.setValue(percent)
 
+                    if int(percent) == 100 and paused:
+                        self.seek(0)
+
     def finished_loading(self):
+        path = self.videos[0].player.path
+        if path is None:
+            return
         tmp = mplayer.Player((
             '-vo', 'null', '-ao', 'null',
             self.videos[0].player.path))
-        tmp.loadfile(self.videos[0].player.path)
+        tmp.loadfile(path)
         tmp.seek(99, 1)
         self.length = tmp.time_pos
         tmp.quit()
@@ -216,6 +227,7 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         vid = VideoWidget(self.verticalLayoutWidget, ('-volume', '0', '-quiet',
                                                       '-really-quiet'))
         vid.player.loadfile(path)
+        vid.player.loop = 0
         x, y = 0, self.grid.rowCount() - 1
         if y < 0:
             y = 0

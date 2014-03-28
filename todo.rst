@@ -24,7 +24,7 @@ Scripts (/scripts)
 * c10_check.py - Validator
 * c10_reindex.py - Walk a chapter 10 file and build a new index
 * video.py
-    * File looping and opening new files
+    * New file handling
 
 Tests (/tests)
 --------------
