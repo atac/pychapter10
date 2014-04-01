@@ -73,6 +73,10 @@ class Computer(Base):
             raise NotImplementedError(
                 'Computer Generated Data Format %s is reserved!' % self.format)
 
+        # User Defined
+        elif self.format == 0:
+            return
+
         # TMATS
         elif self.format == 1:
             self.frmt = bool(self.csdw & (1 << 9))  # Format ASCII / XML
@@ -93,39 +97,37 @@ class Computer(Base):
             self.iph = bool(self.csdw & (1 << 29))  # Index IPH
             self.iec = int(self.csdw & 0xffff)      # Index Entry Count
 
-            data = self.data[:]
-
             if self.fsp:
                 self.file_size = struct.unpack('Q', self.data[:8])[0]
                 self.data = self.data[8:]
 
-        if format != 0:
-            for i in xrange(getattr(self, 'iec', getattr(self, 'reec', 0))):
-                self.all.append(Data('Timestamp', data[:8]))
+        data = self.data[:]
+        for i in xrange(getattr(self, 'iec', getattr(self, 'reec', 0))):
+            self.all.append(Data('Timestamp', data[:8]))
+            data = data[8:]
+
+            if self.iph:
+                self.all.append(Data('IPH', data[:8]))
                 data = data[8:]
 
-                if self.iph:
-                    self.all.append(Data('IPH', data[:8]))
+            if self.format == 2:
+                event = Event(data[:4])
+                self.events.append(event)
+                self.all.append(event)
+                data = data[4:]
+
+            elif self.format == 3:
+                if self.it == 0:
+                    index = Data('Root Index', data[:8])
                     data = data[8:]
+                elif self.it == 1:
+                    index = NodeIndex(data[:12])
+                    data = data[12:]
+                self.indices.append(index)
+                self.all.append(index)
 
-                if self.format == 2:
-                    event = Event(data[:4])
-                    self.events.append(event)
-                    self.all.append(event)
-                    data = data[4:]
-
-                elif self.format == 3:
-                    if self.it == 0:
-                        index = Data('Root Index', data[:8])
-                        data = data[8:]
-                    elif self.it == 1:
-                        index = NodeIndex(data[:12])
-                        data = data[12:]
-                    self.indices.append(index)
-                    self.all.append(index)
-
-            if getattr(self, 'it', None) == 0:
-                self.root_offset = struct.unpack('Q', self.data[:8])[0]
+        if getattr(self, 'it', None) == 0:
+            self.root_offset = struct.unpack('Q', self.data[:8])[0]
 
     def __iter__(self):
         return iter(self.all)
