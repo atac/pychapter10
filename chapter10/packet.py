@@ -30,7 +30,6 @@ class Packet(object):
         self.file, self.pos = file, file.tell()
         header = file.read(24)
 
-        # Make sure we're not reading beyond the file length.
         if len(header) < 24:
             raise EOFError
 
@@ -85,7 +84,9 @@ class Packet(object):
 
         if self.header_sums != self.header_checksum:
             return False
-        elif self.sync_pattern != 60197:
+        elif self.secondary_sums != self.secondary_checksum:
+            return False
+        elif self.sync_pattern != 0xeb25:
             return False
         return True
 
