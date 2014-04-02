@@ -13,25 +13,23 @@ class Base(object):
     def __init__(self, packet):
         """Logs the file cursor location for later and skips past the data."""
 
-        self.packet = packet
+        self.packet, self.init = (packet, False)
 
-        # Whether data has been loaded.
-        self.init = False
+        # Find the body position and skip to the packet trailer.
+        self.pos = self.packet.file.tell()
+        packet.file.seek(self.pos+ self.packet.data_length)
 
-        # Store the body position.
-        self.start = self.packet.file.tell()
-
-        # Skip to the packet trailer.
-        packet.file.seek(self.start + self.packet.data_length)
-
+        # Get our type and format.
         from . import format
         self.type, self.format = format(self.packet.data_type)
 
     def parse(self):
-        """Called lazily (only when requested) to avoid memory overflows."""
+        """Called lazily (only when requested) to avoid memory overflows.
+        Reads the Channel Specific Data Word (csdw) and data into attributes.
+        """
 
         pos = self.packet.file.tell()
-        self.packet.file.seek(self.start)
+        self.packet.file.seek(self.pos)
         self.csdw = struct.unpack('I', self.packet.file.read(4))[0]
         self.data = self.packet.file.read(self.packet.data_length - 4)
         self.packet.file.seek(pos)
