@@ -13,11 +13,12 @@ def test_construct(monkeypatch):
 
 
 def test_next(monkeypatch):
-    monkeypatch.setattr(c10.C10, 'find_and_parse', Mock(return_value=12))
-    assert c10.C10(Mock()).next() == 12
+    f = Mock(read=Mock(return_value='\x25\xeb'), tell=Mock(return_value=2))
+    monkeypatch.setattr(c10, 'Packet', Mock(
+        return_value=Mock(packet_length=2, check=Mock(return_value=True))))
+    assert c10.C10(f).next().packet_length == 2
 
 
 def test_next_stop(monkeypatch):
-    monkeypatch.setattr(c10.C10, 'find_and_parse', Mock(side_effect=EOFError))
     with pytest.raises(StopIteration):
-        c10.C10(Mock()).next()
+        c10.C10(Mock(read=Mock(side_effect=EOFError))).next()

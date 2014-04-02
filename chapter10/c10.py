@@ -26,26 +26,21 @@ class C10(object):
 
     def next(self):
         try:
-            return self.find_and_parse()
+            pos = self.file.tell()
+            s = self.file.read(BUFFER_SIZE)
+            if not s:
+                raise EOFError
+            elif '\x25\xeb' in s:
+                self.file.seek(pos + s.find('\x25\xeb'))
+                p = Packet(self.file)
+                self.file.seek(pos + p.packet_length)
+                if p.check():
+                    return p
+
+            # Keep calling until we get a result or end.
+            return self.next()
         except EOFError:
             raise StopIteration
-
-    def find_and_parse(self):
-        """Find the next sync pattern and attempt to read a packet."""
-
-        pos = self.file.tell()
-        s = self.file.read(BUFFER_SIZE)
-        if not s:
-            raise EOFError
-        elif '\x25\xeb' in s:
-            self.file.seek(pos + s.find('\x25\xeb'))
-            p = Packet(self.file)
-            self.file.seek(pos + p.packet_length)
-            if p.check():
-                return p
-
-        # Keep calling until we get a result or end.
-        return self.find_and_parse()
 
     def __repr__(self):
         return '<C10: {}>'.format(self.file.name)
