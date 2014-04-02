@@ -6,9 +6,9 @@ import datatypes
 
 
 class Packet(object):
-    """Reads header and associates a data type specific object."""
+    """Reads header and associates a datatype specific object."""
 
-    # The attribute names for header fields.
+    # Attribute names for header fields.
     HEADER_KEYS = (
         'Sync Pattern',
         'Channel ID',
@@ -28,15 +28,15 @@ class Packet(object):
 
         # Mark our location in the file and read the header.
         self.file, self.pos = file, file.tell()
-        header = file.read(24)
 
+        # Read the packet header and save header sums for later (masked for bit
+        # length).
+        header = file.read(24)
         if len(header) < 24:
             raise EOFError
-
-        # Store the header sums (masked to be a consistent bit length).
         self.header_sums = sum(array('H', header)[:-1]) & 0xffff
 
-        # Parse the header values.
+        # Parse header fields into attributes.
         values = struct.unpack('HHIIBBBBIHH', header)
         for i, field in enumerate(self.HEADER_KEYS):
             setattr(self, '_'.join(field.split()).lower(), values[i])
@@ -52,32 +52,13 @@ class Packet(object):
             # Store our sums for checking later on (masked for bit length).
             self.secondary_sums = sum(array('H', secondary)[:-1]) & 0xffff
 
+            # Parse the secondary header time and checksum.
             self.time, self.secondary_checksum = struct.unpack('qxxH',
                                                                secondary)
 
         # Parse the body based on type.
         datatype = datatypes.get_handler(self.data_type)
         self.body = datatype(self)
-
-    def print_header(self):
-        """Print out the header information."""
-
-        print '-' * 80
-        for name in self.HEADER_KEYS:
-            attr = '_'.join(name.split()).lower()
-            print name + str(getattr(self, attr)).rjust(80 - len(name), '.')
-        print self.check() and '(valid)' or '(error)'
-        print '-' * 80
-
-    def raw(self):
-        """Returns the entire packet as raw bytes."""
-
-        pos = self.file.tell()
-        self.file.seek(self.pos)
-        raw = self.file.read(self.packet_length)
-        self.file.seek(pos)
-
-        return raw
 
     def check(self):
         """Validate the packet using checksums and verifying fields."""
@@ -92,3 +73,15 @@ class Packet(object):
 
     def __len__(self):
         return self.packet_length
+
+    def __str__(self):
+        """Returns the entire packet as raw bytes."""
+
+        pos = self.file.tell()
+        self.file.seek(self.pos)
+        raw = self.file.read(self.packet_length)
+        self.file.seek(pos)
+        return raw
+
+    def __repr__(self):
+        return '<C10 Packet {} {} bytes>'.format(self.data_type, len(self))
