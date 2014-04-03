@@ -5,7 +5,7 @@ __doc__ = """usage: c10_copy.py <src> <dst> [options]
 Options:
     -c CHANNEL..., --channel CHANNEL...  Specify channels to include (csv).
     -e CHANNEL..., --exclude CHANNEL...  Specify channels to ignore (csv).
-    -t TYPE, --type TYPE                 The types of data to export (csv, may\
+    -t TYPE, --type TYPE                 The types of data to copy (csv, may\
  be decimal or hex eg: 0x40)
     -f --force                           Overwrite existing files."""
 
