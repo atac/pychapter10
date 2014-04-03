@@ -4,9 +4,9 @@ def walk_packets(c10, args={}):
     """Walk a chapter 10 file based on sys.argv (type, channel, etc.)."""
 
     # Apply defaults.
-    args['--type'] = args.get('--type', '') or ''
-    args['--channel'] = args.get('--channel', '') or ''
-    args['--exclude'] = args.get('--exclude', '') or ''
+    args['--type'] = args.get('--type') or ''
+    args['--channel'] = args.get('--channel') or ''
+    args['--exclude'] = args.get('--exclude') or ''
 
     # Parse types (if given) into ints.
     types = [t.strip() for t in args['--type'].split(',') if t.strip()]
