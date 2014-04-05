@@ -8,6 +8,7 @@ class Base(object):
     # The names of any data attributes for lazy-loading.
     data_attrs = (
         'data',
+        'csdw',
     )
 
     def __init__(self, packet):
