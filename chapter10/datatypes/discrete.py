@@ -6,10 +6,8 @@ class Discrete(Base):
     data_attrs = Base.data_attrs + (
         'all',
         'events',
-        'd31',
-        'd30',
-        'd1',
-        'd0',
+        'length',
+        'mode',
     )
 
     def parse(self):
@@ -19,10 +17,8 @@ class Discrete(Base):
             raise NotImplementedError('Discrete data format %s is reserved!'
                                       % self.format)
 
-        self.d31 = bool(self.csdw & (0x1 << 31))
-        self.d30 = bool(self.csdw & (0x1 << 30))
-        self.d1 = bool(self.csdw & (0x1 << 1))
-        self.d0 = bool(self.csdw & 0b1)
+        self.length = int(self.csdw >> 3 & 31)
+        self.mode = int(self.csdw & 0b111)
 
         data = self.data[:]
         self.all, self.events = [], []
