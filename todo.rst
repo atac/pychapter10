@@ -12,6 +12,7 @@ Data Types (/datatypes)
 -----------------------
 
 * computer.py - Implement TMATS XML parser
+* discrete.py - Needs more testing (no data on hand)
 * time.py - Add time word parsing
 * ms1553.py - Finish message parsing
 * analog.py - Finish sample parsing (no data to test with)
