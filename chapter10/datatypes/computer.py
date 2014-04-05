@@ -9,18 +9,16 @@ class TMATS(object):
     """Container for TMATS key-value pairs (similar to a dict)."""
 
     def __init__(self, s, xml=False):
-        self.data = s
         self.all = []
-        self.parse()
-
-    def parse(self):
-        """Parse ASCII format TMATS."""
-
-        for line in self.data.splitlines():
+        for line in s.splitlines():
             if not line.strip():
                 continue
             line = line.strip()[:-1]
-            k, v = line.split(':', 1)
+            try:
+                k, v = line.split(':', 1)
+            except:
+                print repr(line)
+                raise
             self.all.append([k, v])
 
     def __getitem__(self, key):
@@ -82,7 +80,7 @@ class Computer(Base):
             self.frmt = bool(self.csdw & (1 << 9))  # Format ASCII / XML
             self.srcc = bool(self.csdw & (1 << 8))  # Setup Rec Config Change
             self.version = int(self.csdw & (0xff))  # Ch10 Version
-            self.tmats = TMATS(self.data)
+            self.tmats = TMATS(self.data, self.frmt)
             return
 
         # Recording Event
