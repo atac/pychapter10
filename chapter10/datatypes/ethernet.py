@@ -29,16 +29,12 @@ class Ethernet(Base):
                 if len(data) < 12:
                     break
 
-                ipt = Data('Timestamp', data[:8])
-                data = data[8:]
-                self.all.append(ipt)
-
-                iph = Data('IPH', data[:4])
-                data = data[4:]
-                self.all.append(iph)
+                iph = Data('IPH', data[8:12])
+                self.all += [Data('Timestamp', data[:8]), iph]
+                data = data[12:]
 
                 iph = struct.unpack('I', iph.data)[0]
-                length = int(iph & 0x1fff)
+                length = int(iph & 0x3fff)
 
                 frame = Data('Ethernet Frame', data[length:])
                 data = data[length:]

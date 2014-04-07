@@ -11,12 +11,15 @@ General
 Data Types (/datatypes)
 -----------------------
 
+* analog.py - Finish sample parsing (no data to test with)
 * computer.py - Implement TMATS XML parser
 * discrete.py - Needs more testing (no data on hand)
-* time.py - Add time word parsing
+* ethernet.py
+    * Fix format 0 frame length issue
+    * Implement format 1
+    * Write test module
 * ms1553.py - Finish message parsing
-* analog.py - Finish sample parsing (no data to test with)
-* ethernet.py - Implement format 1
+* time.py - Add time word parsing
 * Implement TSPI/CTS parser
 
 Scripts (/scripts)
