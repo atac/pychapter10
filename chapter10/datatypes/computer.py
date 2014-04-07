@@ -88,6 +88,8 @@ class Computer(Base):
             self.iph = bool(self.csdw & (1 << 31))  # Intra Packet Header
             self.reec = int(self.csdw & 0xfff)      # Rec Event Entry Count
 
+            count = self.reec
+
         # Recording Index
         elif self.format == 3:
             self.it = bool(self.csdw & (1 << 31))   # Index Type
@@ -95,12 +97,14 @@ class Computer(Base):
             self.iph = bool(self.csdw & (1 << 29))  # Index IPH
             self.iec = int(self.csdw & 0xffff)      # Index Entry Count
 
+            count = self.iec
+
             if self.fsp:
                 self.file_size = struct.unpack('Q', self.data[:8])[0]
                 self.data = self.data[8:]
 
         data = self.data[:]
-        for i in xrange(getattr(self, 'iec', getattr(self, 'reec', 0))):
+        for i in xrange(count):
             self.all.append(Data('Timestamp', data[:8]))
             data = data[8:]
 
