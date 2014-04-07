@@ -15,7 +15,6 @@ Data Types (/datatypes)
 * computer.py - Implement TMATS XML parser
 * discrete.py - Needs more testing (no data on hand)
 * ethernet.py
-    * Fix format 0 frame length issue
     * Implement format 1
     * Write test module
 * ms1553.py - Finish message parsing

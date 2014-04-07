@@ -20,15 +20,17 @@ class Ethernet(Base):
                                       % self.format)
 
         if self.format == 0:
+
+            # CSDW
             self.fmt = int(self.csdw >> 28)
             self.frame_count = int(self.csdw & 0xffff)
 
+            # Parse frames
             data = self.data[:]
             self.all, self.frames = [], []
             for i in range(self.frame_count):
-                if len(data) < 12:
-                    break
 
+                # IPH
                 iph = Data('IPH', data[8:12])
                 self.all += [Data('Timestamp', data[:8]), iph]
                 data = data[12:]
@@ -36,10 +38,15 @@ class Ethernet(Base):
                 iph = struct.unpack('I', iph.data)[0]
                 length = int(iph & 0x3fff)
 
-                frame = Data('Ethernet Frame', data[length:])
+                # The actual ethernet frame.
+                frame = Data('Ethernet Frame', data[:length])
                 data = data[length:]
                 self.frames.append(frame)
                 self.all.append(frame)
+
+                # Account for filler byte when length is odd.
+                if length % 2:
+                    data = data[1:]
 
     def __iter__(self):
         return iter(self.frames)
