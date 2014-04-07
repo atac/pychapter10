@@ -14,9 +14,7 @@ Data Types (/datatypes)
 * analog.py - Finish sample parsing (no data to test with)
 * computer.py - Implement TMATS XML parser
 * discrete.py - Needs more testing (no data on hand)
-* ethernet.py
-    * Implement format 1
-    * Write test module
+* ethernet.py - Implement format 1 and finish tests
 * ms1553.py - Finish message parsing
 * time.py - Add time word parsing
 * Implement TSPI/CTS parser
