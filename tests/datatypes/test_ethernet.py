@@ -27,4 +27,4 @@ def test_count():
     for packet in C10(SAMPLE):
         if isinstance(packet.body, ethernet.Ethernet):
             break
-    assert packet.body.frame_count == len(packet.body.frames)
+    assert len(packet.body) == len(packet.body.frames)
