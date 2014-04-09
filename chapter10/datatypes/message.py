@@ -35,14 +35,16 @@ class Message(Base):
                 ipdh = Data('IPDH', data[:4])
                 data = data[4:]
 
-                iph = int(struct.unpack('I', ipdh.data)[0])
-                length = int(iph & 0xffff)
-                if len(data) < length:
-                    break
+                length = struct.unpack('HH', ipdh.data)[0]
+
                 msg = Data('Message Data', data[length:])
                 data = data[length:]
                 self.messages.append(msg)
                 self.all += [ipth, ipdh, msg]
+
+                # Account for filler byte when length is odd.
+                if length % 2:
+                    data = data[1:]
 
     def __iter__(self):
         return iter(self.all)
