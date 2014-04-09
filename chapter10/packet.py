@@ -72,7 +72,10 @@ class Packet(object):
         return True
 
     def __len__(self):
-        return self.packet_length
+        return len(self.body)
+
+    def __iter__(self):
+        return iter(self.body)
 
     def __str__(self):
         """Returns the entire packet as raw bytes."""

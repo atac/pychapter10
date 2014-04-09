@@ -15,4 +15,4 @@ def test_raw():
                            'sample.c10'), 'rb') as f:
         p = packet.Packet(f)
         f.seek(0)
-        assert f.read(len(p)) == str(p)
+        assert f.read(p.packet_length) == str(p)
