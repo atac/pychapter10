@@ -12,6 +12,7 @@ class I1394(Base):
         'sy',
         'tc',
         'ipc',
+        'reset',
     )
 
     def parse(self):
@@ -27,11 +28,12 @@ class I1394(Base):
         if self.format == 0:
             self.pbt = int(self.csdw >> 29 & 0b111)  # Packet Body Type
             self.sy = int(self.csdw >> 25 & 0b1111)  # Synchronization Code
-            self.tc = int(self.csdw & 0xffff)           # Transaction Count
+            self.tc = int(self.csdw & 0xffff)        # Transaction Count
 
             # Bus Status
             if self.pbt == 0:
-                pass
+                word = struct.unpack('I', self.data)[0]
+                self.reset = bool(word >> 31)
 
             # Data Streaming
             elif self.pbt == 1:
