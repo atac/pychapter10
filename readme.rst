@@ -30,7 +30,7 @@ To automatically install dependencies using pip_ use::
 Building Binary Executables
 ---------------------------
 
-If you also have cx_Freeze installed you can run::
+If you also have cx_Freeze_ installed you can run::
 
     python setup.py build
 
