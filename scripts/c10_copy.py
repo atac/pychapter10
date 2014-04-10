@@ -27,4 +27,6 @@ if __name__ == '__main__':
 
     with open(args['<dst>'], 'wb') as out:
         for packet in walk_packets(C10(args['<src>']), args):
-            out.write(str(packet))
+            raw = str(packet)
+            if len(raw) == packet.packet_length:
+                out.write(raw)
