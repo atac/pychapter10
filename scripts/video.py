@@ -47,9 +47,16 @@ class VideoWidget(qt4.QPlayerView):
         try:
             id = int(id)
         except TypeError:
-            ctypes.pythonapi.PyCObject_AsVoidPtr.restype = ctypes.c_void_p
-            ctypes.pythonapi.PyCObject_AsVoidPtr.argtypes = [ctypes.py_object]
-            id = ctypes.pythonapi.PyCObject_AsVoidPtr(id)
+            try:
+                ctypes.pythonapi.PyCapsule_GetPointer.restype = ctypes.c_void_p
+                ctypes.pythonapi.PyCapsule_GetPointer.argtypes = [
+                    ctypes.py_object, ctypes.c_char_p]
+                id = ctypes.pythonapi.PyCapsule_GetPointer(id, None)
+            except:
+                ctypes.pythonapi.PyCObject_AsVoidPtr.restype = ctypes.c_void_p
+                ctypes.pythonapi.PyCObject_AsVoidPtr.argtypes = [
+                    ctypes.py_object]
+                id = ctypes.pythonapi.PyCObject_AsVoidPtr(id)
         return id
 
 
