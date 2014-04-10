@@ -29,9 +29,10 @@ def test_tmats():
     for packet in C10(SAMPLE):
         if packet.data_type == 1:
             break
-    assert packet.body.tmats['V-1'].items() == [('V-1\\ID', 'DATASOURCE'),
-                                                ('V-1\\VN', 'HDS'),
-                                                ('V-1\\HDS\\SYS', 'sov2')]
+    assert list(packet.body.tmats['V-1'].items()) == [
+        ('V-1\\ID', 'DATASOURCE'),
+        ('V-1\\VN', 'HDS'),
+        ('V-1\\HDS\\SYS', 'sov2')]
 
 
 def test_events():
