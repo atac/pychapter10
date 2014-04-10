@@ -77,7 +77,7 @@ class Packet(object):
     def __iter__(self):
         return iter(self.body)
 
-    def __str__(self):
+    def __bytes__(self):
         """Returns the entire packet as raw bytes."""
 
         pos = self.file.tell()
@@ -85,6 +85,9 @@ class Packet(object):
         raw = self.file.read(self.packet_length)
         self.file.seek(pos)
         return raw
+
+    def __str__(self):
+        return bytes(self).decode()
 
     def __repr__(self):
         return '<C10 Packet {} {} bytes>'.format(self.data_type, len(self))

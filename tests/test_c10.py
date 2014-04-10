@@ -13,7 +13,7 @@ def test_construct(monkeypatch):
 
 
 def test_next(monkeypatch):
-    f = Mock(read=Mock(return_value='\x25\xeb'), tell=Mock(return_value=2))
+    f = Mock(read=Mock(return_value=b'\x25\xeb'), tell=Mock(return_value=2))
     monkeypatch.setattr(c10, 'Packet', Mock(
         return_value=Mock(packet_length=2, check=Mock(return_value=True))))
     assert c10.C10(f).next().packet_length == 2
