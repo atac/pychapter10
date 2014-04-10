@@ -6,7 +6,6 @@ General
 -------
 
 * Replace usage of datatypes.base.Data with actual values.
-* Python 3 compatibility
 * Intra-packet elements should link together (ie. related timestamp, IPH, and
   data)
 
@@ -28,6 +27,7 @@ Scripts (/scripts)
 Testing (data needed)
 ---------------------
 
+* Get tox working
 * Analog
 * Discrete
 * Ethernet format 1

@@ -44,7 +44,7 @@ if __name__ == '__main__':
 
             # Don't overwrite without explicit direction.
             if os.path.exists(filename) and not args['--force']:
-                print '%s already exists. Use -f to overwrite.' % filename
+                print('%s already exists. Use -f to overwrite.' % filename)
                 break
 
             out[filename] = open(filename, 'wb')
@@ -56,7 +56,7 @@ if __name__ == '__main__':
 
         # Do any data selection.
         if t == 8:
-            data = ''.join([p.data for p in packet.body.mpeg])
+            data = b''.join([p.data for p in packet.body.mpeg])
         else:
             data = packet.body.data
 

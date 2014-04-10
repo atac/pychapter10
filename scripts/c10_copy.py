@@ -22,11 +22,11 @@ if __name__ == '__main__':
 
     # Don't overwrite unless explicitly required.
     if os.path.exists(args['<dst>']) and not args['--force']:
-        print 'dst file already exists. Use -f to overwrite.'
+        print('dst file already exists. Use -f to overwrite.')
         raise SystemExit
 
     with open(args['<dst>'], 'wb') as out:
         for packet in walk_packets(C10(args['<src>']), args):
-            raw = str(packet)
+            raw = bytes(packet)
             if len(raw) == packet.packet_length:
                 out.write(raw)
