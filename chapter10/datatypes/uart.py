@@ -23,24 +23,24 @@ class UART(Base):
         self.all, self.uart = [], []
         data = self.data[:]
         while True:
-            try:
-                if self.iph:
-                    timestamp = Data('Timestamp', data[:8])
-                    data = data[8:]
-                    self.all.append(timestamp)
+            if self.iph:
+                timestamp = Data('Timestamp', data[:8])
+                data = data[8:]
+                self.all.append(timestamp)
 
-                iph = Data('IPH', data[:4])
-                data = data[4:]
-                self.all.append(iph)
+            iph = Data('IPH', data[:4])
+            data = data[4:]
+            self.all.append(iph)
 
-                length = struct.unpack('HH', iph.data)[-1]
+            length = struct.unpack('HH', iph.data)[-1]
 
-                uart = Data('UART Data', data[:length])
-                data = data[length:]
-                self.uart.append(uart)
-                self.all.append(uart)
-            except IndexError:
-                break
+            uart = Data('UART Data', data[:length])
+            data = data[length:]
+            self.uart.append(uart)
+            self.all.append(uart)
+
+            if length % 2:
+                data = data[1:]
 
     def __iter__(self):
         return iter(self.all)
