@@ -8,11 +8,9 @@ Chapter 10 format files.
 Dependencies
 ------------
 
-Optional dependencies have explanations given.
-
-* Python_ 2.7 or greater
+* Python_ 2.7 or greater (tested on 2.7 and 3.3)
 * Docopt_
-* PySide_ (for native GUI applications)
+* PySide_ (for GUI applications such as the video player)
 * pytest_ and Mock_ (for test suite)
 * cx_Freeze_ (for building binary executables)
 
@@ -23,7 +21,7 @@ To install the library run::
 
     python setup.py install_lib
 
-To automatically install dependencies using pip_ use::
+To automatically install required dependencies using pip_ use::
 
     pip install -r requirements.txt
 
