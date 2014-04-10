@@ -40,11 +40,11 @@ if __name__ == '__main__':
 
     print('Channel ID      Data Type' + 'Packets'.rjust(47))
     print('-' * 80)
-    for channel in sorted(channels):
-        print (('Channel %s' % channel['id']).ljust(15),
-               ('%s - %s' % (hex(channel['type']),
-                             get_label(channel['type']))).ljust(35),
-               ('%s packets' % channel['packets']).rjust(20))
+    for channel in channels:
+        print (''.join((('Channel %s' % channel['id']).ljust(15),
+                       ('%s - %s' % (hex(channel['type']),
+                                     get_label(channel['type']))).ljust(35),
+                       ('%s packets' % channel['packets']).rjust(20))))
 
     units = ['gb', 'mb', 'kb']
     unit = 'b'

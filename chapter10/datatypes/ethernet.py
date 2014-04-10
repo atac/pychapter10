@@ -1,7 +1,7 @@
 
 import struct
 
-from base import Base, Data
+from .base import Base, Data
 
 
 class Ethernet(Base):

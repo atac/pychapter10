@@ -2,7 +2,7 @@
 from array import array
 import struct
 
-import datatypes
+from . import datatypes
 
 
 class Packet(object):

@@ -1,9 +1,10 @@
 import atexit
 import os
 
-from packet import Packet
+from .packet import Packet
 
 BUFFER_SIZE = 100000
+SYNC = b'\x25\xeb'
 
 
 class C10(object):
@@ -25,7 +26,7 @@ class C10(object):
         except:
             pass
 
-    def next(self):
+    def __next__(self):
         """Walk a chapter 10 file using python's iterator protocol and return
         a chapter10.packet.Packet object for each valid packet found.
         """
@@ -39,18 +40,20 @@ class C10(object):
                 raise EOFError
 
             # If we find a sync pattern, try to parse a packet header.
-            if '\x25\xeb' in s:
-                self.file.seek(pos + s.find('\x25\xeb'))
+            if SYNC in s:
+                self.file.seek(pos + s.find(SYNC))
                 p = Packet(self.file)
                 self.file.seek(pos + p.packet_length)
                 if p.check():
                     return p
 
             # If no packet then keep calling until we get a result or eof.
-            return self.next()
+            return self.__next__()
 
         except EOFError:
             raise StopIteration
+
+    next = __next__
 
     def __repr__(self):
         return '<C10: {}>'.format(os.path.basename(self.file.name))

@@ -14,11 +14,7 @@ class TMATS(object):
             if not line.strip():
                 continue
             line = line.strip()[:-1]
-            try:
-                k, v = line.split(':', 1)
-            except:
-                print repr(line)
-                raise
+            k, v = line.split(':', 1)
             self.all.append([k, v])
 
     def __getitem__(self, key):
