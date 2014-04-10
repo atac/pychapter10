@@ -13,11 +13,7 @@ General
 Data Types (/datatypes)
 -----------------------
 
-* analog.py - Finish sample parsing (no data to test with)
 * computer.py - Implement TMATS XML parser
-* discrete.py - Needs more testing (no data on hand)
-* ethernet.py - Test format 1 implementation (need data)
-* i1394 - More testing (need data)
 * ms1553.py - Finish message parsing
 * time.py - Add time word parsing
 * Implement TSPI/CTS parser
@@ -29,7 +25,10 @@ Scripts (/scripts)
 * c10_reindex.py - Walk a chapter 10 file and build a new index
 * video.py - New file handling
 
-Tests (/tests)
---------------
+Testing (data needed)
+---------------------
 
-Better coverage for datatypes and top-level package
+* Analog
+* Discrete
+* Ethernet format 1
+* IEEE-1394
