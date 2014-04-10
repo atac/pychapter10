@@ -86,8 +86,7 @@ class Packet(object):
         self.file.seek(pos)
         return raw
 
-    def __str__(self):
-        return bytes(self).decode()
+    __str__ = __bytes__
 
     def __repr__(self):
         return '<C10 Packet {} {} bytes>'.format(self.data_type, len(self))

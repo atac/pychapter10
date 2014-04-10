@@ -11,6 +11,7 @@ class TMATS(object):
     def __init__(self, s, xml=False):
         self.all = []
         for line in s.splitlines():
+            line = line.decode()
             if not line.strip():
                 continue
             line = line.strip()[:-1]
@@ -100,7 +101,7 @@ class Computer(Base):
                 self.data = self.data[8:]
 
         data = self.data[:]
-        for i in xrange(count):
+        for i in range(count):
             self.all.append(Data('Timestamp', data[:8]))
             data = data[8:]
 
