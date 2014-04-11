@@ -34,6 +34,23 @@ If you also have cx_Freeze_ installed you can run::
 
 and generate standalone binary executables for your platform.
 
+Running Tests
+-------------
+
+To run the included test suite run::
+
+    py.test
+
+Or, if you have tox_ installed you can use it instead::
+
+    tox
+
+or on Windows:
+    
+    tox -c tox-win32.ini
+
+This will run the test suite against both Python 2.7 and 3.3 if they are
+installed.
 
 .. _PySide: http://qt-project.org/wiki/Category:LanguageBindings::PySide
 .. _cx_Freeze: http://cx-freeze.sourceforge.net/index.html
@@ -43,3 +60,4 @@ and generate standalone binary executables for your platform.
 .. _Docopt: http://docopt.org
 .. _pytest: http://pytest.org
 .. _Mock: http://www.voidspace.org.uk/python/mock/
+.. _tox: http://tox.readthedocs.org/en/latest/
