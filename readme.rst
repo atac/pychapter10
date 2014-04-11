@@ -45,7 +45,7 @@ Or, if you have tox_ installed you can use it instead::
 
     tox
 
-or on Windows:
+or on Windows::
     
     tox -c tox-win32.ini
 
