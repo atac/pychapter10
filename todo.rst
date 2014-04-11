@@ -27,7 +27,6 @@ Scripts (/scripts)
 Testing (data needed)
 ---------------------
 
-* Get tox working
 * Analog
 * Discrete
 * Ethernet format 1

@@ -1,7 +1,10 @@
 
 import os
 
-from mock import Mock
+try:
+    from unittest.mock import Mock
+except ImportError:
+    from mock import Mock
 import pytest
 
 from chapter10 import C10
