@@ -45,7 +45,10 @@ def get_handler(data_type):
     """Find an appropriate parser for a given data type."""
 
     t, f = format(data_type)
-    return TYPES[t][1]
+    try:
+        return TYPES[t][1]
+    except:
+        return Base
 
 
 def get_label(data_type):
