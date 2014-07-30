@@ -3,7 +3,7 @@ import os
 
 from .packet import Packet
 
-BUFFER_SIZE = 100000
+BUFFER_SIZE = 100000000
 SYNC = b'\x25\xeb'
 
 
@@ -43,8 +43,8 @@ class C10(object):
             if SYNC in s:
                 self.file.seek(pos + s.find(SYNC))
                 p = Packet(self.file)
-                self.file.seek(pos + p.packet_length)
                 if p.check():
+                    self.file.seek(pos + p.packet_length)
                     return p
 
             # If no packet then keep calling until we get a result or eof.
