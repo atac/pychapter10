@@ -58,7 +58,7 @@ class PCM(Base):
         data = self.data[:]
         for i in range(len(data) / frame_size):
             if self.iph:
-                all.append(Data('IPH', data[:iph]))
+                self.all.append(Data('IPH', data[:iph]))
                 data = data[iph:]
             frame = Data('PCM Frame', data[:5])
             self.frames.append(frame)
