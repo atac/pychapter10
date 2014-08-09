@@ -36,6 +36,9 @@ class Base(object):
         self.packet.file.seek(pos)
         self.init = True
 
+    def __len__(self):
+        return self.packet.data_length
+
     def __getattribute__(self, name):
         """Loads packet data on demand."""
 
