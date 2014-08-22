@@ -18,7 +18,10 @@ class Base(object):
 
         # Find the body position and skip to the packet trailer.
         self.pos = self.packet.file.tell()
-        packet.file.seek(self.pos + self.packet.data_length)
+        try:
+            packet.file.seek(self.pos + self.packet.data_length)
+        except OverflowError:
+            pass
 
         # Get our type and format.
         from . import format
