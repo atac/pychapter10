@@ -46,6 +46,8 @@ class C10(object):
                 if p.check():
                     self.file.seek(pos + p.packet_length)
                     return p
+                else:
+                    self.file.seek(p.pos + 1)
 
             # If no packet then keep calling until we get a result or eof.
             return self.__next__()
