@@ -45,7 +45,8 @@ class PCM(Base):
             return
 
         # Figure the frame size for this packet (including IPH).
-        frame_size = 5  # Two words sync, three data.
+        frame_size = 6  # Two words sync, four data.
+        iph = 0
         if self.iph:
             iph = 5
 
@@ -60,10 +61,10 @@ class PCM(Base):
             if self.iph:
                 self.all.append(Data('IPH', data[:iph]))
                 data = data[iph:]
-            frame = Data('PCM Frame', data[:5])
+            frame = Data('PCM Frame', data[:frame_size - iph])
             self.frames.append(frame)
             self.all.append(frame)
-            data = data[5:]
+            data = data[frame_size - iph:]
 
     def __iter__(self):
         return iter(self.all)
