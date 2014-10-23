@@ -8,3 +8,4 @@ bin/*
 .tox/*
 .ropeproject
 MANIFEST
+.DS_store
