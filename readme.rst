@@ -41,6 +41,32 @@ or on Windows::
 This will run the test suite against both Python 2.7 and 3.3 if they are
 installed.
 
+To Do
+-----
+
+General
+.......
+
+* Replace usage of datatypes.base.Data with actual values.
+* Intra-packet elements should link together (ie. related timestamp, IPH, and
+  data)
+
+Data Types (/datatypes)
+.......................
+
+* computer.py - Implement TMATS XML parser
+* ms1553.py - Finish message parsing
+* time.py - Add time word parsing
+* Implement TSPI/CTS parser
+
+Testing (data needed)
+.....................
+
+* Analog
+* Discrete
+* Ethernet format 1
+* IEEE-1394
+
 .. _pip: http://pip-installer.org
 .. _Irig 106: http://irig106.org
 .. _Python: http://python.org
