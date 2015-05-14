@@ -16,3 +16,10 @@ def test_raw():
         p = packet.Packet(f)
         f.seek(0)
         assert f.read(p.packet_length) == bytes(p)
+
+
+def test_string():
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                           'sample.c10'), 'rb') as f:
+        p = packet.Packet.from_string(f.read())
+        assert p.check()

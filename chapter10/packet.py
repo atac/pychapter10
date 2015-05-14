@@ -1,5 +1,6 @@
 
 from array import array
+from cStringIO import StringIO
 import struct
 
 from . import datatypes
@@ -59,6 +60,12 @@ class Packet(object):
         # Parse the body based on type.
         datatype = datatypes.get_handler(self.data_type)
         self.body = datatype(self)
+
+    @classmethod
+    def from_string(cls, s):
+        """Create a packet object from a string."""
+
+        return cls(StringIO(s))
 
     def check(self):
         """Validate the packet using checksums and verifying fields."""
