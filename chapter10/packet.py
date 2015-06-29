@@ -1,6 +1,9 @@
 
 from array import array
-from cStringIO import StringIO
+try:
+    from cStringIO import StringIO as IO
+except ImportError:
+    from io import BytesIO as IO
 import struct
 
 from . import datatypes
@@ -65,7 +68,7 @@ class Packet(object):
     def from_string(cls, s):
         """Create a packet object from a string."""
 
-        return cls(StringIO(s))
+        return cls(IO(s))
 
     def check(self):
         """Validate the packet using checksums and verifying fields."""
