@@ -27,7 +27,7 @@ class Discrete(Base):
             data = data[8:]
             self.all.append(iph)
 
-            event = Data(data[:4])
+            event = Data('Discrete data', data[:4])
             data = data[4:]
             self.events.append(event)
             self.all.append(event)
