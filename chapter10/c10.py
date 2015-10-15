@@ -3,9 +3,6 @@ import os
 
 from .packet import Packet
 
-BUFFER_SIZE = 100000000
-SYNC = b'\x25\xeb'
-
 
 class C10(object):
     """A Chapter 10 parser."""
@@ -31,17 +28,10 @@ class C10(object):
         a chapter10.packet.Packet object for each valid packet found.
         """
 
-        try:
-
-            # Read BUFFER_SIZE.
+        while True:
             pos = self.file.tell()
-            s = self.file.read(BUFFER_SIZE)
-            if not s:
-                raise EOFError
 
-            # If we find a sync pattern, try to parse a packet header.
-            if SYNC in s:
-                self.file.seek(pos + s.find(SYNC))
+            try:
                 p = Packet(self.file)
                 if p.check():
                     self.file.seek(pos + p.packet_length)
@@ -49,11 +39,8 @@ class C10(object):
                 else:
                     self.file.seek(p.pos + 1)
 
-            # If no packet then keep calling until we get a result or eof.
-            return self.__next__()
-
-        except EOFError:
-            raise StopIteration
+            except EOFError:
+                raise StopIteration
 
     next = __next__
 
