@@ -34,11 +34,7 @@ Or, if you have tox_ installed you can use it instead::
 
     tox
 
-or on Windows::
-    
-    tox -c tox-win32.ini
-
-This will run the test suite against both Python 2.7 and 3.3 if they are
+This will run the test suite against both Python 2.7 and 3.5 if they are
 installed.
 
 To Do
