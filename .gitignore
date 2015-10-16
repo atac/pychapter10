@@ -9,3 +9,4 @@ bin/*
 .ropeproject
 MANIFEST
 .DS_store
+.cache
