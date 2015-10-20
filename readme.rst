@@ -1,4 +1,3 @@
-
 Chapter 10
 ==========
 
@@ -43,6 +42,7 @@ To Do
 General
 .......
 
+* Replace body.all (jumbled list of IPDH, IPTS, Data) with single object type (encapsulating all three)
 * Replace usage of datatypes.base.Data with actual values.
 * Intra-packet elements should link together (ie. related timestamp, IPH, and
   data)
