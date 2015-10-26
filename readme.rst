@@ -42,10 +42,10 @@ To Do
 General
 .......
 
-* Replace body.all (jumbled list of IPDH, IPTS, Data) with single object type (encapsulating all three)
+* Replace body.all (jumbled list of IPDH, IPTS, Data) with single object type
+  (encapsulating all three)
+* Have tox read requirements from requirements.txt
 * Replace usage of datatypes.base.Data with actual values.
-* Intra-packet elements should link together (ie. related timestamp, IPH, and
-  data)
 
 Data Types (/datatypes)
 .......................
