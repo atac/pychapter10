@@ -1,15 +1,14 @@
 
-from .base import Base, Data
+import bitstruct
+
+from .base import IterativeBase, Item
 
 
-class ARINC429(Base):
-    data_attrs = Base.data_attrs + (
-        'all',
-        'words',
-        'msg_count')
+class ARINC429(IterativeBase):
+    data_attrs = IterativeBase.data_attrs + ('msg_count',)
 
     def parse(self):
-        Base.parse(self)
+        IterativeBase.parse(self)
 
         if self.format > 0:
             raise NotImplementedError('ARINC-429 format %s is reserved!'
@@ -17,20 +16,18 @@ class ARINC429(Base):
 
         self.msg_count = int(self.csdw & 0xffff)
 
-        data = self.data[:]
-        self.all, self.words = [], []
+        iph_keys = (
+            'bus',
+            'fe',  # Format error flag
+            'pe',  # Parity error flag
+            'bs',  # Bus speed (0 = low speed, 1 = high speed)
+            'gap_time')
         for i in range(self.msg_count):
-            iph = Data('IPH', data[:4])
-            data = data[4:]
-            self.all.append(iph)
+            offset = i * 8
 
-            words = Data('ARINC429 Word', data[:4])
-            data = data[4:]
-            self.words.append(words)
-            self.all.append(words)
+            raw_iph = bitstruct.unpack(
+                'u7u1u1u1p1u19', bytearray(self.data[offset:offset + 4]))
+            iph = dict(zip(iph_keys, raw_iph))
 
-    def __iter__(self):
-        return iter(self.all)
-
-    def __len__(self):
-        return len(self.all)
+            self.all.append(Item(self.data[offset + 4:offset + 8],
+                                 'ARINC-429 Data Word', **iph))
