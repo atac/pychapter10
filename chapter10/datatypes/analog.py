@@ -5,17 +5,18 @@ from .base import IterativeBase, Item
 
 
 class Analog(IterativeBase):
+    data_attrs = IterativeBase.data_attrs + (
+        'same',
+        'factor',
+        'totchan',
+        'subchan',
+        'length',
+        'mode')
 
     def parse_csdw(self, raw):
         """Parses a CSDW from raw bytes and returns a dict of values."""
 
-        keys = (
-            'same',
-            'factor',
-            'totchan',
-            'subchan',
-            'length',
-            'mode')
+        keys = self.data_attrs[-6:]
         values = bitstruct.unpack('p2u1u3u7u7u5u2', raw)
         return dict(zip(keys, values))
 
@@ -28,6 +29,7 @@ class Analog(IterativeBase):
 
         # Parse one CSDW and see how many there are.
         subchannel = self.parse_csdw(self.csdw)
+        self.__dict__.update(subchannel)
         self.subchannels = [subchannel]
         count = subchannel['totchan'] or 256  # totchan: 0 = 256
         if not subchannel['same']:
