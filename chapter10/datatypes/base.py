@@ -3,7 +3,11 @@ import struct
 
 
 class Base(object):
-    """Base for packet data. Reads out raw bytes and stores in an attribute."""
+    """Base object for packet data. All data types include a "csdw" attribute
+    containing the channel specific raw data word (or words in some cases), and
+    a "data" attribute containing the raw packet data. Subclasses should extend
+    the parse method to process the raw data into more useful forms.
+    """
 
     # The names of any data attributes for lazy-loading.
     data_attrs = (
@@ -50,6 +54,25 @@ class Base(object):
         return object.__getattribute__(self, name)
 
 
+class IterativeBase(Base):
+    """Allows for easily packaging sub-elements into an iterable object based
+    on an "all" attribute. Subclasses merely populate this attribute (a list)
+    and length, iteration, etc. should just work.
+    """
+
+    data_attrs = Base.data_attrs + ('all', )
+
+    def __init__(self, *args, **kwargs):
+        Base.__init__(self, *args, **kwargs)
+        self.all = []
+
+    def __iter__(self):
+        return iter(self.all)
+
+    def __len__(self):
+        return len(self.all)
+
+
 class Data(object):
     """A simple data container."""
 
@@ -58,3 +81,19 @@ class Data(object):
 
     def __repr__(self):
         return '<%s data %s bytes>' % (self.label, len(self.data))
+
+
+class Item(object):
+    """The base container for packet data."""
+
+    def __init__(self, data, label="Packet Data", **kwargs):
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+
+            self.data, self.label = data, label
+
+    def __repr__(self):
+        return '<%s>' % (self.label)
+
+    def bytes(self):
+        return self.data
