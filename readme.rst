@@ -43,8 +43,9 @@ General
 .......
 
 * Replace body.all (jumbled list of IPDH, IPTS, Data) with single object type
-  (encapsulating all three)
-* Have tox read requirements from requirements.txt
+  (encapsulating all three).
+* Have tox read requirements from requirements.txt.
+* Implement standard IPTS parsing.
 * Replace usage of datatypes.base.Data with actual values.
 
 Data Types (/datatypes)
