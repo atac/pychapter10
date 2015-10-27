@@ -2,50 +2,15 @@
 from collections import OrderedDict
 import struct
 
-from .base import Base, Data
+import bitstruct
+
+from .base import IterativeBase, Item
 
 
-class TMATS(object):
-    """Container for TMATS key-value pairs (similar to a dict)."""
-
-    def __init__(self, s, xml=False):
-        self.all = []
-        for line in s.splitlines():
-            line = line.decode()
-            if not line.strip():
-                continue
-            line = line.strip()[:-1]
-            if ':' in line:
-                k, v = line.split(':', 1)
-            else:
-                k, v = line, ''
-            self.all.append([k, v])
-
-    def __getitem__(self, key):
-        return OrderedDict([line for line in self.all
-                            if line[0].startswith(key)])
-
-
-class Event(Data):
-    def __init__(self, raw):
-        Data.__init__(self, 'Recording Event', raw)
-        raw = struct.unpack('I', raw)[0]
-        self.eo = bool(raw & (1 << 28))
-        self.event_count = int((raw >> 12) & 0xffff)
-        self.event_number = int(raw & 0xfff)
-
-
-class NodeIndex(Data):
-    def __init__(self, raw):
-        Data.__init__(self, 'Node Index', raw)
-        self.channel_id, self.data_type = struct.unpack('BH', raw[:4])
-        self.offset = struct.unpack('Q', raw[4:])[0]
-
-
-class Computer(Base):
+class Computer(IterativeBase):
     """Computer generated data (eg. TMATS setup record)."""
 
-    data_attrs = Base.data_attrs + (
+    data_attrs = IterativeBase.data_attrs + (
         'frmt',
         'srcc',
         'version',
@@ -54,33 +19,46 @@ class Computer(Base):
         'it',
         'fsp',
         'iec',
-        'tmats',
         'file_size',
         'all',
-        'indices',
         'root_offset',
-        'events',
     )
 
     def parse(self):
-        Base.parse(self)
+        IterativeBase.parse(self)
 
-        self.all, self.events, self.indices = [], [], []
+        # Offset into the data attribute.
+        offset = 0
 
         if self.format > 3:
             raise NotImplementedError(
                 'Computer Generated Data Format %s is reserved!' % self.format)
 
-        # User Defined
+        # User Defined: do nothing
         elif self.format == 0:
             return
 
         # TMATS
         elif self.format == 1:
-            self.frmt = bool(self.csdw & (1 << 9))  # Format ASCII / XML
-            self.srcc = bool(self.csdw & (1 << 8))  # Setup Rec Config Change
-            self.version = int(self.csdw & (0xff))  # Ch10 Version
-            self.tmats = TMATS(self.data, self.frmt)
+            keys = ('frmt',     # Format: 0 = ASCII, 1 = XML.
+                    'srcc',     # Setup Record Config Change flag.
+                    'version')  # Chapter 10 version
+            csdw = bitstruct.unpack('p21u1u1u8', bytearray(self.csdw))
+            csdw = dict(zip(keys, csdw))
+            self.__dict__.update(csdw)
+
+            # Parse ASCII style TMATS.
+            if self.frmt == 0:
+                for line in self.data.splitlines():
+                    line = line.decode()
+                    if not line.strip():
+                        continue
+                    line = line.strip()[:-1]  # Strip the semicolon.
+                    if ':' in line:
+                        k, v = line.split(':', 1)
+                    else:
+                        k, v = line, ''
+                    self.all.append([k, v])
             return
 
         # Recording Event
@@ -89,6 +67,7 @@ class Computer(Base):
             self.reec = int(self.csdw & 0xfff)      # Rec Event Entry Count
 
             count = self.reec
+            step = 12
 
         # Recording Index
         elif self.format == 3:
@@ -101,38 +80,54 @@ class Computer(Base):
 
             if self.fsp:
                 self.file_size = struct.unpack('Q', self.data[:8])[0]
-                self.data = self.data[8:]
+                offset += 8
 
-        data = self.data[:]
+            step = 20 if self.it else 16
+
+        if self.iph:
+            step += 8
+
         for i in range(count):
-            self.all.append(Data('Timestamp', data[:8]))
-            data = data[8:]
 
+            attrs = {}
+
+            # IPTS @todo: parse into useful type
+            attrs['ipts'] = self.data[offset:offset + 8]
+            offset += 8
+
+            # IPH (optional) @todo: compute time
             if self.iph:
-                self.all.append(Data('IPH', data[:8]))
-                data = data[8:]
+                attrs['iph'] = self.data[offset:offset + 8]
+                offset += 8
 
+            # Data (event, root index, or node index)
             if self.format == 2:
-                event = Event(data[:4])
-                self.events.append(event)
-                self.all.append(event)
-                data = data[4:]
+                data = self.data[offset:offset + 4]
+                keys = ('eo', 'event_count', 'event_number')
+                values = bitstruct.unpack('p2u1u15u12', bytearray(data))
+
+                self.all.append(Item(data, 'Recording Event', **attrs))
+                offset += 4
 
             elif self.format == 3:
                 if self.it == 0:
-                    index = Data('Root Index', data[:8])
-                    data = data[8:]
+                    data = self.data[offset:offset + 8]
+                    attrs['offset'] = struct.unpack('=Q', data)[0]
+                    self.all.append(Item(data, 'Root Index', **attrs))
+                    offset += 8
                 elif self.it == 1:
-                    index = NodeIndex(data[:12])
-                    data = data[12:]
-                self.indices.append(index)
-                self.all.append(index)
+                    data = self.data[offset:offset + 12]
+                    keys = ('channel_id', 'data_type', 'offset')
+                    values = struct.unpack('=xBHQ', data)
+                    attrs.update(dict(zip(keys, values)))
+                    self.all.append(Item(data, 'Node Index', **attrs))
+                    offset += 12
 
         if getattr(self, 'it', None) == 0:
             self.root_offset = struct.unpack('Q', self.data[:8])[0]
 
-    def __iter__(self):
-        return iter(self.all)
-
-    def __len__(self):
-        return len(self.all)
+    def __getitem__(self, key):
+        if self.format == 1:
+            return OrderedDict([line for line in self.all
+                                if line[0].startswith(key)])
+        return IterativeBase.__getitem__(self, key)

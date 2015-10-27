@@ -32,7 +32,7 @@ def test_tmats():
     for packet in C10(SAMPLE):
         if packet.data_type == 1:
             break
-    assert list(packet.body.tmats['V-1'].items()) == [
+    assert list(packet.body['V-1'].items()) == [
         ('V-1\\ID', 'DATASOURCE'),
         ('V-1\\VN', 'HDS'),
         ('V-1\\HDS\\SYS', 'sov2')]
@@ -41,15 +41,15 @@ def test_tmats():
 def test_events():
     for packet in C10(EVENTS):
         if packet.data_type == 2:
-            assert len(packet.body.events) == packet.body.reec
+            assert len(packet.body) == packet.body.reec
 
 
 def test_index():
     for packet in C10(INDEX):
         if packet.data_type == 3:
             if packet.body.it:
-                for part in packet.body.indices:
-                    assert isinstance(part, computer.NodeIndex)
+                for part in packet.body:
+                    assert part.label == 'Node Index'
             else:
                 for part in packet.body:
-                    assert isinstance(part, Data)
+                    assert part.label == 'Root Index'
