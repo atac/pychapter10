@@ -44,6 +44,8 @@ General
 
 * Replace body.all (jumbled list of IPDH, IPTS, Data) with single object type
   (encapsulating all three).
+* Change Base.csdw to be a BitArray instead of an int (this will break lots of
+  things).
 * Have tox read requirements from requirements.txt.
 * Implement standard IPTS parsing.
 * Replace usage of datatypes.base.Data with actual values.
