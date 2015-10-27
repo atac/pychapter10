@@ -20,7 +20,6 @@ class Computer(IterativeBase):
         'fsp',
         'iec',
         'file_size',
-        'all',
         'root_offset',
     )
 
