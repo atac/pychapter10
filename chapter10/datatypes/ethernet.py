@@ -1,19 +1,17 @@
 
-import struct
+from bitstring import BitArray
 
-from .base import Base, Data
+from .base import IterativeBase, Item
 
 
-class Ethernet(Base):
-    data_attrs = Base.data_attrs + (
-        'frames',
-        'all',
+class Ethernet(IterativeBase):
+    data_attrs = IterativeBase.data_attrs + (
         'fmt',
         'length',
     )
 
     def parse(self):
-        Base.parse(self)
+        IterativeBase.parse(self)
 
         if self.format > 1:
             raise NotImplementedError('Ethernet format %s is reserved!'
@@ -23,41 +21,36 @@ class Ethernet(Base):
         if self.format == 0:
             self.fmt = int(self.csdw >> 28)
             iph_length = 4
-            time_length = 8
         elif self.format == 1:
             self.iph_length = int(self.csdw >> 16)
             iph_length = 20
-            time_length = 4
         self.length = int(self.csdw & 0xffff)
 
         # Parse frames
-        data = self.data[:]
-        self.all, self.frames = [], []
+        offset = 0
         for i in range(self.length):
 
+            attrs = {}
+
+            # IPTS @todo: replace with a useful type.
+            attrs['ipts'] = self.data[offset:offset + 8]
+            offset += 8
+
             # IPH
-            iph = Data('IPH', data[time_length:iph_length + time_length])
-            self.all += [Data('Timestamp', data[:time_length]), iph]
-            data = data[time_length + iph_length:]
+            iph = BitArray(bytes=self.data[offset:offset + iph_length])
+            iph.byteswap()
+            offset += iph_length
 
             if self.format == 0:
-                iph = struct.unpack('I', iph.data)[0]
-                length = int(iph & 0x3fff)
+                length = iph[-14:].int
             else:
-                length = struct.unpack('HH', iph.data)[1]
+                length = iph[-16:].int
 
             # The actual ethernet frame.
-            frame = Data('Ethernet Frame', data[:length])
-            data = data[length:]
-            self.frames.append(frame)
-            self.all.append(frame)
+            self.all.append(Item(
+                self.data[offset:offset + length], 'Ethernet Frame', **attrs))
+            offset += length
 
             # Account for filler byte when length is odd.
             if length % 2:
-                data = data[1:]
-
-    def __iter__(self):
-        return iter(self.frames)
-
-    def __len__(self):
-        return self.length
+                offset += 1
