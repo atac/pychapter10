@@ -2,7 +2,6 @@
 import struct
 
 from bitstring import BitArray
-
 from .base import IterativeBase, Item
 
 
