@@ -17,12 +17,12 @@ class Analog(IterativeBase):
         """Parses a CSDW from raw bytes and returns a dict of values."""
 
         return {
-            'same': csdw[-28],
-            'factor': csdw[-24:-27].int,
-            'totchan': csdw[-16:-23].int,
-            'subchan': csdw[-8:-15].int,
-            'length': csdw[-2:-7].int,
-            'mode': csdw[-1:].int}
+            'same': csdw[-28],  # Is the CSDW the same for all subchannels?
+            'factor': csdw[-24:-27].int,   # Sampling rate factor.
+            'totchan': csdw[-16:-23].int,  # Subchannel count.
+            'subchan': csdw[-8:-15].int,   # Subchannel ID.
+            'length': csdw[-2:-7].int,     # Sample length.
+            'mode': csdw[-1:].int}         # Alignment and packing mode.
 
     def parse(self):
         IterativeBase.parse(self)
@@ -36,12 +36,12 @@ class Analog(IterativeBase):
         self.__dict__.update(subchannel)
         self.subchannels = [subchannel]
         count = subchannel['totchan'] or 256  # totchan: 0 = 256
-        if not subchannel['same']:
 
-            # Read other subchannel CSDWs.
+        # Read CSDWs for subchannels if applicable.
+        if not subchannel['same']:
             for i in range(count - 1):
                 i *= 4
-                csdw = BitArray(self.data[i:i+4])
+                csdw = BitArray(bytes=self.data[i:i+4])
                 csdw.byteswap()
                 self.subchannels.append(self.parse_csdw(csdw))
 

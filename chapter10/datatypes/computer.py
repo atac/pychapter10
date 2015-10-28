@@ -67,10 +67,10 @@ class Computer(IterativeBase):
 
         # Recording Index
         elif self.format == 3:
-            self.it = self.csdw[31]        # Index Type
-            self.fsp = self.csdw[30]       # File Size Present
-            self.iph = self.csdw[29]       # Index IPH
-            self.iec = self.csdw[:15].int  # Index Entry Count
+            self.it = self.csdw[-32]        # Index Type
+            self.fsp = self.csdw[-31]       # File Size Present
+            self.iph = self.csdw[-30]       # Index IPH
+            self.iec = self.csdw[-16:].int  # Index Entry Count
 
             count = self.iec
 

@@ -15,7 +15,6 @@ class Discrete(IterativeBase):
         self.length = self.csdw[-7:-3].int
         self.mode = self.csdw[-2:].int
 
-        data = self.data[:]
         offset = 0
         for i in range(len(data) / 12):
             iph = data[offset:offset + 8]

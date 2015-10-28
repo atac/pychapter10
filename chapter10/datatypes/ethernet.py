@@ -21,12 +21,12 @@ class Ethernet(IterativeBase):
 
         # CSDW
         if self.format == 0:
-            self.fmt = self.csdw[28:31].int
+            self.fmt = self.csdw[-31:-28].int
             iph_length = 4
         elif self.format == 1:
-            self.iph_length = self.csdw[16:31].int
+            self.iph_length = self.csdw[-31:-16].int
             iph_length = 20
-        self.length = self.csdw[:15].int
+        self.length = self.csdw[-15:].int
 
         # Parse frames
         offset = 0
@@ -39,19 +39,18 @@ class Ethernet(IterativeBase):
             offset += 8
 
             # IPH
-            offset += iph_length
-
             if self.format == 0:
                 iph = BitArray(bytes=self.data[offset:offset + iph_length])
+                iph.byteswap()
                 attrs.update({
-                    'fce': iph[31],             # Frame CRC Error
-                    'fe': iph[30],              # Frame Error
-                    'content': iph[28:29].int,
-                    'speed': iph[24:27].int,    # Ethernet Speed
-                    'net_id': iph[16:23].int,
-                    'dce': iph[15],             # Data CRC Error
-                    'le': iph[14],              # Data Length Error
-                    'data_length': iph[:13].int})
+                    'fce': iph[-31],              # Frame CRC Error
+                    'fe': iph[-30],               # Frame Error
+                    'content': iph[-29:-28].int,
+                    'speed': iph[-27:-24].int,    # Ethernet Speed
+                    'net_id': iph[-23:-16].int,
+                    'dce': iph[-15],              # Data CRC Error
+                    'le': iph[-14],               # Data Length Error
+                    'data_length': iph[-13:].int})
             else:
                 keys = (
                     'data_length',
@@ -63,8 +62,9 @@ class Ethernet(IterativeBase):
                     'src_port',
                     'dst_port')
                 values = struct.unpack('HBBxxHLLHH',
-                                       self.data[offset:offset + 20])
+                                       self.data[offset:offset + iph_length])
                 attrs.update(dict(zip(keys, values)))
+            offset += iph_length
 
             # The actual ethernet frame.
             data = self.data[offset:offset + attrs['data_length']]
