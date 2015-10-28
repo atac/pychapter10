@@ -1,5 +1,5 @@
 
-import bitstruct
+from bitstring import BitArray
 
 from .base import IterativeBase, Item
 
@@ -13,12 +13,16 @@ class Analog(IterativeBase):
         'length',
         'mode')
 
-    def parse_csdw(self, raw):
+    def parse_csdw(self, csdw):
         """Parses a CSDW from raw bytes and returns a dict of values."""
 
-        keys = self.data_attrs[-6:]
-        values = bitstruct.unpack('p2u1u3u7u7u5u2', raw)
-        return dict(zip(keys, values))
+        return {
+            'same': csdw[-28],
+            'factor': csdw[-24:-27].int,
+            'totchan': csdw[-16:-23].int,
+            'subchan': csdw[-8:-15].int,
+            'length': csdw[-2:-7].int,
+            'mode': csdw[-1:].int}
 
     def parse(self):
         IterativeBase.parse(self)
@@ -37,7 +41,9 @@ class Analog(IterativeBase):
             # Read other subchannel CSDWs.
             for i in range(count - 1):
                 i *= 4
-                self.subchannels.append(self.parse_csdw(self.data[i:i+4]))
+                csdw = BitArray(self.data[i:i+4])
+                csdw.byteswap()
+                self.subchannels.append(self.parse_csdw(csdw))
 
         # The current offset into self.data
         offset = i + 4

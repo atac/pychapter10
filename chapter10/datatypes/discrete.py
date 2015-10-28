@@ -1,8 +1,6 @@
 
 from .base import IterativeBase, Item
 
-import bitstruct
-
 
 class Discrete(IterativeBase):
     data_attrs = IterativeBase.data_attrs + ('length', 'mode')
@@ -14,7 +12,8 @@ class Discrete(IterativeBase):
             raise NotImplementedError('Discrete data format %s is reserved!'
                                       % self.format)
 
-        self.length, self.mode = bitstruct.unpack('p24u5u3', self.csdw)
+        self.length = self.csdw[-7:-3].int
+        self.mode = self.csdw[-2:].int
 
         data = self.data[:]
         offset = 0
