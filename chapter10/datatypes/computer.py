@@ -39,12 +39,9 @@ class Computer(IterativeBase):
 
         # TMATS
         elif self.format == 1:
-            keys = ('frmt',     # Format: 0 = ASCII, 1 = XML.
-                    'srcc',     # Setup Record Config Change flag.
-                    'version')  # Chapter 10 version
-            csdw = bitstruct.unpack('p21u1u1u8', bytearray(self.csdw))
-            csdw = dict(zip(keys, csdw))
-            self.__dict__.update(csdw)
+            self.frmt = self.csdw[9]          # Format: 0 = ASCII, 1 = XML.
+            self.srcc = self.csdw[8]          # Setup Record Config Change flag
+            self.version = self.csdw[:7].int  # Chapter 10 version
 
             # Parse ASCII style TMATS.
             if self.frmt == 0:
@@ -62,18 +59,18 @@ class Computer(IterativeBase):
 
         # Recording Event
         elif self.format == 2:
-            self.iph = bool(self.csdw & (1 << 31))  # Intra Packet Header
-            self.reec = int(self.csdw & 0xfff)      # Rec Event Entry Count
+            self.iph = self.csdw[31]        # Intra Packet Header
+            self.reec = self.csdw[:11].int  # Rec Event Entry Count
 
             count = self.reec
             step = 12
 
         # Recording Index
         elif self.format == 3:
-            self.it = bool(self.csdw & (1 << 31))   # Index Type
-            self.fsp = bool(self.csdw & (1 << 30))  # File Size Present
-            self.iph = bool(self.csdw & (1 << 29))  # Index IPH
-            self.iec = int(self.csdw & 0xffff)      # Index Entry Count
+            self.it = self.csdw[31]        # Index Type
+            self.fsp = self.csdw[30]       # File Size Present
+            self.iph = self.csdw[29]       # Index IPH
+            self.iec = self.csdw[:15].int  # Index Entry Count
 
             count = self.iec
 

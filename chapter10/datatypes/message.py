@@ -19,8 +19,8 @@ class Message(Base):
             raise NotImplementedError('Message format %s is reserved!'
                                       % self.format)
 
-        self.packet_type = int(self.csdw >> 16 & 0b11)
-        self.counter = int(self.csdw & 0xffff)
+        self.packet_type = self.csdw[16:17].int
+        self.counter = self.csdw[:15].int
 
         # Type: complete
         if not self.packet_type:

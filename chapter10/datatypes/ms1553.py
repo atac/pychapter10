@@ -47,12 +47,12 @@ class MS1553(Base):
         data = self.data[:]
 
         if self.format == 1:
-            self.ttb = int(self.csdw >> 30)
-            self.msg_count = int(self.csdw & 0xffffff)
+            self.ttb = self.csdw[:-30].int
+            self.msg_count = self.csdw[-23:].int
             iph_len = 14
 
         elif self.format == 2:
-            self.msg_count = int(self.csdw)
+            self.msg_count = self.csdw.int
             iph_len = 12
 
         for i in range(self.msg_count):

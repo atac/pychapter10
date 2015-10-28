@@ -1,5 +1,5 @@
 
-import bitstruct
+from bitstring import BitArray
 
 from .base import IterativeBase, Item
 
@@ -14,20 +14,20 @@ class ARINC429(IterativeBase):
             raise NotImplementedError('ARINC-429 format %s is reserved!'
                                       % self.format)
 
-        self.msg_count = int(self.csdw & 0xffff)
+        self.msg_count = self.csdw[-16:].int
+        assert len(self.data) == (self.packet.data_length - 4)
 
-        iph_keys = (
-            'bus',
-            'fe',  # Format error flag
-            'pe',  # Parity error flag
-            'bs',  # Bus speed (0 = low speed, 1 = high speed)
-            'gap_time')
+        offset = 0
         for i in range(self.msg_count):
-            offset = i * 8
+            raw = BitArray(bytes=self.data[offset:offset + 4])
+            iph = {
+                'bus': raw[24:31].int,
+                'fe': raw[23],          # Format error flag
+                'pe': raw[22],          # Parity error flag
+                'bs': raw[21],          # Bus speed (0 = low, 1 = high)
+                'gap_time': raw[:19].int}
+            offset += 4
 
-            raw_iph = bitstruct.unpack(
-                'u7u1u1u1p1u19', bytearray(self.data[offset:offset + 4]))
-            iph = dict(zip(iph_keys, raw_iph))
-
-            self.all.append(Item(self.data[offset + 4:offset + 8],
+            self.all.append(Item(self.data[offset:offset + 4],
                                  'ARINC-429 Data Word', **iph))
+            offset += 4
