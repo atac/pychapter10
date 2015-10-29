@@ -1,35 +1,13 @@
 
 import struct
 
-from .base import Base, Data
+from bitstring import BitArray
+
+from .base import IterativeBase, Item
 
 
-class IPH(Data):
-    def __init__(self, s, format):
-        Data.__init__(self, 'IPH', s)
-
-        if format == 1:
-            self.timestamp = s[:8]
-            status, self.gap, self.length = struct.unpack('HHH', s[8:])
-            self.bid = bool(status & (0x1 << 13))  # Bus ID (A/B)
-            self.me = bool(status & (0x1 << 12))   # Message Error
-            self.rr = bool(status & (0x1 << 11))   # RT to RT Transfer
-            self.fe = bool(status & (0x1 << 10))   # Format Error
-            self.tm = bool(status & (0x1 << 9))    # Response Time Out
-            self.le = bool(status & (0x1 << 5))    # Word Count Error
-            self.se = bool(status & (0x1 << 4))    # Sync Type Error
-            self.we = bool(status & (0x1 << 3))    # Invalid Word Error
-        elif format == 2:
-            self.timestamp, self.length, self.status = struct.unpack('QHH', s)
-            self.te = bool(self.status & (0x1 << 15))  # Transaction Error
-            self.re = bool(self.status & (0x1 << 14))  # Reset
-            self.tm = bool(self.status & (0x1 << 13))  # Message Time Out
-            self.se = bool(self.status & (0x1 << 6))   # Status Error
-            self.ee = bool(self.status & (0x1 << 3))   # Echo Error
-
-
-class MS1553(Base):
-    data_attrs = Base.data_attrs + (
+class MS1553(IterativeBase):
+    data_attrs = IterativeBase.data_attrs + (
         'messages',
         'all',
         'ttb',
@@ -37,36 +15,57 @@ class MS1553(Base):
     )
 
     def parse(self):
-        Base.parse(self)
+        IterativeBase.parse(self)
 
         if self.format == 0 or self.format > 2:
             raise NotImplementedError('1553 Format %s is reserved!'
                                       % self.format)
 
-        self.all, self.messages = [], []
-        data = self.data[:]
+        offset = 0
 
         if self.format == 1:
             self.ttb = self.csdw[:-30].int
             self.msg_count = self.csdw[-23:].int
-            iph_len = 14
+            iph_len = 6
 
         elif self.format == 2:
             self.msg_count = self.csdw.int
-            iph_len = 12
+            iph_len = 4
 
         for i in range(self.msg_count):
-            iph = IPH(data[:iph_len], self.format)
-            data = data[iph_len:]
-            self.all.append(iph)
+            attrs = {'ipts': self.data[offset:offset + 8]}
+            offset += 8
+            iph = self.data[offset:offset + iph_len]
+            offset += iph_len
+            if self.format == 1:
+                gap, length = struct.unpack('HH', iph[-4:])
+                status = BitArray(bytes=iph[:2])
+                status.byteswap()
+                attrs = {
+                    'gap': gap,
+                    'length': length,
+                    'bid': status[-13],  # Bus ID (A/B)
+                    'me': status[-12],   # Message Error
+                    'rr': status[-11],   # RT to RT Transfer
+                    'fe': status[-10],   # Format Error
+                    'tm': status[-9],    # Response Time Out
+                    'le': status[-5],    # Word Count Error
+                    'se': status[-4],    # Sync Type Error
+                    'we': status[-3],    # Invalid Word Error
+                }
+            elif self.format == 2:
+                length, = struct.unpack('H', iph[:2])
+                status = BitArray(bytes=iph[:2])
+                status.byteswap()
+                attrs = {
+                    'length': length,
+                    'te': status[-15],  # Transaction Error
+                    're': status[-14],  # Reset
+                    'tm': status[-13],  # Message Time Out
+                    'se': status[-6],   # Status Error
+                    'ee': status[-3],   # Echo Error
+                }
 
-            message = Data('Message', data[:iph.length])
-            data = data[iph.length:]
-            self.messages.append(message)
-            self.all.append(message)
-
-    def __iter__(self):
-        return iter(self.all)
-
-    def __len__(self):
-        return len(self.all)
+            data = self.data[offset:offset + attrs['length']]
+            offset += attrs['length']
+            self.all.append(Item(data, 'Message', **attrs))
