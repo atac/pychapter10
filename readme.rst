@@ -41,7 +41,6 @@ To Do
 General
 .......
 
-* Have tox read requirements from requirements.txt.
 * Implement standardized IPTS parsing.
 * Strengthen test suite with more robust and varied data.
 
