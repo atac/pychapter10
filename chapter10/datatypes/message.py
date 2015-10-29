@@ -1,53 +1,43 @@
 
 import struct
 
-from .base import Base, Data
+from .base import IterativeBase, Item
 
 
-class Message(Base):
-    data_attrs = Base.data_attrs + (
+class Message(IterativeBase):
+    data_attrs = IterativeBase.data_attrs + (
         'packet_type',
         'counter',
-        'messages',
-        'all',
     )
 
     def parse(self):
-        Base.parse(self)
+        IterativeBase.parse(self)
 
         if self.format != 0:
             raise NotImplementedError('Message format %s is reserved!'
                                       % self.format)
 
-        self.packet_type = self.csdw[16:17].int
-        self.counter = self.csdw[:15].int
+        self.packet_type = self.csdw[-17:-16].int
+        self.counter = self.csdw[-15:].int
 
         # Type: complete
         if not self.packet_type:
-            data = self.data[:]
-            self.messages, self.all = [], []
+            offset = 0
 
             for i in range(self.counter):
 
-                ipth = Data('IPTH', data[:8])
-                data = data[8:]
+                ipts = self.data[offset:offset + 8]
+                offset += 8
+                ipdh = self.data[offset:offset + 4]
+                offset += 4
+                length = struct.unpack('HH', ipdh)[0]
 
-                ipdh = Data('IPDH', data[:4])
-                data = data[4:]
+                attrs = {'ipts': ipts, 'length': length}
 
-                length = struct.unpack('HH', ipdh.data)[0]
-
-                msg = Data('Message Data', data[length:])
-                data = data[length:]
-                self.messages.append(msg)
-                self.all += [ipth, ipdh, msg]
+                data = self.data[offset:offset + length]
+                offset += length
+                self.all.append(Item(data, 'Message Data', **attrs))
 
                 # Account for filler byte when length is odd.
                 if length % 2:
-                    data = data[1:]
-
-    def __iter__(self):
-        return iter(self.all)
-
-    def __len__(self):
-        return len(self.all)
+                    offset += 1
