@@ -1,49 +1,42 @@
 
-import struct
+from bitstring import BitArray
 
-from .base import Base, Data
+from .base import IterativeBase, Item
 
 
-class UART(Base):
-    data_attrs = Base.data_attrs + (
-        'all',
-        'uart',
+class UART(IterativeBase):
+    data_attrs = IterativeBase.data_attrs + (
         'iph',
     )
 
     def parse(self):
-        Base.parse(self)
+        IterativeBase.parse(self)
 
         if self.format > 0:
             raise NotImplementedError('UART format %s is reserved!'
                                       % self.format)
 
-        self.iph = bool(self.csdw & (0x1 << 31))
+        self.iph = self.csdw[-31]
 
-        self.all, self.uart = [], []
-        data = self.data[:]
+        offset = 0
         while True:
+            attrs = {}
+
             if self.iph:
-                timestamp = Data('Timestamp', data[:8])
-                data = data[8:]
-                self.all.append(timestamp)
+                attrs['ipts'] = self.data[offset:offset + 8]
+                offset += 8
 
-            iph = Data('IPH', data[:4])
-            data = data[4:]
-            self.all.append(iph)
+            iph = BitArray(self.data[offset:offset + 4])
+            iph.byteswap()
+            offset += 4
+            attrs.update({
+                'pe': iph[-31],
+                'subchannel': iph[-29:-16].int,
+                'length': iph[-15:].int})
 
-            length = struct.unpack('HH', iph.data)[-1]
+            data = self.data[offset:offset + attrs['length']]
+            offset += attrs['length']
+            self.all.append(Item(data, 'UART Data', **attrs))
 
-            uart = Data('UART Data', data[:length])
-            data = data[length:]
-            self.uart.append(uart)
-            self.all.append(uart)
-
-            if length % 2:
-                data = data[1:]
-
-    def __iter__(self):
-        return iter(self.all)
-
-    def __len__(self):
-        return len(self.all)
+            if attrs['length'] % 2:
+                offset += 1

@@ -2,6 +2,8 @@
 from datetime import datetime, timedelta
 import struct
 
+from bitstring import BitArray
+
 from .base import Base
 
 
@@ -23,10 +25,10 @@ class Time(Base):
 
         # 0 = IRIG day available
         # 1 = Month and year available
-        self.date_fmt = int(self.csdw >> 8 & 0b1)
+        self.date_fmt = self.csdw[-9]
 
         # Leap year flag
-        self.leap = int(self.csdw >> 8 & 0b10)
+        self.leap = self.csdw[-8]
 
         # 0 = IRIG-B
         # 1 = IRIG-A
@@ -35,27 +37,31 @@ class Time(Base):
         # 4 = UTC Time from GPS
         # 5 = Native GPS Time
         # F = None (payload invalid)
-        self.time_fmt = int(self.csdw >> 4 & 0xf)
+        self.time_fmt = self.csdw[-7:-4].int
 
         # 0 = Internal (to the recorder)
         # 1 = External (to the recorder)
         # 2 = Internal from RMM
         # F = None
-        self.source = int(self.csdw & 0xf)
+        self.source = self.csdw[-3:].int
 
         if self.date_fmt:
             data = struct.unpack('HHHH', self.data)
         else:
             data = struct.unpack('HHH', self.data)
 
-        TSn = int(data[0] >> 12 & 0b111)  # Tens of Seconds
-        Sn = int(data[0] >> 8 & 0xf)      # Seconds
-        Hmn = int(data[0] >> 4 & 0xf)     # Hundreds of milliseconds
-        Tmn = int(data[0] & 0xf)          # Tens of milliseconds
-        THn = int(data[1] >> 12 & 0b11)   # Tens of hours
-        Hn = int(data[1] >> 8 & 0xf)      # Hours
-        TMn = int(data[1] >> 4 & 0b111)   # Tens of minutes
-        Mn = int(data[1] & 0xf)           # Minutes
+        data = [BitArray(word) for word in data]
+        for arr in data:
+            arr.byteswap()
+
+        TSn = data[0][-14:-12].int  # Tens of Seconds
+        Sn = data[0][-11:-8].int    # Seconds
+        Hmn = data[0][-7:-4].int    # Hundreds of milliseconds
+        Tmn = data[0][-3:].int      # Tens of milliseconds
+        THn = data[1][-14:-12].int  # Tens of hours
+        Hn = data[1][-11:-8].int    # Hours
+        TMn = data[1][-6:-4].int    # Tens of minutes
+        Mn = data[1][-3:].int       # Minutes
 
         seconds = Sn + (TSn * 10) + (Hmn / 10) + (Tmn / 100)
         minutes = Mn + (TMn * 10)
@@ -63,9 +69,9 @@ class Time(Base):
 
         # IRIG day format
         if not self.date_fmt:
-            HDn = int(data[2] >> 8 & 0b11)  # Hundreds of days
-            TDn = int(data[2] >> 4 & 0xf)   # Tens of days
-            Dn = int(data[2] & 0xf)         # Days
+            HDn = data[2][-10:-8].int  # Hundreds of days
+            TDn = data[2][-7:-4].int   # Tens of days
+            Dn = data[2][-3:].int      # Days
 
             day = Dn + (HDn * 100) + (TDn * 10)
 
@@ -74,14 +80,14 @@ class Time(Base):
 
         # Month and Year Format
         else:
-            TOn = int(data[2] >> 12 & 0b1)   # Tens of months
-            On = int(data[2] >> 8 & 0xf)     # Months
-            TDn = int(data[2] >> 4 * 0xf)    # Tens of days
-            Dn = int(data[2] & 0xf)          # Days
-            OYn = int(data[3] >> 12 & 0b11)  # Thousands of years
-            HYn = int(data[3] >> 8 & 0xf)    # Hundreds of years
-            TYn = int(data[3] >> 4 & 0xf)    # Tens of years
-            Yn = int(data[3] & 0xf)          # Years
+            TOn = data[2][-13:-12].int  # Tens of months
+            On = data[2][-11:-8].int    # Months
+            TDn = data[2][-7:-4].int    # Tens of days
+            Dn = data[2][-3:].int       # Days
+            OYn = data[3][-13:-12].int  # Thousands of years
+            HYn = data[3][-11:-8].int   # Hundreds of years
+            TYn = data[3][-7:-4].int    # Tens of years
+            Yn = data[3][-3:].int       # Years
 
             month = On + (TOn * 10)
             day = Dn + (TDn * 10)
