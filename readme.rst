@@ -43,6 +43,8 @@ General
 
 * Implement standardized IPTS parsing.
 * Strengthen test suite with more robust and varied data.
+* Packet/file generation
+* Packet/file validation
 
 Data Types (/datatypes)
 .......................
