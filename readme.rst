@@ -41,29 +41,17 @@ To Do
 General
 .......
 
-* Replace body.all (jumbled list of IPDH, IPTS, Data) with single object type
-  (encapsulating all three).
-* Change Base.csdw to be a BitArray instead of an int (this will break lots of
-  things).
 * Have tox read requirements from requirements.txt.
-* Implement standard IPTS parsing.
-* Replace usage of datatypes.base.Data with actual values.
+* Implement standardized IPTS parsing.
+* Strengthen test suite with more robust and varied data.
 
 Data Types (/datatypes)
 .......................
 
 * computer.py - Implement TMATS XML parser
 * ms1553.py - Finish message parsing
-* time.py - Add time word parsing
 * Implement TSPI/CTS parser
 
-Testing (data needed)
-.....................
-
-* Analog
-* Discrete
-* Ethernet format 1
-* IEEE-1394
 
 .. _pip: http://pip-installer.org
 .. _Irig 106: http://irig106.org

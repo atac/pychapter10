@@ -8,7 +8,6 @@ except ImportError:
 import pytest
 
 from chapter10.datatypes import computer
-from chapter10.datatypes.base import Data
 from chapter10 import C10
 
 SAMPLE = os.path.join(os.path.dirname(__file__), '..', 'sample.c10')

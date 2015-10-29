@@ -75,16 +75,6 @@ class IterativeBase(Base):
         return len(self.all)
 
 
-class Data(object):
-    """A simple data container."""
-
-    def __init__(self, label, data):
-        self.label, self.data = label, data
-
-    def __repr__(self):
-        return '<%s data %s bytes>' % (self.label, len(self.data))
-
-
 class Item(object):
     """The base container for packet data."""
 
