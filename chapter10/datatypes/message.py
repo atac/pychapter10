@@ -1,5 +1,5 @@
 
-import struct
+from bitstring import BitArray
 
 from .base import IterativeBase, Item
 
@@ -20,19 +20,25 @@ class Message(IterativeBase):
         self.packet_type = self.csdw[-17:-16].int
         self.counter = self.csdw[-15:].int
 
+        # @todo: support for segmented messages
+
         # Type: complete
         if not self.packet_type:
             offset = 0
 
             for i in range(self.counter):
 
-                ipts = self.data[offset:offset + 8]
+                attrs = {'ipts': self.data[offset:offset + 8]}
                 offset += 8
                 ipdh = self.data[offset:offset + 4]
+                ipdh = BitArray(bytearray(ipdh))
+                ipdh.byteswap()
                 offset += 4
-                length = struct.unpack('HH', ipdh)[0]
-
-                attrs = {'ipts': ipts, 'length': length}
+                attrs['de'] = ipdh[-31]
+                attrs['fe'] = ipdh[-30]
+                attrs['subchannel'] = ipdh[-29:-16].int
+                length = ipdh[-15:].int
+                attrs['length'] = length
 
                 data = self.data[offset:offset + length]
                 offset += length

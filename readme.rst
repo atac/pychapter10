@@ -7,7 +7,7 @@ Chapter 10 format files.
 Dependencies
 ------------
 
-* Python_ 2.7 or greater (tested on 2.7 and 3.3)
+* Python_ 2.7 or greater (tested on 2.7 and 3.5)
 * pytest_ and Mock_ (for test suite)
 
 Installation
@@ -49,6 +49,7 @@ General
 Data Types (/datatypes)
 .......................
 
+* message.py - Implement support for segmented messages
 * computer.py - Implement TMATS XML parser
 * ms1553.py - Finish message parsing
 * Implement TSPI/CTS parser
