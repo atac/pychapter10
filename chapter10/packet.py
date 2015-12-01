@@ -45,6 +45,9 @@ class Packet(object):
         for i, field in enumerate(self.HEADER_KEYS):
             setattr(self, '_'.join(field.split()).lower(), values[i])
 
+        self.rtc, = struct.unpack(
+            'Q', struct.pack('IHxx', self.rtc_low, self.rtc_high))
+
         # Read the secondary header (if any).
         self.time = None
         self.secondary_sums, self.secondary_checksum = (None, None)
