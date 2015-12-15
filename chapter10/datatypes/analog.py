@@ -42,7 +42,7 @@ class Analog(IterativeBase):
         if not subchannel['same']:
             for i in range(count - 1):
                 i *= 4
-                csdw, = struct.unpack('H', self.data[i:i+4])
+                csdw, = struct.unpack('=I', self.data[i:i+4])
                 # csdw = BitArray(bytes=self.data[i:i+4])
                 # csdw.byteswap()
                 self.subchannels.append(self.parse_csdw(csdw))

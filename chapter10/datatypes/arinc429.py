@@ -18,7 +18,7 @@ class ARINC429(IterativeBase):
 
         offset = 0
         for i in range(self.msg_count):
-            raw, = struct.unpack('=H', self.data[offset:offset + 4])
+            raw, = struct.unpack('=I', self.data[offset:offset + 4])
             iph = {
                 'bus': int((raw >> 24) & 0xff),
                 'fe': (raw >> 23) & 0x1,        # Format error flag
