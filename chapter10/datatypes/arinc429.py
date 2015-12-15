@@ -1,5 +1,5 @@
 
-from bitstring import BitArray
+import struct
 
 from .base import IterativeBase, Item
 
@@ -18,14 +18,13 @@ class ARINC429(IterativeBase):
 
         offset = 0
         for i in range(self.msg_count):
-            raw = BitArray(bytes=self.data[offset:offset + 4])
-            raw.byteswap()
+            raw, = struct.unpack('=H', self.data[offset:offset + 4])
             iph = {
-                'bus': raw[-31:-24].int,
-                'fe': raw[-23],          # Format error flag
-                'pe': raw[-22],          # Parity error flag
-                'bs': raw[-21],          # Bus speed (0 = low, 1 = high)
-                'gap_time': raw[:-19].int}
+                'bus': int((raw >> 24) & 0xff),
+                'fe': (raw >> 23) & 0x1,        # Format error flag
+                'pe': (raw >> 22) & 0x1,        # Parity error flag
+                'bs': (raw >> 21) & 0x1,        # Bus speed (0 = low, 1 = high)
+                'gap_time': int(raw & 0xfffff)}
             offset += 4
 
             self.all.append(Item(self.data[offset:offset + 4],
