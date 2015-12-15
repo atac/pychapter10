@@ -2,8 +2,6 @@
 from collections import OrderedDict
 import struct
 
-from bitstring import BitArray
-
 from .base import IterativeBase, Item
 
 
@@ -99,12 +97,11 @@ class Computer(IterativeBase):
             # Data (event, root index, or node index)
             if self.format == 2:
                 raw = self.data[offset:offset + 4]
-                data = BitArray(bytes=raw)
-                data.byteswap()
+                data = struct.unpack('=I', raw)
                 attrs.update({
-                    'eo': data[-28],
-                    'event_count': data[-27:-12].int,
-                    'event_number': data[-11:].int})
+                    'eo': (data >> 28) & 0x1,
+                    'event_count': int((data >> 12) & 0xffff),
+                    'event_number': int(data & 0xfff)})
                 self.all.append(Item(raw, 'Recording Event', **attrs))
                 offset += 4
 

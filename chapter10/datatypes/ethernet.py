@@ -1,7 +1,6 @@
 
 import struct
 
-from bitstring import BitArray
 from .base import IterativeBase, Item
 
 
@@ -40,17 +39,16 @@ class Ethernet(IterativeBase):
 
             # IPH
             if self.format == 0:
-                iph = BitArray(bytes=self.data[offset:offset + iph_length])
-                iph.byteswap()
+                iph, = struct.unpack('=I', self.data[offset:offset + 4])
                 attrs.update({
-                    'fce': iph[-31],              # Frame CRC Error
-                    'fe': iph[-30],               # Frame Error
-                    'content': iph[-29:-28].int,
-                    'speed': iph[-27:-24].int,    # Ethernet Speed
-                    'net_id': iph[-23:-16].int,
-                    'dce': iph[-15],              # Data CRC Error
-                    'le': iph[-14],               # Data Length Error
-                    'data_length': iph[-13:].int})
+                    'fce': (iph >> 31) & 0x1,           # Frame CRC Error
+                    'fe': (iph >> 30) & 0x1,            # Frame Error
+                    'content': int((iph >> 28) & 0b11),
+                    'speed': int((iph >> 24) & 0xf),    # Ethernet Speed
+                    'net_id': int((iph >> 16) & 0xf),
+                    'dce': (iph >> 15) & 0x1,           # Data CRC Error
+                    'le': (iph >> 14) & 0x1,            # Data Length Error
+                    'data_length': int(iph & 0x3fff)})
             else:
                 keys = (
                     'data_length',
@@ -62,7 +60,7 @@ class Ethernet(IterativeBase):
                     'src_port',
                     'dst_port')
                 values = struct.unpack('HBBxxHLLHH',
-                                       self.data[offset:offset + iph_length])
+                                       self.data[offset:offset + 20])
                 attrs.update(dict(zip(keys, values)))
             offset += iph_length
 
