@@ -1,5 +1,5 @@
 
-from bitstring import BitArray
+import struct
 
 from .base import IterativeBase, Item
 
@@ -30,14 +30,13 @@ class Message(IterativeBase):
 
                 attrs = {'ipts': self.data[offset:offset + 8]}
                 offset += 8
-                ipdh = self.data[offset:offset + 4]
-                ipdh = BitArray(bytearray(ipdh))
-                ipdh.byteswap()
+                ipdh, = struct.unpack('=I', self.data[offset:offset + 4])
                 offset += 4
-                attrs['de'] = ipdh[-31]
-                attrs['fe'] = ipdh[-30]
-                attrs['subchannel'] = ipdh[-29:-16].int
-                length = ipdh[-15:].int
+                attrs['de'] = int(ipdh >> 31)
+                attrs['fe'] = int((ipdh >> 30) & 0b1)
+                attrs['subchannel'] = int((ipdh >> 16) & 0x1fff)
+                length = int(ipdh & 0x7fff)
+
                 attrs['length'] = length
 
                 data = self.data[offset:offset + length]
