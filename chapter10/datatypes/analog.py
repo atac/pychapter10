@@ -1,5 +1,5 @@
 
-from bitstring import BitArray
+import struct
 
 from .base import IterativeBase, Item
 
@@ -17,12 +17,13 @@ class Analog(IterativeBase):
         """Parses a CSDW from raw bytes and returns a dict of values."""
 
         return {
-            'same': csdw[-28],  # Is the CSDW the same for all subchannels?
-            'factor': csdw[-24:-27].int,   # Sampling rate factor.
-            'totchan': csdw[-16:-23].int,  # Subchannel count.
-            'subchan': csdw[-8:-15].int,   # Subchannel ID.
-            'length': csdw[-2:-7].int,     # Sample length.
-            'mode': csdw[-1:].int}         # Alignment and packing mode.
+            'same': bool((csdw >> 29) & 0x1),     # Is the CSDW the same for
+                                                  # all subchannels?
+            'factor': int((csdw >> 24) & 0b111),  # Sampling rate factor.
+            'totchan': int((csdw >> 16) & 0xff),  # Subchannel count.
+            'subchan': int((csdw >> 8) & 0xff),   # Subchannel ID.
+            'length': int((csdw >> 2) & 0x3f),    # Sample length.
+            'mode': int(csdw & 0b11)}             # Alignment and packing mode.
 
     def parse(self):
         IterativeBase.parse(self)
@@ -41,8 +42,9 @@ class Analog(IterativeBase):
         if not subchannel['same']:
             for i in range(count - 1):
                 i *= 4
-                csdw = BitArray(bytes=self.data[i:i+4])
-                csdw.byteswap()
+                csdw, = struct.unpack('H', self.data[i:i+4])
+                # csdw = BitArray(bytes=self.data[i:i+4])
+                # csdw.byteswap()
                 self.subchannels.append(self.parse_csdw(csdw))
 
         # The current offset into self.data
