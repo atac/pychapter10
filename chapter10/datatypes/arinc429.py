@@ -14,7 +14,7 @@ class ARINC429(IterativeBase):
             raise NotImplementedError('ARINC-429 format %s is reserved!'
                                       % self.format)
 
-        self.msg_count = self.csdw[-16:].int
+        self.msg_count = int(self.csdw & 0xffff)
 
         offset = 0
         for i in range(self.msg_count):

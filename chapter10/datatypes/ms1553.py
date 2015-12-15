@@ -1,8 +1,6 @@
 
 import struct
 
-from bitstring import BitArray
-
 from .base import IterativeBase, Item
 
 
@@ -24,12 +22,12 @@ class MS1553(IterativeBase):
         offset = 0
 
         if self.format == 1:
-            self.ttb = self.csdw[:-30].int
-            self.msg_count = self.csdw[-23:].int
+            self.ttb = int(self.csdw >> 30)
+            self.msg_count = int(self.csdw & 0xffffff)
             iph_len = 6
 
         elif self.format == 2:
-            self.msg_count = self.csdw.int
+            self.msg_count = int(self.csdw)
             iph_len = 4
 
         for i in range(self.msg_count):
@@ -38,32 +36,29 @@ class MS1553(IterativeBase):
             iph = self.data[offset:offset + iph_len]
             offset += iph_len
             if self.format == 1:
-                gap, length = struct.unpack('HH', iph[-4:])
-                status = BitArray(bytes=iph[:2])
-                status.byteswap()
+                gap, length = struct.unpack('=HH', iph[-4:])
+                status, = struct.unpack('=H', iph[:2])
                 attrs = {
                     'gap': gap,
                     'length': length,
-                    'bid': status[-13],  # Bus ID (A/B)
-                    'me': status[-12],   # Message Error
-                    'rr': status[-11],   # RT to RT Transfer
-                    'fe': status[-10],   # Format Error
-                    'tm': status[-9],    # Response Time Out
-                    'le': status[-5],    # Word Count Error
-                    'se': status[-4],    # Sync Type Error
-                    'we': status[-3],    # Invalid Word Error
+                    'bid': (status >> 13) & 0x1,  # Bus ID (A/B)
+                    'me': (status >> 12) & 0x1,   # Message Error
+                    'rr': (status >> 11) & 0x1,   # RT to RT Transfer
+                    'fe': (status >> 10) & 0x1,   # Format Error
+                    'tm': (status >> 9) & 0x1,    # Response Time Out
+                    'le': (status >> 5) & 0x1,    # Word Count Error
+                    'se': (status >> 4) & 0x1,    # Sync Type Error
+                    'we': (status >> 3) & 0x1,    # Invalid Word Error
                 }
             elif self.format == 2:
-                length, = struct.unpack('H', iph[:2])
-                status = BitArray(bytes=iph[:2])
-                status.byteswap()
+                length, status = struct.unpack('=HH', iph)
                 attrs = {
                     'length': length,
-                    'te': status[-15],  # Transaction Error
-                    're': status[-14],  # Reset
-                    'tm': status[-13],  # Message Time Out
-                    'se': status[-6],   # Status Error
-                    'ee': status[-3],   # Echo Error
+                    'te': (status >> 15) & 0x1,  # Transaction Error
+                    're': (status >> 14) & 0x1,  # Reset
+                    'tm': (status >> 13) & 0x1,  # Message Time Out
+                    'se': (status >> 6) & 0x1,   # Status Error
+                    'ee': (status >> 3) & 0x1,   # Echo Error
                 }
 
             data = self.data[offset:offset + attrs['length']]

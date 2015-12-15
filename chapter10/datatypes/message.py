@@ -17,8 +17,8 @@ class Message(IterativeBase):
             raise NotImplementedError('Message format %s is reserved!'
                                       % self.format)
 
-        self.packet_type = self.csdw[-17:-16].int
-        self.counter = self.csdw[-15:].int
+        self.packet_type = int((self.csdw >> 16) & 0b11)
+        self.counter = int(self.csdw >> 15)
 
         # @todo: support for segmented messages
 

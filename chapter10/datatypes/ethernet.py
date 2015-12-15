@@ -21,12 +21,12 @@ class Ethernet(IterativeBase):
 
         # CSDW
         if self.format == 0:
-            self.fmt = self.csdw[-31:-28].int
+            self.fmt = int(self.csdw >> 28)
             iph_length = 4
         elif self.format == 1:
-            self.iph_length = self.csdw[-31:-16].int
+            self.iph_length = int(self.csdw >> 16)
             iph_length = 20
-        self.length = self.csdw[-15:].int
+        self.length = int(self.csdw & 0xffff)
 
         # Parse frames
         offset = 0

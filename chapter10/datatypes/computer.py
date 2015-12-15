@@ -39,9 +39,9 @@ class Computer(IterativeBase):
 
         # TMATS
         elif self.format == 1:
-            self.frmt = self.csdw[9]          # Format: 0 = ASCII, 1 = XML.
-            self.srcc = self.csdw[8]          # Setup Record Config Change flag
-            self.version = self.csdw[:7].int  # Chapter 10 version
+            self.frmt = (self.csdw >> 9) & 0x1    # Format: 0 = ASCII, 1 = XML.
+            self.srcc = (self.csdw >> 8) & 0x1    # Setup Record Config Change
+            self.version = int(self.csdw & 0xff)  # Chapter 10 version
 
             # Parse ASCII style TMATS.
             if self.frmt == 0:
@@ -59,18 +59,18 @@ class Computer(IterativeBase):
 
         # Recording Event
         elif self.format == 2:
-            self.iph = self.csdw[31]        # Intra Packet Header
-            self.reec = self.csdw[:11].int  # Rec Event Entry Count
+            self.iph = (self.csdw >> 31) & 0x1  # Intra Packet Header
+            self.reec = int(self.csdw >> 11)    # Rec Event Entry Count
 
             count = self.reec
             step = 12
 
         # Recording Index
         elif self.format == 3:
-            self.it = self.csdw[-32]        # Index Type
-            self.fsp = self.csdw[-31]       # File Size Present
-            self.iph = self.csdw[-30]       # Index IPH
-            self.iec = self.csdw[-16:].int  # Index Entry Count
+            self.it = (self.csdw >> 32) & 0x1   # Index Type
+            self.fsp = (self.csdw >> 31) & 0x1  # File Size Present
+            self.iph = (self.csdw >> 30) & 0x1  # Index IPH
+            self.iec = int(self.csdw & 0xffff)  # Index Entry Count
 
             count = self.iec
 

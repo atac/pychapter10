@@ -1,5 +1,5 @@
 
-from bitstring import BitArray
+import struct
 
 
 class Base(object):
@@ -38,9 +38,7 @@ class Base(object):
 
         pos = self.packet.file.tell()
         self.packet.file.seek(self.pos)
-        csdw = BitArray(bytes=self.packet.file.read(4))
-        csdw.byteswap()
-        self.csdw = csdw
+        self.csdw, = struct.unpack('=I', self.packet.file.read(4))
         self.data = self.packet.file.read(self.packet.data_length - 4)
         self.packet.file.seek(pos)
         self.init = True
