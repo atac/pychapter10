@@ -12,12 +12,12 @@ class Discrete(IterativeBase):
             raise NotImplementedError('Discrete data format %s is reserved!'
                                       % self.format)
 
-        self.length = self.csdw[-7:-3].int
-        self.mode = self.csdw[-2:].int
+        self.length = int((self.csdw >> 3) & 0x1f)
+        self.mode = int(self.csdw & 0b111)
 
         offset = 0
-        for i in range(len(data) / 12):
-            iph = data[offset:offset + 8]
+        for i in range(len(self.data) / 12):
+            iph = self.data[offset:offset + 8]
             offset += 8
 
             data = self.data[offset:offset + 4]

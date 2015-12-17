@@ -20,13 +20,13 @@ class Image(IterativeBase):
             raise NotImplementedError('Image format %s is reserved!'
                                       % self.format)
 
-        self.parts = self.csdw[:-30].int
-        self.sum = self.csdw[-29:-28].int
-        self.iph = self.csdw[-27]
+        self.parts = int((self.csdw >> 30) & 0b11)
+        self.sum = int((self.csdw >> 28) & 0b11)
+        self.iph = (self.csdw >> 27) & 0b1
 
         offset = 0
         if self.format == 0:
-            self.length = self.csdw[-26:].int
+            self.length = int(self.csdw & 0x7ffffff)
             segment_length = self.length
             if self.iph:
                 segment_length += 8
@@ -43,9 +43,9 @@ class Image(IterativeBase):
 
         else:
             if self.format == 1:
-                self.fmt = self.csdw[-26:-23].int
+                self.fmt = int((self.csdw >> 23) & 0x1f)
             elif self.format == 2:
-                self.fmt = self.csdw[-26:-21].int
+                self.fmt = int((self.csdw >> 21) & 0x1f)
 
             while True:
                 try:

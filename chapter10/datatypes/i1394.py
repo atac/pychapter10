@@ -24,9 +24,9 @@ class I1394(IterativeBase):
 
         offset = 0
         if self.format == 0:
-            self.pbt = self.csdw[:-29].int    # Packet Body Type
-            self.sy = self.csdw[-28:-25].int  # Synchronization Code
-            self.tc = self.csdw[-15:].int     # Transaction Count
+            self.pbt = int((self.csdw >> 29) & 0b111)  # Packet Body Type
+            self.sy = int((self.csdw >> 25) & 0xf)     # Synchronization Code
+            self.tc = int(self.csdw & 0xffff)          # Transaction Count
 
             # Bus Status
             if self.pbt == 0:
@@ -50,7 +50,7 @@ class I1394(IterativeBase):
                                          ipts=ipts))
 
         elif self.format == 1:
-            self.ipc = self.csdw[-15:].int  # Intra Packet Count
+            self.ipc = int(self.csdw & 0xffff)  # Intra Packet Count
 
             for i in range(self.ipc):
                 attrs = {'ipts': self.data[offset:offset + 8]}
