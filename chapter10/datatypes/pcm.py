@@ -1,5 +1,5 @@
 
-from bitstring import BitArray
+import struct
 
 from .base import IterativeBase, Item
 
@@ -27,16 +27,16 @@ class PCM(IterativeBase):
                 'PCM Format %s is reserved!' % self.format)
 
         # Channel Specific Data Word (csdw).
-        self.iph = self.csdw[-30]            # Intra-packet header
-        self.ma = self.csdw[-29]             # Major frame indicator
-        self.mi = self.csdw[-28]             # Minor frame indicator
-        self.mafs = self.csdw[-27:-26].int   # Major frame status
-        self.mifs = self.csdw[-25:-24].int   # Minor frame status
-        self.align = self.csdw[-21]          # Alignment mode
-        self.throughput = self.csdw[-20]     # Throughput mode
-        self.packed = self.csdw[-19]         # Packed mode
-        self.unpacked = self.csdw[-18]       # Unpacked mode
-        self.s_offset = self.csdw[-17:].int  # Sync offset
+        self.iph = (self.csdw >> 30) & 0x1         # Intra-packet header
+        self.ma = (self.csdw >> 29) & 0x1          # Major frame indicator
+        self.mi = (self.csdw >> 28) & 0x1          # Minor frame indicator
+        self.mifs = int((self.csdw >> 26) & 0b11)  # Major frame status
+        self.mafs = int((self.csdw >> 24) & 0b11)  # Minor frame status
+        self.align = (self.csdw >> 21) & 0x1       # Alignment mode
+        self.throughput = (self.csdw >> 20) & 0x1  # Throughput mode
+        self.packed = (self.csdw >> 19) & 0x1      # Packed mode
+        self.unpacked = (self.csdw >> 18) & 0x1    # Unpacked mode
+        self.s_offset = int(self.csdw & 0x3ffff)   # Sync offset
 
         # Throughput basically means we don't need to do anything.
         if self.throughput:
@@ -61,9 +61,9 @@ class PCM(IterativeBase):
                 attrs['ipts'] = self.data[offset:offset + 8]
                 offset += 8
 
-                iph = BitArray(bytes=self.data[offset:offset + iph_len])
-                iph.byteswap()
-                attrs['lockst'] = iph[-15:-12].int
+                iph = self.data[offset:offset + iph_len]
+                iph, = struct.unpack('=H' if len(iph) == 2 else '=I', iph)
+                attrs['lockst'] = int((iph >> 12) & 0xf)
                 offset += iph_len
             data = self.data[offset:offset + frame_size]
             offset += frame_size

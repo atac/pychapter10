@@ -1,5 +1,5 @@
 
-from bitstring import BitArray
+import struct
 
 from .base import IterativeBase, Item
 
@@ -16,7 +16,7 @@ class UART(IterativeBase):
             raise NotImplementedError('UART format %s is reserved!'
                                       % self.format)
 
-        self.iph = self.csdw[-31]
+        self.iph = (self.csdw >> 31) & 0x1
 
         offset = 0
         while True:
@@ -26,13 +26,12 @@ class UART(IterativeBase):
                 attrs['ipts'] = self.data[offset:offset + 8]
                 offset += 8
 
-            iph = BitArray(self.data[offset:offset + 4])
-            iph.byteswap()
+            iph, = struct.unpack('=I', self.data[offset:offset + 4])
             offset += 4
             attrs.update({
-                'pe': iph[-31],
-                'subchannel': iph[-29:-16].int,
-                'length': iph[-15:].int})
+                'pe': (iph >> 31) & 0x1,
+                'subchannel': int((iph >> 16) & 0x1fff),
+                'length': int(iph & 0xffff)})
 
             data = self.data[offset:offset + attrs['length']]
             offset += attrs['length']
