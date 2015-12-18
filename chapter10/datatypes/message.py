@@ -18,7 +18,7 @@ class Message(IterativeBase):
                                       % self.format)
 
         self.packet_type = int((self.csdw >> 16) & 0b11)
-        self.counter = int(self.csdw >> 15)
+        self.counter = int(self.csdw & 0xffff)
 
         # @todo: support for segmented messages
 
