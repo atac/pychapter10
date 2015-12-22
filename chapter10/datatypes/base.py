@@ -30,6 +30,7 @@ class Base(object):
         # Get our type and format.
         from . import format
         self.type, self.format = format(self.packet.data_type)
+        self.parse()
 
     def parse(self):
         """Called lazily (only when requested) to avoid memory overflows.
@@ -46,12 +47,12 @@ class Base(object):
     def __len__(self):
         return self.packet.data_length
 
-    def __getattribute__(self, name):
-        """Loads packet data on demand."""
+    # def __getattribute__(self, name):
+    #     """Loads packet data on demand."""
 
-        if name != 'data_attrs' and name in self.data_attrs and not self.init:
-            self.parse()
-        return object.__getattribute__(self, name)
+    #     if name != 'data_attrs' and name in self.data_attrs and not self.init:
+    #         self.parse()
+    #     return object.__getattribute__(self, name)
 
 
 class IterativeBase(Base):
@@ -63,8 +64,8 @@ class IterativeBase(Base):
     data_attrs = Base.data_attrs + ('all', )
 
     def __init__(self, *args, **kwargs):
-        Base.__init__(self, *args, **kwargs)
         self.all = []
+        Base.__init__(self, *args, **kwargs)
 
     def __iter__(self):
         return iter(self.all)
