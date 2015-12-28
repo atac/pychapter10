@@ -26,6 +26,13 @@ class Base(object):
         # Get our type and format.
         from . import format
         self.type, self.format = format(self.packet.data_type)
+        self.parse()
+
+    def parse(self):
+        """Reads the Channel Specific Data Word (csdw) and data into
+        attributes.
+        """
+
         self.csdw, = struct.unpack('=I', self.packet.file.read(4))
         self.data = self.packet.file.read(self.packet.data_length - 4)
 
