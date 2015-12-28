@@ -9,7 +9,7 @@ class Base(object):
     the parse method to process the raw data into more useful forms.
     """
 
-    # The names of any data attributes for lazy-loading.
+    # The names of any data attributes for lazy-loading (deprecated).
     data_attrs = (
         'data',
         'csdw',
@@ -20,39 +20,17 @@ class Base(object):
 
         self.packet, self.init = (packet, False)
 
-        # Find the body position and skip to the packet trailer.
+        # Find the body position.
         self.pos = self.packet.file.tell()
-        try:
-            packet.file.seek(self.pos + self.packet.data_length)
-        except OverflowError:
-            pass
 
         # Get our type and format.
         from . import format
         self.type, self.format = format(self.packet.data_type)
-        self.parse()
-
-    def parse(self):
-        """Called lazily (only when requested) to avoid memory overflows.
-        Reads the Channel Specific Data Word (csdw) and data into attributes.
-        """
-
-        pos = self.packet.file.tell()
-        self.packet.file.seek(self.pos)
         self.csdw, = struct.unpack('=I', self.packet.file.read(4))
         self.data = self.packet.file.read(self.packet.data_length - 4)
-        self.packet.file.seek(pos)
-        self.init = True
 
     def __len__(self):
         return self.packet.data_length
-
-    # def __getattribute__(self, name):
-    #     """Loads packet data on demand."""
-
-    #     if name != 'data_attrs' and name in self.data_attrs and not self.init:
-    #         self.parse()
-    #     return object.__getattribute__(self, name)
 
 
 class IterativeBase(Base):

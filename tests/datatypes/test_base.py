@@ -18,13 +18,3 @@ def body():
 def test_parse(body):
     body.parse()
     assert 'data' in body.__dict__
-
-
-def test_lazy(body):
-    assert body.__dict__.get('data') is None
-
-
-def test_load(monkeypatch, body):
-    monkeypatch.setattr(base.Base, 'parse', Mock())
-    getattr(body, 'data', None)
-    assert base.Base.parse.called
