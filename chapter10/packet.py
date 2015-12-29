@@ -67,6 +67,9 @@ class Packet(object):
         datatype = datatypes.get_handler(self.data_type)
         self.body = datatype(self)
 
+        # Skip trailer @TODO: parse trailer if present.
+        self.file.seek(self.pos + self.packet_length)
+
     @classmethod
     def from_string(cls, s):
         """Create a packet object from a string."""

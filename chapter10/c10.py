@@ -29,12 +29,9 @@ class C10(object):
         """
 
         while True:
-            pos = self.file.tell()
-
             try:
                 p = Packet(self.file)
                 if p.check():
-                    self.file.seek(pos + p.packet_length)
                     return p
                 else:
                     self.file.seek(p.pos + 1)
