@@ -5,9 +5,6 @@ from .base import IterativeBase, Item
 
 
 class UART(IterativeBase):
-    data_attrs = IterativeBase.data_attrs + (
-        'iph',
-    )
 
     def parse(self):
         IterativeBase.parse(self)

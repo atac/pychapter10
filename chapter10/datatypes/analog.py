@@ -5,13 +5,6 @@ from .base import IterativeBase, Item
 
 
 class Analog(IterativeBase):
-    data_attrs = IterativeBase.data_attrs + (
-        'same',
-        'factor',
-        'totchan',
-        'subchan',
-        'length',
-        'mode')
 
     def parse_csdw(self, csdw):
         """Parses a CSDW from raw bytes and returns a dict of values."""

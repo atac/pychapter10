@@ -8,19 +8,6 @@ from .base import IterativeBase, Item
 class Computer(IterativeBase):
     """Computer generated data (eg. TMATS setup record)."""
 
-    data_attrs = IterativeBase.data_attrs + (
-        'frmt',
-        'srcc',
-        'version',
-        'iph',
-        'reec',
-        'it',
-        'fsp',
-        'iec',
-        'file_size',
-        'root_offset',
-    )
-
     def parse(self):
         IterativeBase.parse(self)
 

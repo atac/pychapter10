@@ -5,11 +5,6 @@ from .base import IterativeBase, Item
 
 
 class Ethernet(IterativeBase):
-    data_attrs = IterativeBase.data_attrs + (
-        'fmt',
-        'length',
-        'iph_length',
-    )
 
     def parse(self):
         IterativeBase.parse(self)

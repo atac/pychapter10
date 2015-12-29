@@ -7,18 +7,6 @@ from .base import IterativeBase, Item
 class Video(IterativeBase):
     """Parse video (type 0x40-0x47)."""
 
-    data_attrs = IterativeBase.data_attrs + (
-        'et',
-        'iph',
-        'srs',
-        'klv',
-        'pl',
-        'ba',
-        'epl',
-        'md',
-        'tp',
-        'pc')
-
     def parse(self):
         """Process channel specific data word (cdsw) and parse data."""
 

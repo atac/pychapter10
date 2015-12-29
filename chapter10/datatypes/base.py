@@ -9,12 +9,6 @@ class Base(object):
     the parse method to process the raw data into more useful forms.
     """
 
-    # The names of any data attributes for lazy-loading (deprecated).
-    data_attrs = (
-        'data',
-        'csdw',
-    )
-
     def __init__(self, packet):
         """Logs the file cursor location for later and skips past the data."""
 
@@ -45,8 +39,6 @@ class IterativeBase(Base):
     on an "all" attribute. Subclasses merely populate this attribute (a list)
     and length, iteration, etc. should just work.
     """
-
-    data_attrs = Base.data_attrs + ('all', )
 
     def __init__(self, *args, **kwargs):
         self.all = []

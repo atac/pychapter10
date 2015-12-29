@@ -6,13 +6,6 @@ from .base import Base
 
 
 class Time(Base):
-    data_attrs = Base.data_attrs + (
-        'date_fmt',
-        'leap',
-        'time_fmt',
-        'source',
-        'time',
-    )
 
     def parse(self):
         Base.parse(self)

@@ -5,13 +5,6 @@ from .base import IterativeBase, Item
 
 
 class I1394(IterativeBase):
-    data_attrs = IterativeBase.data_attrs + (
-        'pbt',
-        'sy',
-        'tc',
-        'ipc',
-        'reset',
-    )
 
     def parse(self):
         IterativeBase.parse(self)

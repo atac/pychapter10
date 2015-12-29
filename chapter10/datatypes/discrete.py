@@ -3,7 +3,6 @@ from .base import IterativeBase, Item
 
 
 class Discrete(IterativeBase):
-    data_attrs = IterativeBase.data_attrs + ('length', 'mode')
 
     def parse(self):
         IterativeBase.parse(self)

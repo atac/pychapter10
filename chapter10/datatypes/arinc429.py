@@ -5,7 +5,6 @@ from .base import IterativeBase, Item
 
 
 class ARINC429(IterativeBase):
-    data_attrs = IterativeBase.data_attrs + ('msg_count',)
 
     def parse(self):
         IterativeBase.parse(self)

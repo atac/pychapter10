@@ -5,12 +5,6 @@ from .base import IterativeBase, Item
 
 
 class MS1553(IterativeBase):
-    data_attrs = IterativeBase.data_attrs + (
-        'messages',
-        'all',
-        'ttb',
-        'msg_count',
-    )
 
     def parse(self):
         IterativeBase.parse(self)

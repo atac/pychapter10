@@ -6,19 +6,6 @@ from .base import IterativeBase, Item
 
 class PCM(IterativeBase):
 
-    data_attrs = IterativeBase.data_attrs + (
-        'iph',
-        'ma',
-        'mi',
-        'mafs',
-        'mifs',
-        'align',
-        'throughput',
-        'packed',
-        'unpacked',
-        's_offset',
-    )
-
     def parse(self):
         IterativeBase.parse(self)
 

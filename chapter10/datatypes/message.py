@@ -5,10 +5,6 @@ from .base import IterativeBase, Item
 
 
 class Message(IterativeBase):
-    data_attrs = IterativeBase.data_attrs + (
-        'packet_type',
-        'counter',
-    )
 
     def parse(self):
         IterativeBase.parse(self)

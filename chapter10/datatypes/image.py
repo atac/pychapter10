@@ -5,13 +5,6 @@ from .base import IterativeBase, Item
 
 
 class Image(IterativeBase):
-    data_attrs = IterativeBase.data_attrs + (
-        'parts',
-        'sum',
-        'iph',
-        'length',
-        'segments',
-    )
 
     def parse(self):
         IterativeBase.parse(self)
