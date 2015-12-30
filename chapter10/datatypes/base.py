@@ -2,12 +2,20 @@
 import struct
 
 
+def mask(i):
+    """Create a mask of i length."""
+
+    return int('0b' + ('1' * i), 2)
+
+
 class Base(object):
     """Base object for packet data. All data types include a "csdw" attribute
     containing the channel specific raw data word (or words in some cases), and
     a "data" attribute containing the raw packet data. Subclasses should extend
     the parse method to process the raw data into more useful forms.
     """
+
+    csdw_structure = None
 
     def __init__(self, packet):
         """Logs the file cursor location for later and skips past the data."""
@@ -22,12 +30,26 @@ class Base(object):
         self.type, self.format = format(self.packet.data_type)
         self.parse()
 
+    def _dissect(self, data, structure):
+        # just csdw for now
+        # data, = struct.unpack('=I', data)
+        for attr, size in reversed(structure):
+            value = data & mask(size)
+            if size > 1:
+                value = int(value)
+            data = data >> size
+            if attr is not None:
+                for a in attr.split(','):
+                    setattr(self, a, value)
+
     def parse(self):
         """Reads the Channel Specific Data Word (csdw) and data into
         attributes.
         """
 
         self.csdw, = struct.unpack('=I', self.packet.file.read(4))
+        if self.csdw_structure is not None:
+            self._dissect(self.csdw, self.csdw_structure)
         self.data = self.packet.file.read(self.packet.data_length - 4)
 
     def __len__(self):
