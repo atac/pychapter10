@@ -31,16 +31,25 @@ class Base(object):
         self.parse()
 
     def _dissect(self, data, structure):
-        # just csdw for now
-        # data, = struct.unpack('=I', data)
-        for attr, size in reversed(structure):
-            value = data & mask(size)
-            if size > 1:
-                value = int(value)
-            data = data >> size
+        result = {}
+        for field in reversed(structure):
+            attr, size = field[:2]
+            if isinstance(size, str):
+                fmt = size
+                size = struct.calcsize(fmt)
+                value, = struct.unpack(fmt, data[-size:])
+                data = data[:-size]
+            else:
+                value = data & mask(size)
+                if size > 1:
+                    value = int(value)
+                data = data >> size
+            if len(field) == 3:
+                result.update(self._dissect(value, field[2]))
             if attr is not None:
                 for a in attr.split(','):
-                    setattr(self, a, value)
+                    result[a] = value
+        return result
 
     def parse(self):
         """Reads the Channel Specific Data Word (csdw) and data into
@@ -49,7 +58,7 @@ class Base(object):
 
         self.csdw, = struct.unpack('=I', self.packet.file.read(4))
         if self.csdw_structure is not None:
-            self._dissect(self.csdw, self.csdw_structure)
+            self.__dict__.update(self._dissect(self.csdw, self.csdw_structure))
         self.data = self.packet.file.read(self.packet.data_length - 4)
 
     def __len__(self):
