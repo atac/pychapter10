@@ -6,7 +6,7 @@ from .base import IterativeBase, Item
 
 class Analog(IterativeBase):
 
-    def parse_csdw(self, csdw):
+    def _parse_csdw(self, csdw):
         """Parses a CSDW from raw bytes and returns a dict of values."""
 
         return {
@@ -26,7 +26,7 @@ class Analog(IterativeBase):
                                       % self.format)
 
         # Parse one CSDW and see how many there are.
-        subchannel = self.parse_csdw(self.csdw)
+        subchannel = self._parse_csdw(self.csdw)
         self.__dict__.update(subchannel)
         self.subchannels = [subchannel]
         count = subchannel['totchan'] or 256  # totchan: 0 = 256
@@ -38,7 +38,7 @@ class Analog(IterativeBase):
                 csdw, = struct.unpack('=I', self.data[i:i+4])
                 # csdw = BitArray(bytes=self.data[i:i+4])
                 # csdw.byteswap()
-                self.subchannels.append(self.parse_csdw(csdw))
+                self.subchannels.append(self._parse_csdw(csdw))
 
         # The current offset into self.data
         offset = i + 4

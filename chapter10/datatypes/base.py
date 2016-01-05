@@ -2,10 +2,17 @@
 import struct
 
 
-def mask(i):
+mask_cache = {}
+
+
+def mask(bitlength):
     """Create a mask of i length."""
 
-    return int('0b' + ('1' * i), 2)
+    if bitlength not in mask_cache:
+        mask_cache[bitlength] = 0
+        for i in range(bitlength):
+            mask_cache[bitlength] |= (1 << i)
+    return mask_cache[bitlength]
 
 
 class Base(object):
@@ -15,7 +22,7 @@ class Base(object):
     the parse method to process the raw data into more useful forms.
     """
 
-    csdw_structure = None
+    csdw_format = ('=I', None)
 
     def __init__(self, packet):
         """Logs the file cursor location for later and skips past the data."""
@@ -32,23 +39,15 @@ class Base(object):
 
     def _dissect(self, data, structure):
         result = {}
-        for field in reversed(structure):
-            attr, size = field[:2]
-            if isinstance(size, str):
-                fmt = size
-                size = struct.calcsize(fmt)
-                value, = struct.unpack(fmt, data[-size:])
-                data = data[:-size]
+        for i, field in enumerate(structure):
+            value = int(data[i])
+            if isinstance(field, tuple):
+                for attr, size in reversed(field):
+                    if attr is not None:
+                        result[attr] = value & mask(size)
+                    value = value >> size
             else:
-                value = data & mask(size)
-                if size > 1:
-                    value = int(value)
-                data = data >> size
-            if len(field) == 3:
-                result.update(self._dissect(value, field[2]))
-            if attr is not None:
-                for a in attr.split(','):
-                    result[a] = value
+                result[field] = value
         return result
 
     def parse(self):
@@ -56,9 +55,19 @@ class Base(object):
         attributes.
         """
 
-        self.csdw, = struct.unpack('=I', self.packet.file.read(4))
-        if self.csdw_structure is not None:
-            self.__dict__.update(self._dissect(self.csdw, self.csdw_structure))
+        self.parse_csdw()
+        self.parse_data()
+
+    def parse_csdw(self):
+        raw = self.packet.file.read(4)
+        fmt, structure = self.csdw_format
+        if structure is None:
+            self.csdw, = struct.unpack('=I', raw)
+        else:
+            self.__dict__.update(self._dissect(
+                struct.unpack(fmt, raw), structure))
+
+    def parse_data(self):
         self.data = self.packet.file.read(self.packet.data_length - 4)
 
     def __len__(self):
@@ -71,9 +80,34 @@ class IterativeBase(Base):
     and length, iteration, etc. should just work.
     """
 
+    item_label = None
+    iph_format = None
+
     def __init__(self, *args, **kwargs):
         self.all = []
         Base.__init__(self, *args, **kwargs)
+
+    def parse_data(self):
+        if not self.iph_format:
+            self.data = self.packet.file.read(self.packet.data_length - 4)
+        else:
+            fmt, structure = self.iph_format
+            iph_size = struct.calcsize(fmt)
+            end = self.pos + self.packet.data_length
+            while True:
+                iph = self._dissect(
+                    struct.unpack(fmt, self.packet.file.read(iph_size)),
+                    structure)
+
+                data = self.packet.file.read(iph['length'])
+                self.all.append(Item(data, self.item_label, **iph))
+
+                # Account for filler byte when length is odd.
+                if iph['length'] % 2:
+                    self.packet.file.seek(1, 1)
+
+                if self.packet.file.tell() >= end:
+                    break
 
     def __iter__(self):
         return iter(self.all)
