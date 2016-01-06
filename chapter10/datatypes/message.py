@@ -23,10 +23,4 @@ class Message(IterativeBase):
             raise NotImplementedError('Message format %s is reserved!'
                                       % self.format)
 
-        self.parse_csdw()
-
-        # @todo: support for segmented messages
-
-        # Type: complete
-        if not self.packet_type:
-            self.parse_data()
+        IterativeBase.parse(self)

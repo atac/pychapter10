@@ -59,13 +59,12 @@ class Base(object):
         self.parse_data()
 
     def parse_csdw(self):
-        raw = self.packet.file.read(4)
         fmt, structure = self.csdw_format
+        raw = struct.unpack(fmt, self.packet.file.read(4))
         if structure is None:
-            self.csdw, = struct.unpack('=I', raw)
+            self.csdw = raw[0]
         else:
-            self.__dict__.update(self._dissect(
-                struct.unpack(fmt, raw), structure))
+            self.__dict__.update(self._dissect(raw, structure))
 
     def parse_data(self):
         self.data = self.packet.file.read(self.packet.data_length - 4)
@@ -89,15 +88,14 @@ class IterativeBase(Base):
 
     def parse_data(self):
         if not self.iph_format:
-            self.data = self.packet.file.read(self.packet.data_length - 4)
+            Base.parse_data(self)
         else:
             fmt, structure = self.iph_format
             iph_size = struct.calcsize(fmt)
             end = self.pos + self.packet.data_length
             while True:
-                iph = self._dissect(
-                    struct.unpack(fmt, self.packet.file.read(iph_size)),
-                    structure)
+                iph = struct.unpack(fmt, self.packet.file.read(iph_size))
+                iph = self._dissect(iph, structure)
 
                 data = self.packet.file.read(iph['length'])
                 self.all.append(Item(data, self.item_label, **iph))
