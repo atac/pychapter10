@@ -38,17 +38,18 @@ class Base(object):
         self.parse()
 
     def _dissect(self, data, structure):
-        result = {}
         for i, field in enumerate(structure):
-            value = int(data[i])
+            value = data[i]
             if isinstance(field, tuple):
                 for attr, size in reversed(field):
+                    result = None
                     if attr is not None:
-                        result[attr] = value & mask(size)
+                        result = value & mask(size)
                     value = value >> size
+                    if result:
+                        yield attr, result
             else:
-                result[field] = value
-        return result
+                yield field, value
 
     def parse(self):
         """Reads the Channel Specific Data Word (csdw) and data into
@@ -64,7 +65,9 @@ class Base(object):
         if structure is None:
             self.csdw = raw[0]
         else:
-            self.__dict__.update(self._dissect(raw, structure))
+            for k, v in self._dissect(raw, structure):
+                setattr(self, k, v)
+            # self.__dict__.update()
 
     def parse_data(self):
         self.data = self.packet.file.read(self.packet.data_length - 4)
@@ -95,7 +98,7 @@ class IterativeBase(Base):
             end = self.pos + self.packet.data_length
             while True:
                 iph = struct.unpack(fmt, self.packet.file.read(iph_size))
-                iph = self._dissect(iph, structure)
+                iph = dict(self._dissect(iph, structure))
 
                 data = self.packet.file.read(iph['length'])
                 self.all.append(Item(data, self.item_label, **iph))
@@ -118,10 +121,8 @@ class Item(object):
     """The base container for packet data."""
 
     def __init__(self, data, label="Packet Data", **kwargs):
-        for k, v in kwargs.items():
-            setattr(self, k, v)
-
-            self.data, self.label = data, label
+        self.__dict__.update(kwargs)
+        self.data, self.label = data, label
 
     def __repr__(self):
         return '<%s>' % (self.label)
