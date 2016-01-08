@@ -19,6 +19,12 @@ class PCM(IterativeBase):
     ),),)
     item_label = 'PCM Frame'
     item_size = 12  # Two words sync, four data.
+    iph_format = ['=QH', (
+        'ipts', (
+            ('lockst', 4),
+            (None, 12),
+        )
+    )]
 
     def parse(self):
         if self.format != 1:
@@ -35,18 +41,6 @@ class PCM(IterativeBase):
         if self.iph:
             # Extra IPH word in 32 bit alignment.
             if self.align:
-                self.iph_format = ('=QI', (
-                    'ipts', (
-                        ('lockst', 4),
-                        (None, 12),
-                    )
-                ))
-            else:
-                self.iph_format = ('=QH', (
-                    'ipts', (
-                        ('lockst', 4),
-                        (None, 12),
-                    )
-                ))
+                self.iph_format[0] = self.iph_format[0][:-1] + 'I'
 
         self.parse_data()
