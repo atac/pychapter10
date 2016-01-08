@@ -92,24 +92,29 @@ class IterativeBase(Base):
         if not self.iph_format:
             Base.parse_data(self)
         else:
-            fmt, structure = self.iph_format
-            iph_size = struct.calcsize(fmt)
             end = self.pos + self.packet.data_length
             while True:
-                iph = struct.unpack(fmt, self.packet.file.read(iph_size))
-                iph = dict(self._dissect(iph, structure))
-
-                length = getattr(self, 'item_size', iph.get('length'))
-
-                data = self.packet.file.read(length)
-                self.all.append(Item(data, self.item_label, **iph))
-
-                # Account for filler byte when length is odd.
-                if length % 2:
-                    self.packet.file.seek(1, 1)
+                self.parse_one_item()
 
                 if self.packet.file.tell() >= end:
                     break
+
+    def parse_one_item(self):
+        length = getattr(self, 'item_size', None)
+        fmt, structure = self.iph_format
+        if fmt is not None:
+            iph_size = struct.calcsize(fmt)
+            iph = struct.unpack(fmt, self.packet.file.read(iph_size))
+            iph = dict(self._dissect(iph, structure))
+            if 'length' in iph:
+                length = iph['length']
+
+        data = self.packet.file.read(length)
+        self.all.append(Item(data, self.item_label, **iph))
+
+        # Account for filler byte when length is odd.
+        if length % 2:
+            self.packet.file.seek(1, 1)
 
     def __iter__(self):
         return iter(self.all)
