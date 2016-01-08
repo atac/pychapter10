@@ -2,18 +2,13 @@
 from collections import OrderedDict
 import struct
 
-from .base import IterativeBase, Item
+from .base import IterativeBase
 
 
 class Computer(IterativeBase):
     """Computer generated data (eg. TMATS setup record)."""
 
     def parse(self):
-        IterativeBase.parse(self)
-
-        # Offset into the data attribute.
-        offset = 0
-
         if self.format > 3:
             raise NotImplementedError(
                 'Computer Generated Data Format %s is reserved!' % self.format)
@@ -24,9 +19,14 @@ class Computer(IterativeBase):
 
         # TMATS
         elif self.format == 1:
-            self.frmt = (self.csdw >> 9) & 0x1    # Format: 0 = ASCII, 1 = XML.
-            self.srcc = (self.csdw >> 8) & 0x1    # Setup Record Config Change
-            self.version = int(self.csdw & 0xff)  # Chapter 10 version
+            self.csdw_format = ('=I', ((
+                (None, 22),
+                ('frmt', 1),     # Format: 0 = ASCII, 1 = XML.
+                ('srcc', 1),     # Setup Record Config Change
+                ('version', 8),  # Chapter 10 version
+            ),),)
+            self.parse_csdw()
+            self.parse_data()
 
             # Parse ASCII style TMATS.
             if self.frmt == 0:
@@ -43,71 +43,60 @@ class Computer(IterativeBase):
             return
 
         # Recording Event
-        elif self.format == 2:
-            self.iph = (self.csdw >> 31) & 0x1  # Intra Packet Header
-            self.reec = int(self.csdw >> 11)    # Rec Event Entry Count
-
-            count = self.reec
-            step = 12
+        if self.format == 2:
+            self.csdw_format = ('=I', ((
+                ('ipdh', 1),
+                (None, 19),
+                ('reec', 12),  # Rec Event Entry Count
+            ),),)
+            self.item_label = 'Recording Event'
+            item_format = ('I', [(
+                (None, 3),
+                ('eo', 1),
+                ('event_count', 16),
+                ('event_number', 12),
+            )],)
 
         # Recording Index
         elif self.format == 3:
-            self.it = (self.csdw >> 32) & 0x1   # Index Type
-            self.fsp = (self.csdw >> 31) & 0x1  # File Size Present
-            self.iph = (self.csdw >> 30) & 0x1  # Index IPH
-            self.iec = int(self.csdw & 0xffff)  # Index Entry Count
+            self.csdw_format = ('=I', ((
+                ('it', 1),    # Index Type
+                ('fsp', 1),   # File Size Present
+                ('ipdh', 1),  # Index IPDH
+                (None, 13),
+                ('iec', 16),  # Index entry count
+            ),),)
 
-            count = self.iec
-
-            if self.fsp:
-                self.file_size = struct.unpack('Q', self.data[:8])[0]
-                offset += 8
-
-            step = 20 if self.it else 16
-
-        if self.iph:
-            step += 8
-
-        for i in range(count):
-
-            attrs = {}
-
-            # IPTS @todo: parse into useful type
-            attrs['ipts'] = self.data[offset:offset + 8]
-            offset += 8
-
-            # IPH (optional) @todo: compute time
-            if self.iph:
-                attrs['iph'] = self.data[offset:offset + 8]
-                offset += 8
-
-            # Data (event, root index, or node index)
-            if self.format == 2:
-                raw = self.data[offset:offset + 4]
-                data = struct.unpack('=I', raw)
-                attrs.update({
-                    'eo': (data >> 28) & 0x1,
-                    'event_count': int((data >> 12) & 0xffff),
-                    'event_number': int(data & 0xfff)})
-                self.all.append(Item(raw, 'Recording Event', **attrs))
-                offset += 4
-
-            elif self.format == 3:
-                if self.it == 0:
-                    data = self.data[offset:offset + 8]
-                    attrs['offset'] = struct.unpack('=Q', data)[0]
-                    self.all.append(Item(data, 'Root Index', **attrs))
-                    offset += 8
-                elif self.it == 1:
-                    data = self.data[offset:offset + 12]
-                    keys = ('channel_id', 'data_type', 'offset')
-                    values = struct.unpack('=xBHQ', data)
-                    attrs.update(dict(zip(keys, values)))
-                    self.all.append(Item(data, 'Node Index', **attrs))
-                    offset += 12
+        self.parse_csdw()
 
         if getattr(self, 'it', None) == 0:
-            self.root_offset = struct.unpack('Q', self.data[:8])[0]
+            self.item_label = 'Root Index'
+            item_format = ('Q', ['offset'])
+        elif getattr(self, 'it', None) == 1:
+            self.item_label = 'Node Index'
+            item_format = ('xBHQ', ['data_type', 'channel_id', 'offset'])
+
+        self.iph_format = ['=Q', ['ipts']]
+
+        if self.ipdh:
+            self.iph_format[0] += 'Q'
+            self.iph_format[1].append('ipdh')
+
+        self.iph_format[0] += item_format[0]
+        self.iph_format[1] = tuple(self.iph_format[1] + item_format[1])
+
+        if getattr(self, 'fsp', False):
+            self.file_size, = struct.unpack('Q', self.packet.file.read(8))
+
+        self.parse_data()
+
+    def parse_one_item(self):
+        IterativeBase.parse_one_item(self)
+        if getattr(self, 'it', None) == 0:
+            if len(self) == self.iec:
+                self.root_offset, = struct.unpack(
+                    'Q', self.packet.file.read(8))
+            raise StopIteration
 
     def __getitem__(self, key):
         if self.format == 1:
