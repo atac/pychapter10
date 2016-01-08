@@ -100,7 +100,7 @@ class IterativeBase(Base):
                     break
 
     def parse_one_item(self):
-        length = getattr(self, 'item_size', None)
+        length = getattr(self, 'item_size', 0)
         fmt, structure = self.iph_format
         if fmt is not None:
             iph_size = struct.calcsize(fmt)
