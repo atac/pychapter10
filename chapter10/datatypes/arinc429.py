@@ -1,31 +1,27 @@
 
-import struct
-
-from .base import IterativeBase, Item
+from .base import IterativeBase
 
 
 class ARINC429(IterativeBase):
 
-    def parse(self):
-        IterativeBase.parse(self)
+    csdw_format = ('=I', ((
+        (None, 16),
+        ('msg_count', 16),
+    ),),)
+    iph_format = ('=I', ((
+        ('bus', 8),
+        ('fe', 1),        # Format error flag
+        ('pe', 1),        # Parity error flag
+        ('bs', 1),        # Bus speed (0 = low, 1 = high)
+        (None, 1),
+        ('gap_time', 20),
+    ),),)
+    item_size = 4
+    item_label = 'ARINC-429 Data Word'
 
+    def parse(self):
         if self.format > 0:
             raise NotImplementedError('ARINC-429 format %s is reserved!'
                                       % self.format)
 
-        self.msg_count = int(self.csdw & 0xffff)
-
-        offset = 0
-        for i in range(self.msg_count):
-            raw, = struct.unpack('=I', self.data[offset:offset + 4])
-            iph = {
-                'bus': int((raw >> 24) & 0xff),
-                'fe': (raw >> 23) & 0x1,        # Format error flag
-                'pe': (raw >> 22) & 0x1,        # Parity error flag
-                'bs': (raw >> 21) & 0x1,        # Bus speed (0 = low, 1 = high)
-                'gap_time': int(raw & 0xfffff)}
-            offset += 4
-
-            self.all.append(Item(self.data[offset:offset + 4],
-                                 'ARINC-429 Data Word', **iph))
-            offset += 4
+        IterativeBase.parse(self)
