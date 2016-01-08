@@ -46,7 +46,7 @@ class Base(object):
                     if attr is not None:
                         result = value & mask(size)
                     value = value >> size
-                    if result:
+                    if result is not None:
                         yield attr, result
             else:
                 yield field, value
@@ -67,7 +67,6 @@ class Base(object):
         else:
             for k, v in self._dissect(raw, structure):
                 setattr(self, k, v)
-            # self.__dict__.update()
 
     def parse_data(self):
         self.data = self.packet.file.read(self.packet.data_length - 4)
@@ -100,11 +99,13 @@ class IterativeBase(Base):
                 iph = struct.unpack(fmt, self.packet.file.read(iph_size))
                 iph = dict(self._dissect(iph, structure))
 
-                data = self.packet.file.read(iph['length'])
+                length = getattr(self, 'item_size', iph.get('length'))
+
+                data = self.packet.file.read(length)
                 self.all.append(Item(data, self.item_label, **iph))
 
                 # Account for filler byte when length is odd.
-                if iph['length'] % 2:
+                if length % 2:
                     self.packet.file.seek(1, 1)
 
                 if self.packet.file.tell() >= end:

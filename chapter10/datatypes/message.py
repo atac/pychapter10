@@ -4,9 +4,10 @@ from .base import IterativeBase
 
 class Message(IterativeBase):
 
-    csdw_format = ('=I', (
-        (('packet_type', 2), ('counter', 16)),
-    ))
+    csdw_format = ('=I', ((
+        ('packet_type', 2),
+        ('counter', 16)
+    ),),)
 
     iph_format = ('=qI', (
         'ipts', (
