@@ -23,6 +23,7 @@ class Base(object):
     """
 
     csdw_format = ('=I', None)
+    data_format = None
 
     def __init__(self, packet):
         """Logs the file cursor location for later and skips past the data."""
@@ -70,6 +71,11 @@ class Base(object):
 
     def parse_data(self):
         self.data = self.packet.file.read(self.packet.data_length - 4)
+        if self.data_format is not None:
+            fmt, structure = self.data_format
+            raw = struct.unpack(fmt, self.data)
+            for k, v in self._dissect(raw, structure):
+                setattr(self, k, v)
 
     def __len__(self):
         return self.packet.data_length
