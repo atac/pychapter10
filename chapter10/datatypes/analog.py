@@ -1,7 +1,7 @@
 
 import struct
 
-from .base import IterativeBase
+from .base import IterativeBase, Item
 
 
 class Analog(IterativeBase):
@@ -42,16 +42,22 @@ class Analog(IterativeBase):
 
         IterativeBase.parse_data()
 
-    def parse_one_item(self):
-        if self.same:
-            csdw = self.subchannels[0]
-        else:
-            csdw = self.subchannels[len(self) + 1]
+    def parse_data(self):
+        for i in xrange(self.totchan):
+            if self.same:
+                csdw = self.subchannels[0]
+            else:
+                csdw = self.subchannels[len(self) + 1]
 
-        # Find the sample size (in bits).
-        length = csdw['length'] or 64  # Length 0 = 64 bits
+            # Find the sample size (in bits).
+            length = csdw['length'] or 64  # Length 0 = 64 bits
 
-        # Convert length to bytes (align on 16 bits first of course).
-        self.item_size = (length / 16) + (length % 16 and 1 or 0)
+            # Convert length to bytes (align on 16 bits first of course).
+            length = (length / 16) + (length % 16 and 1 or 0)
 
-        IterativeBase.parse_one_item(self)
+            data = self.packet.file.read(length)
+            self.all.append(Item(data, self.item_label))
+
+            # Account for filler byte when length is odd.
+            if length % 2:
+                self.packet.file.seek(1, 1)

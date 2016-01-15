@@ -90,13 +90,15 @@ class Computer(IterativeBase):
 
         self.parse_data()
 
-    def parse_one_item(self):
-        IterativeBase.parse_one_item(self)
-        if getattr(self, 'it', None) == 0:
-            if len(self) == self.iec:
+        end = self.pos + self.packet.data_length
+        if self.packet.file.tell() > end:
+            self.all.pop()
+            if getattr(self, 'it', None) == 0:
+                self.seek(end - 8)
                 self.root_offset, = struct.unpack(
                     'Q', self.packet.file.read(8))
-            raise StopIteration
+            else:
+                self.seek(end)
 
     def __getitem__(self, key):
         if self.format == 1:
