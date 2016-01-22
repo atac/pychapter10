@@ -52,7 +52,7 @@ class Time(Base):
 
         THn = int((data[1] >> 12) & 0b11)  # Tens of hours
         Hn = int((data[1] >> 8) & 0xf)     # Hours
-        TMn = int((data[1] >> 4) & 0b11)   # Tens of minutes
+        TMn = int((data[1] >> 4) & 0b111)  # Tens of minutes
         Mn = int(data[1] & 0xf)            # Minutes
 
         microseconds = ((Hmn * 10) + Tmn)
