@@ -42,8 +42,8 @@ class Time(Base):
             ((None, 2),
              ('THn', 2),    # Tens of hours
              ('Hn', 4),     # Hours
-             (None, 2),
-             ('TMn', 2),    # Tens of minutes
+             (None, 1),
+             ('TMn', 3),    # Tens of minutes
              ('Mn', 4),),   # Minutes
             ((None, 6),
              ('HDn', 2),    # Hundreds of days
@@ -73,6 +73,7 @@ class Time(Base):
         seconds = self.Sn + (self.TSn * 10)
         minutes = self.Mn + (self.TMn * 10)
         hours = self.Hn + (self.THn * 10)
+        print '%s:%s:%s.%s' % (hours, minutes, seconds, microseconds)
 
         # IRIG day format
         if not self.date_fmt:
