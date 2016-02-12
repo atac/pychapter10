@@ -36,7 +36,22 @@ class Base(object):
         # Get our type and format.
         from . import format
         self.type, self.format = format(self.packet.data_type)
+        if self.packet.lazy:
+            self.__getattribute__ = self.lazy_getter
+        else:
+            self.parse()
+
+    def lazy_getter(self, key):
+        if key == 'all' and not self.init:
+            self.parse()
+        try:
+            return object.__getattribute__(self, key)
+        except AttributeError:
+            if self.init:
+                raise
+
         self.parse()
+        return object.__getattribute__(self, key)
 
     def _dissect(self, data, structure):
         for i, field in enumerate(structure):
@@ -59,6 +74,7 @@ class Base(object):
 
         self.parse_csdw()
         self.parse_data()
+        self.init = True
 
     def parse_csdw(self):
         fmt, structure = self.csdw_format

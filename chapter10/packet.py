@@ -27,8 +27,10 @@ class Packet(object):
         'Header Checksum'
     )
 
-    def __init__(self, file):
+    def __init__(self, file, lazy=False):
         """Takes an open file object with its cursor at this packet."""
+
+        self.lazy = lazy
 
         # Mark our location in the file and read the header.
         self.file, self.pos = file, file.tell()

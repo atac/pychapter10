@@ -7,13 +7,14 @@ from .packet import Packet
 class C10(object):
     """A Chapter 10 parser."""
 
-    def __init__(self, f):
+    def __init__(self, f, lazy=False):
         """Takes a file or filename and reads packets."""
 
         atexit.register(self.close)
         if isinstance(f, str):
             f = open(f, 'rb')
         self.file = f
+        self.lazy = lazy
 
     def close(self):
         """Make sure we close our file if we can."""
@@ -30,7 +31,7 @@ class C10(object):
 
         while True:
             try:
-                p = Packet(self.file)
+                p = Packet(self.file, self.lazy)
                 if p.check():
                     return p
                 else:
