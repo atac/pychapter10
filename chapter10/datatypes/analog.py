@@ -40,7 +40,7 @@ class Analog(IterativeBase):
             for i in range(count - 1):
                 self.parse_csdw()
 
-        IterativeBase.parse_data()
+        self.parse_data()
 
     def parse_data(self):
         for i in xrange(self.totchan):
