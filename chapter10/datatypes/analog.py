@@ -32,6 +32,7 @@ class Analog(IterativeBase):
         count = subchannel['totchan'] or 256  # totchan: 0 = 256
 
         # Read CSDWs for subchannels if applicable.
+        i = 0
         if not subchannel['same']:
             for i in range(count - 1):
                 i *= 4
@@ -58,6 +59,6 @@ class Analog(IterativeBase):
             length = (length / 16) + (length % 16 and 1 or 0)
 
             self.all.append(
-                Item(self.data[offset:length], 'Analog Sample'), **csdw)
+                Item(self.data[offset:length], 'Analog Sample', **csdw))
 
             offset += length
