@@ -17,8 +17,6 @@ class Image(IterativeBase):
             ('iph', 1),
         ]]]
 
-        IterativeBase.parse(self)
-
         if self.format > 2:
             raise NotImplementedError('Image format %s is reserved!'
                                       % self.format)
