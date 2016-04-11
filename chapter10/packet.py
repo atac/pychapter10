@@ -73,19 +73,21 @@ class Packet(object):
         self.file.seek(self.pos + self.packet_length)
 
     @classmethod
-    def from_string(cls, s):
+    def from_string(cls, s, lazy=False):
         """Create a packet object from a string."""
 
-        return cls(IO(s))
+        return cls(IO(s), lazy)
 
     def check(self):
         """Validate the packet using checksums and verifying fields."""
 
-        if self.header_sums != self.header_checksum:
+        if self.sync_pattern != 0xeb25:
+            return False
+        elif self.header_sums != self.header_checksum:
             return False
         elif self.secondary_sums != self.secondary_checksum:
             return False
-        elif self.sync_pattern != 0xeb25:
+        elif self.data_length > 524288:
             return False
         return True
 
