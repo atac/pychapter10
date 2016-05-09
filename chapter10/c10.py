@@ -1,24 +1,10 @@
 
-try:
-    from cStringIO import StringIO
-except:
-    from io import StringIO
 import atexit
 import os
+import struct
 
 from .packet import Packet
-
-
-class Buffer(object):
-    def __init__(self, *args, **kwargs):
-        self.io = StringIO(*args, **kwargs)
-        self.tell = self.io.tell
-
-    def read(self, size, *args, **kwargs):
-        value = self.io.read(*args, **kwargs)
-        if len(value) != size:
-            raise EOFError
-        return value
+from .buffer import Buffer
 
 
 class C10(object):
@@ -57,6 +43,8 @@ class C10(object):
                     return p
                 else:
                     self.file.seek(p.pos + 1)
+            except struct.error:
+                raise StopIteration
             except EOFError:
                 raise StopIteration
 
