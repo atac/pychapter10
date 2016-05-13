@@ -1,9 +1,9 @@
 
+from io import BytesIO
 from array import array
 import struct
 
 from . import datatypes
-from .buffer import Buffer
 
 
 class Packet(object):
@@ -73,7 +73,7 @@ class Packet(object):
     def from_string(cls, s, lazy=False):
         """Create a packet object from a string."""
 
-        return cls(Buffer(s), lazy)
+        return cls(BytesIO(s), lazy)
 
     def check(self):
         """Validate the packet using checksums and verifying fields."""
