@@ -1,19 +1,27 @@
+
 import atexit
 import os
+import struct
 
 from .packet import Packet
+from .buffer import Buffer
 
 
 class C10(object):
     """A Chapter 10 parser."""
 
-    def __init__(self, f):
+    def __init__(self, f, lazy=False):
         """Takes a file or filename and reads packets."""
 
         atexit.register(self.close)
         if isinstance(f, str):
             f = open(f, 'rb')
         self.file = f
+        self.lazy = lazy
+
+    @classmethod
+    def from_string(cls, s):
+        return cls(Buffer(s))
 
     def close(self):
         """Make sure we close our file if we can."""
@@ -30,12 +38,13 @@ class C10(object):
 
         while True:
             try:
-                p = Packet(self.file)
+                p = Packet(self.file, self.lazy)
                 if p.check():
                     return p
                 else:
                     self.file.seek(p.pos + 1)
-
+            except struct.error:
+                raise StopIteration
             except EOFError:
                 raise StopIteration
 

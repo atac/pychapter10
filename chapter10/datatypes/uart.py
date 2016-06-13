@@ -1,38 +1,28 @@
 
-import struct
-
-from .base import IterativeBase, Item
+from .base import IterativeBase
 
 
 class UART(IterativeBase):
+    csdw_format = ('=I', ((
+        ('iph', 1),
+        (None, 31),
+    ),),)
+    iph_format = ['=I', [
+        (('pe', 1),
+            ('subchannel', 14),
+            ('length', 16),),
+    ]]
+    item_label = 'UART Data'
 
     def parse(self):
-        IterativeBase.parse(self)
-
         if self.format > 0:
             raise NotImplementedError('UART format %s is reserved!'
                                       % self.format)
 
-        self.iph = (self.csdw >> 31) & 0x1
+        self.parse_csdw()
 
-        offset = 0
-        while True:
-            attrs = {}
+        if self.iph:
+            self.iph_format[0].insert(1, 'Q')
+            self.iph_format[1].insert(0, 'ipts')
 
-            if self.iph:
-                attrs['ipts'] = self.data[offset:offset + 8]
-                offset += 8
-
-            iph, = struct.unpack('=I', self.data[offset:offset + 4])
-            offset += 4
-            attrs.update({
-                'pe': (iph >> 31) & 0x1,
-                'subchannel': int((iph >> 16) & 0x1fff),
-                'length': int(iph & 0xffff)})
-
-            data = self.data[offset:offset + attrs['length']]
-            offset += attrs['length']
-            self.all.append(Item(data, 'UART Data', **attrs))
-
-            if attrs['length'] % 2:
-                offset += 1
+        self.parse_data()
