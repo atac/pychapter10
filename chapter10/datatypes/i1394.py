@@ -12,10 +12,10 @@ class I1394(IterativeBase):
 
         if self._format == 0:
             self.csdw_format = ('=I', ((
-                ('pbt', 3),  # Packet Body Type
-                ('sy', 4),   # Synchronization Code
+                ('packet_body_type', 3),
+                ('sync_code', 4),
                 (None, 9),
-                ('tc', 16),  # Transaction Count
+                ('transaction_count', 16),
             ),),)
 
             self.parse_csdw()
@@ -31,17 +31,17 @@ class I1394(IterativeBase):
             # General Purpose
             elif self.pbt == 2:
                 self.item_size = ((self.packet.data_length - 4) / self.tc) - 8
-                self.iph_format = ('=Q', ('ipts',),)
+                self.iph_format = ('=Q', ('intra_packet_time_stamp',),)
 
             self.parse_data()
 
         elif self._format == 1:
-            self.csdw_format = ('=xxH', ('ipc',))  # Intra Packet Count
-            self.iph_format = ('=QHH', ('ipts', (
+            self.csdw_format = ('=xxH', ('intra_packet_count',))
+            self.iph_format = ('=QHH', ('intra_packet_time_stamp', (
                 ('status', 8),
                 ('speed', 4),
-                ('trfovf', 2),
-                ('lbo', 1),
+                ('transfer_overflow_error', 2),
+                ('local_buffer_overflow', 1),
                 (None, 1),
                 ('length', 16),
             ),),)
