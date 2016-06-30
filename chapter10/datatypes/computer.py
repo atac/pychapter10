@@ -94,11 +94,11 @@ class Computer(IterativeBase):
         if self.packet.file.tell() > end:
             self.all.pop()
             if getattr(self, 'it', None) == 0:
-                self.seek(end - 8)
+                self.packet.file.seek(end - 8)
                 self.root_offset, = struct.unpack(
                     'Q', self.packet.file.read(8))
             else:
-                self.seek(end)
+                self.packet.file.seek(end)
 
     def __getitem__(self, key):
         if self.format == 1:
