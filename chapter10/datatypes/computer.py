@@ -9,16 +9,16 @@ class Computer(IterativeBase):
     """Computer generated data (eg. TMATS setup record)."""
 
     def parse(self):
-        if self.format > 3:
-            raise NotImplementedError(
-                'Computer Generated Data Format %s is reserved!' % self.format)
+        if self._format > 3:
+            raise NotImplementedError('Computer Generated Data Format %s is \
+reserved!' % self._format)
 
         # User Defined: do nothing
-        elif self.format == 0:
+        elif self._format == 0:
             return
 
         # TMATS
-        elif self.format == 1:
+        elif self._format == 1:
             self.csdw_format = ('=I', ((
                 (None, 22),
                 ('frmt', 1),     # Format: 0 = ASCII, 1 = XML.
@@ -43,7 +43,7 @@ class Computer(IterativeBase):
             return
 
         # Recording Event
-        if self.format == 2:
+        if self._format == 2:
             self.csdw_format = ('=I', ((
                 ('intra_packet_data_header', 1),
                 (None, 19),
@@ -58,7 +58,7 @@ class Computer(IterativeBase):
             )],)
 
         # Recording Index
-        elif self.format == 3:
+        elif self._format == 3:
             self.csdw_format = ('=I', ((
                 ('index_type', 1),
                 ('file_size_present', 1),
@@ -101,7 +101,7 @@ class Computer(IterativeBase):
                 self.packet.file.seek(end)
 
     def __getitem__(self, key):
-        if self.format == 1:
+        if self._format == 1:
             return OrderedDict([line for line in self.all
                                 if line[0].startswith(key)])
         return IterativeBase.__getitem__(self, key)

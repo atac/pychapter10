@@ -15,9 +15,9 @@ class UART(IterativeBase):
     item_label = 'UART Data'
 
     def parse(self):
-        if self.format > 0:
+        if self._format > 0:
             raise NotImplementedError('UART format %s is reserved!'
-                                      % self.format)
+                                      % self._format)
 
         self.parse_csdw()
 

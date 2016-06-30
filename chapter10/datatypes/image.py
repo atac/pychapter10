@@ -17,11 +17,11 @@ class Image(IterativeBase):
             ('iph', 1),
         ]]]
 
-        if self.format > 2:
+        if self._format > 2:
             raise NotImplementedError('Image format %s is reserved!'
-                                      % self.format)
+                                      % self._format)
 
-        if self.format == 0:
+        if self._format == 0:
             self.csdw_format[1][0].append(('length', 27))
 
             self.parse_csdw()
@@ -33,9 +33,9 @@ class Image(IterativeBase):
             self.parse_data()
 
         else:
-            if self.format == 1:
+            if self._format == 1:
                 self.csdw_format[1][0] += [('fmt', 4), (None, 24)]
-            elif self.format == 2:
+            elif self._format == 2:
                 self.csdw_format[1][0] += [('fmt', 6), (None, 21)]
 
             self.iph_format = ('=QI', ('ipts', 'length'))

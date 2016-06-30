@@ -13,7 +13,7 @@ class Video(IterativeBase):
         """Process channel specific data word (cdsw) and parse data."""
 
         # Channel Specific Data Word (csdw).
-        if self.format == 0:
+        if self._format == 0:
             self.csdw_format = ('=I', ((
                 ('et', 1),   # Embedded time
                 ('iph', 1),  # Intra-packet header
@@ -23,7 +23,7 @@ class Video(IterativeBase):
                 ('ba', 1),   # Byte alignment
                 (None, 23),
             ),),)
-        elif self.format == 1:
+        elif self._format == 1:
             self.csdw_format = ('=I', ((
                 (None, 10),
                 ('klv', 1),  # KLV Metadata
@@ -35,7 +35,7 @@ class Video(IterativeBase):
                 ('tp', 1),   # Bit stream type
                 ('pc', 12),  # Packet count
             ),),)
-        elif self.format == 2:
+        elif self._format == 2:
             self.csdw_format = ('=I', ((
                 ('aet', 1),  # Audio Encoding Type
                 ('el', 4),   # Encoding Level
@@ -50,7 +50,7 @@ class Video(IterativeBase):
             ),),)
         else:
             raise NotImplementedError(
-                'Video Format %s is reserved!' % self.format)
+                'Video Format %s is reserved!' % self._format)
 
         self.parse_csdw()
 

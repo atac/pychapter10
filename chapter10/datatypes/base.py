@@ -35,7 +35,7 @@ class Base(object):
 
         # Get our type and format.
         from . import format
-        self.type, self.format = format(self.packet.data_type)
+        self.type, self._format = format(self.packet.data_type)
         if self.packet.lazy:
             self.__getattribute__ = self.lazy_getter
         else:

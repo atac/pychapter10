@@ -6,11 +6,11 @@ class MS1553(IterativeBase):
     item_label = 'Message'
 
     def parse(self):
-        if self.format == 0 or self.format > 2:
+        if self._format == 0 or self._format > 2:
             raise NotImplementedError('1553 Format %s is reserved!'
-                                      % self.format)
+                                      % self._format)
 
-        if self.format == 1:
+        if self._format == 1:
             self.csdw_format = ('=I', ((
                 ('ttb', 2),
                 (None, 6),
@@ -30,7 +30,7 @@ class MS1553(IterativeBase):
                 (None, 3),
             ), 'gap', 'length'))
 
-        elif self.format == 2:
+        elif self._format == 2:
             self.csdw_format = ('=I', ('msg_count',))
 
             self.iph_format = ('=QHH', ('ipts', 'length', (

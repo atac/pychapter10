@@ -26,9 +26,9 @@ class Analog(IterativeBase):
         self.subchannels.append(values)
 
     def parse(self):
-        if self.format != 1:
+        if self._format != 1:
             raise NotImplementedError('Analog format %s is reserved!'
-                                      % self.format)
+                                      % self._format)
 
         # Parse one CSDW and see how many there are.
         self.subchannels = []

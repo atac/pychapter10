@@ -6,12 +6,12 @@ class Ethernet(IterativeBase):
     item_label = 'Ethernet Frame'
 
     def parse(self):
-        if self.format > 1:
+        if self._format > 1:
             raise NotImplementedError('Ethernet format %s is reserved!'
-                                      % self.format)
+                                      % self._format)
 
         # CSDW
-        if self.format == 0:
+        if self._format == 0:
             self.csdw_format = ('=I', ((
                 ('fmt', 4),
                 (None, 12),
@@ -28,7 +28,7 @@ class Ethernet(IterativeBase):
                 ('length', 14),
             ),),)
 
-        elif self.format == 1:
+        elif self._format == 1:
             self.csdw_format = ('=HH', ('iph_length', 'message_count'),)
             self.iph_format = ('HBBxxHLLHH', (
                 'length',

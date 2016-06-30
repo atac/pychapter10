@@ -6,11 +6,11 @@ class I1394(IterativeBase):
     item_label = 'IEEE-1394 Transaction'
 
     def parse(self):
-        if self.format > 1:
+        if self._format > 1:
             raise NotImplementedError('IEEE-1394 format %s is reserved!'
-                                      % self.format)
+                                      % self._format)
 
-        if self.format == 0:
+        if self._format == 0:
             self.csdw_format = ('=I', ((
                 ('pbt', 3),  # Packet Body Type
                 ('sy', 4),   # Synchronization Code
@@ -35,7 +35,7 @@ class I1394(IterativeBase):
 
             self.parse_data()
 
-        elif self.format == 1:
+        elif self._format == 1:
             self.csdw_format = ('=xxH', ('ipc',))  # Intra Packet Count
             self.iph_format = ('=QHH', ('ipts', (
                 ('status', 8),

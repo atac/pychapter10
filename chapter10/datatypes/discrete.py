@@ -13,8 +13,8 @@ class Discrete(IterativeBase):
     iph_format = ('=Q', ('intra_packet_time_stamp',))
 
     def parse(self):
-        if self.format != 1:
+        if self._format != 1:
             raise NotImplementedError('Discrete data format %s is reserved!'
-                                      % self.format)
+                                      % self._format)
 
         IterativeBase.parse(self)

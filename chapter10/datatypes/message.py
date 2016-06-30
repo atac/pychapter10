@@ -20,8 +20,8 @@ class Message(IterativeBase):
     item_label = 'Message Data'
 
     def parse(self):
-        if self.format != 0:
+        if self._format != 0:
             raise NotImplementedError('Message format %s is reserved!'
-                                      % self.format)
+                                      % self._format)
 
         IterativeBase.parse(self)

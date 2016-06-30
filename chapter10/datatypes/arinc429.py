@@ -20,8 +20,8 @@ class ARINC429(IterativeBase):
     item_label = 'ARINC-429 Data Word'
 
     def parse(self):
-        if self.format > 0:
+        if self._format > 0:
             raise NotImplementedError('ARINC-429 format %s is reserved!'
-                                      % self.format)
+                                      % self._format)
 
         IterativeBase.parse(self)

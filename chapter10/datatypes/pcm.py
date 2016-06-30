@@ -27,9 +27,9 @@ class PCM(IterativeBase):
     )]
 
     def parse(self):
-        if self.format != 1:
+        if self._format != 1:
             raise NotImplementedError(
-                'PCM Format %s is reserved!' % self.format)
+                'PCM Format %s is reserved!' % self._format)
 
         self.parse_csdw()
 

@@ -27,9 +27,9 @@ class Time(Base):
     ),),)
 
     def parse(self):
-        if self.format != 1:
+        if self._format != 1:
             raise NotImplementedError('Time Data format %s is reserved!'
-                                      % self.format)
+                                      % self._format)
         self.parse_csdw()
 
         self.data_format = ['=HHH', [
