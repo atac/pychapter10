@@ -21,7 +21,7 @@ reserved!' % self._format)
         elif self._format == 1:
             self.csdw_format = ('=I', ((
                 (None, 22),
-                ('frmt', 1),     # Format: 0 = ASCII, 1 = XML.
+                ('format', 1),     # Format: 0 = ASCII, 1 = XML.
                 ('setup_record_configuration_change', 1),
                 ('version', 8),  # Chapter 10 version
             ),),)
@@ -29,7 +29,7 @@ reserved!' % self._format)
             self.parse_data()
 
             # Parse ASCII style TMATS.
-            if self.frmt == 0:
+            if self.format == 0:
                 for line in self.data.splitlines():
                     line = line.decode()
                     if not line.strip():

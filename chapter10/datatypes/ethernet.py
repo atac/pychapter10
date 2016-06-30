@@ -13,18 +13,18 @@ class Ethernet(IterativeBase):
         # CSDW
         if self._format == 0:
             self.csdw_format = ('=I', ((
-                ('fmt', 4),
+                ('format', 4),
                 (None, 12),
-                ('frames', 16),
+                ('number_of_frames', 16),
             ),),)
             self.iph_format = ('=QI', ('ipts', (
-                ('fce', 1),      # Frame CRC Error
-                ('fe', 1),       # Frame Error
-                ('content', 2),
-                ('speed', 4),    # Ethernet Speed
-                ('net_id', 8),
-                ('dce', 1),      # Data CRC Error
-                ('le', 1),       # Data Length Error
+                ('frame_crc_error', 1),      # Frame CRC Error
+                ('frame_error', 1),       # Frame Error
+                ('captured_data_content', 2),
+                ('ethernet_speed', 4),    # Ethernet Speed
+                ('network_identifier', 8),
+                ('data_crc_error', 1),      # Data CRC Error
+                ('data_length_error', 1),       # Data Length Error
                 ('length', 14),
             ),),)
 
