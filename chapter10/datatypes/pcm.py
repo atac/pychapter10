@@ -5,23 +5,23 @@ from .base import IterativeBase
 class PCM(IterativeBase):
 
     csdw_format = ('=I', ((
-        ('iph', 1),
-        ('ma', 1),
-        ('mi', 1),
-        ('mifs', 2),
-        ('mafs', 2),
+        ('intra_packet_header', 1),
+        ('major_frame_indicator', 1),
+        ('minor_frame_indicator', 1),
+        ('minor_frame_status', 2),
+        ('major_frame_status', 2),
         (None, 2),
-        ('align', 1),
+        ('alignment', 1),
         ('throughput', 1),
         ('packed', 1),
         ('unpacked', 1),
-        ('s_offset', 18),
+        ('sync_offset', 18),
     ),),)
     item_label = 'PCM Frame'
     item_size = 12  # Two words sync, four data.
     iph_format = ['=QH', (
-        'ipts', (
-            ('lockst', 4),
+        'intra_packet_timestamp', (
+            ('lock_status', 4),
             (None, 12),
         )
     )]
@@ -38,9 +38,9 @@ class PCM(IterativeBase):
             return
 
         # Figure out the correct IPH format based on CSDW.
-        if self.iph:
+        if self.intra_packet_header:
             # Extra IPH word in 32 bit alignment.
-            if self.align:
+            if self.alignment:
                 self.iph_format[0] = self.iph_format[0][:-1] + 'I'
 
         self.parse_data()

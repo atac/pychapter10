@@ -10,7 +10,7 @@ class Discrete(IterativeBase):
     ),),)
     item_label = 'Discrete data'
     item_size = 4
-    iph_format = ('=Q', ('ipts',))
+    iph_format = ('=Q', ('intra_packet_time_stamp',))
 
     def parse(self):
         if self.format != 1:

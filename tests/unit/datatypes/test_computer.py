@@ -40,13 +40,13 @@ def test_tmats():
 def test_events():
     for packet in C10(EVENTS):
         if packet.data_type == 2:
-            assert len(packet.body) == packet.body.reec
+            assert len(packet.body) == packet.body.recording_event_entry_count
 
 
 def test_index():
     for packet in C10(INDEX):
         if packet.data_type == 3:
-            if packet.body.it:
+            if packet.body.index_type:
                 for part in packet.body:
                     assert part.label == 'Node Index'
             else:

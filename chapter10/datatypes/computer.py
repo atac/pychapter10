@@ -22,7 +22,7 @@ class Computer(IterativeBase):
             self.csdw_format = ('=I', ((
                 (None, 22),
                 ('frmt', 1),     # Format: 0 = ASCII, 1 = XML.
-                ('srcc', 1),     # Setup Record Config Change
+                ('setup_record_configuration_change', 1),
                 ('version', 8),  # Chapter 10 version
             ),),)
             self.parse_csdw()
@@ -45,14 +45,14 @@ class Computer(IterativeBase):
         # Recording Event
         if self.format == 2:
             self.csdw_format = ('=I', ((
-                ('ipdh', 1),
+                ('intra_packet_data_header', 1),
                 (None, 19),
-                ('reec', 12),  # Rec Event Entry Count
+                ('recording_event_entry_count', 12),
             ),),)
             self.item_label = 'Recording Event'
             item_format = ('I', [(
                 (None, 3),
-                ('eo', 1),
+                ('event_occurrence', 1),
                 ('event_count', 16),
                 ('event_number', 12),
             )],)
@@ -60,32 +60,32 @@ class Computer(IterativeBase):
         # Recording Index
         elif self.format == 3:
             self.csdw_format = ('=I', ((
-                ('it', 1),    # Index Type
-                ('fsp', 1),   # File Size Present
-                ('ipdh', 1),  # Index IPDH
+                ('index_type', 1),
+                ('file_size_present', 1),
+                ('intra_packet_data_header', 1),
                 (None, 13),
-                ('iec', 16),  # Index entry count
+                ('index_entry_count', 16),
             ),),)
 
         self.parse_csdw()
 
-        if getattr(self, 'it', None) == 0:
+        if getattr(self, 'index_type', None) == 0:
             self.item_label = 'Root Index'
             item_format = ('Q', ['offset'])
-        elif getattr(self, 'it', None) == 1:
+        elif getattr(self, 'index_type', None) == 1:
             self.item_label = 'Node Index'
             item_format = ('xBHQ', ['data_type', 'channel_id', 'offset'])
 
-        self.iph_format = ['=Q', ['ipts']]
+        self.iph_format = ['=Q', ['intra_packet_time_stamp']]
 
-        if self.ipdh:
+        if self.intra_packet_data_header:
             self.iph_format[0] += 'Q'
-            self.iph_format[1].append('ipdh')
+            self.iph_format[1].append('intra_packet_data_header')
 
         self.iph_format[0] += item_format[0]
         self.iph_format[1] = tuple(self.iph_format[1] + item_format[1])
 
-        if getattr(self, 'fsp', False):
+        if getattr(self, 'file_size_present', False):
             self.file_size, = struct.unpack('Q', self.packet.file.read(8))
 
         self.parse_data()
@@ -93,7 +93,7 @@ class Computer(IterativeBase):
         end = self.pos + self.packet.data_length
         if self.packet.file.tell() > end:
             self.all.pop()
-            if getattr(self, 'it', None) == 0:
+            if getattr(self, 'index_type', None) == 0:
                 self.packet.file.seek(end - 8)
                 self.root_offset, = struct.unpack(
                     'Q', self.packet.file.read(8))
