@@ -17,15 +17,12 @@ class I1394(IterativeBase):
                 (None, 9),
                 ('tc', 16),  # Transaction Count
             ),),)
-            self.pbt = int((self.csdw >> 29) & 0b111)
-            self.sy = int((self.csdw >> 25) & 0xf)
-            self.tc = int(self.csdw & 0xffff)
 
             self.parse_csdw()
 
             # Bus Status
             if self.pbt == 0:
-                self.iph_format = ('=I', (('reset', 1),),)
+                self.iph_format = ('=I', ((('reset', 1),),),)
 
             # Data Streaming
             elif self.pbt == 1:
