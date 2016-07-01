@@ -11,8 +11,8 @@ class Message(IterativeBase):
 
     iph_format = ('=qI', (
         'ipts', (
-            ('de', 1),
-            ('fe', 1),
+            ('data_error', 1),
+            ('format_error', 1),
             ('subchannel', 14),
             ('length', 16)
         ),

@@ -21,16 +21,17 @@ class I1394(IterativeBase):
             self.parse_csdw()
 
             # Bus Status
-            if self.pbt == 0:
+            if self.packet_body_type == 0:
                 self.iph_format = ('=I', ((('reset', 1),),),)
 
             # Data Streaming
-            elif self.pbt == 1:
+            elif self.packet_body_type == 1:
                 self.item_size = self.packet.data_length - 4
 
             # General Purpose
-            elif self.pbt == 2:
-                self.item_size = ((self.packet.data_length - 4) / self.tc) - 8
+            elif self.packet_body_type == 2:
+                self.item_size = (
+                    (self.packet.data_length - 4) / self.transaction_count) - 8
                 self.iph_format = ('=Q', ('intra_packet_time_stamp',),)
 
             self.parse_data()

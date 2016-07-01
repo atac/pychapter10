@@ -12,33 +12,33 @@ class MS1553(IterativeBase):
 
         if self._format == 1:
             self.csdw_format = ('=I', ((
-                ('ttb', 2),
+                ('time_tag_bits', 2),
                 (None, 6),
-                ('msg_count', 24),
+                ('message_count', 24),
             ),),)
             self.iph_format = ('=QHHH', ('ipts', (
                 (None, 2),
-                ('bid', 1),  # Bus ID (A/B)
-                ('me', 1),   # Message Error
-                ('rr', 1),   # RT to RT Transfer
-                ('fe', 1),   # Format Error
-                ('tm', 1),   # Response Time Out
+                ('bus_id', 1),
+                ('message_error', 1),
+                ('rt_to_rt', 1),
+                ('format_error', 1),
+                ('response_timeout', 1),
                 (None, 3),
-                ('le', 1),   # Word Count Error
-                ('se', 1),   # Sync Type Error
-                ('we', 1),   # Invalid Word Error
+                ('word_count_error', 1),
+                ('sync_type_error', 1),
+                ('invalid_word_error', 1),
                 (None, 3),
-            ), 'gap', 'length'))
+            ), 'gap_times', 'length'))
 
         elif self._format == 2:
-            self.csdw_format = ('=I', ('msg_count',))
+            self.csdw_format = ('=I', ('message_count',))
 
-            self.iph_format = ('=QHH', ('ipts', 'length', (
-                ('te', 1),  # Transaction Error
-                ('re', 1),  # Reset
-                ('tm', 1),  # Message Time Out
-                ('se', 1),  # Status Error
-                ('ee', 1),  # Echo Error
+            self.iph_format = ('=QHH', ('intra_packet_timestamp', 'length', (
+                ('transaction_error', 1),
+                ('reset', 1),
+                ('message_timeout', 1),
+                ('status_error', 1),
+                ('echo_error', 1),
             )))
 
         IterativeBase.parse(self)

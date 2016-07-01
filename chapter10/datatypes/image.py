@@ -14,7 +14,7 @@ class Image(IterativeBase):
         self.csdw_format = ['=I', [[
             ('parts', 2),
             ('sum', 2),
-            ('iph', 1),
+            ('intra_packet_header', 1),
         ]]]
 
         if self._format > 2:
@@ -27,17 +27,17 @@ class Image(IterativeBase):
             self.parse_csdw()
             self.item_length = self.length
 
-            if self.iph:
-                self.iph_format = ('=Q', ('ipts',))
+            if self.intra_packet_header:
+                self.iph_format = ('=Q', ('intra_packet_time_stamp',))
 
             self.parse_data()
 
         else:
             if self._format == 1:
-                self.csdw_format[1][0] += [('fmt', 4), (None, 24)]
+                self.csdw_format[1][0] += [('format', 4), (None, 24)]
             elif self._format == 2:
-                self.csdw_format[1][0] += [('fmt', 6), (None, 21)]
+                self.csdw_format[1][0] += [('format', 6), (None, 21)]
 
-            self.iph_format = ('=QI', ('ipts', 'length'))
+            self.iph_format = ('=QI', ('intra_packet_time_stamp', 'length'))
 
             IterativeBase.parse(self)
