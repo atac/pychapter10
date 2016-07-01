@@ -9,7 +9,7 @@ class Time(Base):
         (None, 22),
         # 0 = IRIG day available
         # 1 = Month and year available
-        ('date_fmt', 1),
+        ('date_format', 1),
         ('leap', 1),
         # 0 = IRIG-B
         # 1 = IRIG-A
@@ -18,12 +18,12 @@ class Time(Base):
         # 4 = UTC Time from GPS
         # 5 = Native GPS Time
         # F = None (payload invalid)
-        ('time_fmt', 4),
+        ('time_format', 4),
         # 0 = Internal (to the recorder)
         # 1 = External (to the recorder)
         # 2 = Internal from RMM
         # F = None
-        ('source', 4),
+        ('time_source', 4),
     ),),)
 
     def parse(self):
@@ -50,7 +50,7 @@ class Time(Base):
              ('Dn', 4),)    # Days
         ]]
 
-        if self.date_fmt:
+        if self.date_format:
             self.data_format[0] += 'H'
             del self.data_format[1][2]
             self.data_format[1] += [
@@ -74,7 +74,7 @@ class Time(Base):
         hours = self.Hn + (self.THn * 10)
 
         # IRIG day format
-        if not self.date_fmt:
+        if not self.date_format:
             day = self.Dn + (self.HDn * 100) + (self.TDn * 10)
 
             today = datetime.today()

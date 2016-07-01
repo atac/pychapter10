@@ -15,38 +15,38 @@ class Video(IterativeBase):
         # Channel Specific Data Word (csdw).
         if self._format == 0:
             self.csdw_format = ('=I', ((
-                ('et', 1),   # Embedded time
-                ('iph', 1),  # Intra-packet header
-                ('src', 1),  # SCR/RTC Sync
-                ('klv', 1),  # KLV Metadata
-                ('pl', 4),   # Payload type
-                ('ba', 1),   # Byte alignment
+                ('embedded_time', 1),
+                ('intra_packet_header', 1),
+                ('scr_rtc_sync', 1),
+                ('key_length_value', 1),
+                ('payload', 4),
+                ('byte_alignment', 1),
                 (None, 23),
             ),),)
         elif self._format == 1:
             self.csdw_format = ('=I', ((
                 (None, 10),
-                ('klv', 1),  # KLV Metadata
-                ('src', 1),  # SCR/RTC Sync
-                ('iph', 1),  # Intra-packet header
-                ('epl', 4),  # Encode profile & level
-                ('et', 1),   # Embedded time
-                ('md', 1),   # Bit rate mode
-                ('tp', 1),   # Bit stream type
-                ('pc', 12),  # Packet count
+                ('key_length_value', 1),
+                ('scr_rtc_sync', 1),
+                ('intra_packet_header', 1),
+                ('encoding_profile_and_level', 4),
+                ('embedded_time', 1),
+                ('mode', 1),
+                ('type', 1),
+                ('packet_count', 12),
             ),),)
         elif self._format == 2:
             self.csdw_format = ('=I', ((
-                ('aet', 1),  # Audio Encoding Type
-                ('el', 4),   # Encoding Level
-                ('klv', 1),  # KLV metadata
-                ('srs', 1),  # SCR/RTC Sync
-                ('iph', 1),  # Intra-packet header
-                ('ep', 4),   # Encoding Profile
-                ('et', 1),   # Embedded Time
-                ('md', 1),   # Bit rate mode
-                ('tp', 1),   # Bit stream type
-                ('pc', 12),  # Packet Count
+                ('audio_encoding_type', 1),  # Audio Encoding Type
+                ('encoding_level', 4),   # Encoding Level
+                ('key_length_value', 1),  # KLV metadata
+                ('scr_rtc_sync', 1),  # SCR/RTC Sync
+                ('intra_packet_header', 1),  # Intra-packet header
+                ('encoding_profile', 4),   # Encoding Profile
+                ('embedded_time', 1),   # Embedded Time
+                ('mode', 1),   # Bit rate mode
+                ('type', 1),   # Bit stream type
+                ('packet_count', 12),  # Packet Count
             ),),)
         else:
             raise NotImplementedError(
@@ -54,7 +54,7 @@ class Video(IterativeBase):
 
         self.parse_csdw()
 
-        if self.iph:
-            self.iph_format = ('=q', ('ipts',))
+        if self.intra_packet_header:
+            self.iph_format = ('=q', ('intra_packet_timestamp',))
 
         self.parse_data()

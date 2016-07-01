@@ -10,7 +10,7 @@ class Message(IterativeBase):
     ),),)
 
     iph_format = ('=qI', (
-        'ipts', (
+        'intra_packet_timestamp', (
             ('data_error', 1),
             ('format_error', 1),
             ('subchannel', 14),

@@ -76,7 +76,7 @@ reserved!' % self._format)
             self.item_label = 'Node Index'
             item_format = ('xBHQ', ['data_type', 'channel_id', 'offset'])
 
-        self.iph_format = ['=Q', ['intra_packet_time_stamp']]
+        self.iph_format = ['=Q', ['intra_packet_timestamp']]
 
         if self.intra_packet_data_header:
             self.iph_format[0] += 'Q'

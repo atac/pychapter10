@@ -17,7 +17,7 @@ class Ethernet(IterativeBase):
                 (None, 12),
                 ('number_of_frames', 16),
             ),),)
-            self.iph_format = ('=QI', ('ipts', (
+            self.iph_format = ('=QI', ('intra_packet_timestamp', (
                 ('frame_crc_error', 1),      # Frame CRC Error
                 ('frame_error', 1),       # Frame Error
                 ('captured_data_content', 2),

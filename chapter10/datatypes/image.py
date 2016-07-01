@@ -28,7 +28,7 @@ class Image(IterativeBase):
             self.item_length = self.length
 
             if self.intra_packet_header:
-                self.iph_format = ('=Q', ('intra_packet_time_stamp',))
+                self.iph_format = ('=Q', ('intra_packet_timestamp',))
 
             self.parse_data()
 
@@ -38,6 +38,6 @@ class Image(IterativeBase):
             elif self._format == 2:
                 self.csdw_format[1][0] += [('format', 6), (None, 21)]
 
-            self.iph_format = ('=QI', ('intra_packet_time_stamp', 'length'))
+            self.iph_format = ('=QI', ('intra_packet_timestamp', 'length'))
 
             IterativeBase.parse(self)

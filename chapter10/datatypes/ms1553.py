@@ -16,7 +16,7 @@ class MS1553(IterativeBase):
                 (None, 6),
                 ('message_count', 24),
             ),),)
-            self.iph_format = ('=QHHH', ('ipts', (
+            self.iph_format = ('=QHHH', ('intra_packet_timestamp', (
                 (None, 2),
                 ('bus_id', 1),
                 ('message_error', 1),

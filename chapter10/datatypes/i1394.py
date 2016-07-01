@@ -32,13 +32,13 @@ class I1394(IterativeBase):
             elif self.packet_body_type == 2:
                 self.item_size = (
                     (self.packet.data_length - 4) / self.transaction_count) - 8
-                self.iph_format = ('=Q', ('intra_packet_time_stamp',),)
+                self.iph_format = ('=Q', ('intra_packet_timestamp',),)
 
             self.parse_data()
 
         elif self._format == 1:
             self.csdw_format = ('=xxH', ('intra_packet_count',))
-            self.iph_format = ('=QHH', ('intra_packet_time_stamp', (
+            self.iph_format = ('=QHH', ('intra_packet_timestamp', (
                 ('status', 8),
                 ('speed', 4),
                 ('transfer_overflow_error', 2),
