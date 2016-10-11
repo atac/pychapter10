@@ -1,9 +1,10 @@
-image: python:2.7.11
+image:
+    name: mcferrill/node-python-git
+    username: $DOCKER_USER
+    password: $DOCKER_PASS
 
 pipelines:
     default:
         - step:
             script:
-                - pip install -r requirements.txt
-                - pip install .
-                - py.test
+                - tox
