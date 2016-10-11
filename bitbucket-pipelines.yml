@@ -2,6 +2,7 @@ image:
     name: mcferrill/node-python-git
     username: $DOCKER_USER
     password: $DOCKER_PASS
+    email: mcferrill@msn.com
 
 pipelines:
     default:
