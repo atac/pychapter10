@@ -4,6 +4,12 @@ import struct
 from .base import IterativeBase, Item
 
 
+try:
+    range = xrange
+except NameError:
+    pass
+
+
 class Analog(IterativeBase):
 
     csdw_format = ('=I', ((
@@ -43,7 +49,7 @@ class Analog(IterativeBase):
         self.parse_data()
 
     def parse_data(self):
-        for i in xrange(self.totchan):
+        for i in range(self.totchan):
             if self.same:
                 csdw = self.subchannels[0]
             else:
@@ -53,7 +59,7 @@ class Analog(IterativeBase):
             length = csdw['length'] or 64  # Length 0 = 64 bits
 
             # Convert length to bytes (align on 16 bits first of course).
-            length = (length / 16) + (length % 16 and 1 or 0)
+            length = int(length / 16) + (length % 16 and 1 or 0)
 
             data = self.packet.file.read(length)
             self.all.append(Item(data, self.item_label))

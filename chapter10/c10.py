@@ -41,12 +41,11 @@ class C10(object):
                 p = Packet(self.file, self.lazy)
                 if p.check():
                     return p
-                else:
-                    self.file.seek(p.pos + 1)
-            except struct.error:
+            except (struct.error, EOFError):
                 raise StopIteration
-            except EOFError:
-                raise StopIteration
+            except:
+                pass
+            self.file.seek(p.pos + 1)
 
     next = __next__
 

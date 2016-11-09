@@ -10,3 +10,4 @@ bin/*
 MANIFEST
 .DS_store
 .cache
+junit-results.xml
