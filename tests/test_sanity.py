@@ -2,6 +2,7 @@
 import struct
 
 from chapter10 import Packet
+from chapter10.packet import InvalidPacket
 
 
 # Highest numerical datatype available.
@@ -46,7 +47,7 @@ def test_sanity():
                 try:
                     dummy_packet(i, s)
                     break
-                except struct.error:
+                except (struct.error, InvalidPacket):
                     pass
         except NotImplementedError:
             continue

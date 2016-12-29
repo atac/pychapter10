@@ -6,6 +6,10 @@ import struct
 from . import datatypes
 
 
+class InvalidPacket(Exception):
+    pass
+
+
 class Packet(object):
     """Reads header and associates a datatype specific object."""
 
@@ -66,7 +70,11 @@ class Packet(object):
         datatype = datatypes.get_handler(self.data_type)
         self.body = datatype(self)
 
-        # Skip trailer @TODO: parse trailer if present.
+        if not self.check():
+            raise InvalidPacket
+
+        # Skip packet body and trailer.
+        # @TODO: parse trailer if present.
         self.file.seek(self.pos + self.packet_length)
 
     @classmethod

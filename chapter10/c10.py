@@ -3,7 +3,7 @@ import atexit
 import os
 import struct
 
-from .packet import Packet
+from .packet import Packet, InvalidPacket
 from .buffer import Buffer
 
 
@@ -37,15 +37,14 @@ class C10(object):
         """
 
         while True:
+            pos = self.file.tell()
             try:
-                p = Packet(self.file, self.lazy)
-                if p.check():
-                    return p
+                return Packet(self.file, self.lazy)
             except (struct.error, EOFError):
                 raise StopIteration
-            except:
-                pass
-            self.file.seek(p.pos + 1)
+            except InvalidPacket:
+                # @TODO: search for sync pattern and start from there.
+                self.file.seek(pos + 1)
 
     next = __next__
 
