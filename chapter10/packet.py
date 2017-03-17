@@ -70,8 +70,9 @@ class Packet(object):
         datatype = datatypes.get_handler(self.data_type)
         self.body = datatype(self)
 
-        if not self.check():
-            raise InvalidPacket
+        error = self.get_errors()
+        if error:
+            raise error
 
         # Skip packet body and trailer.
         # @TODO: parse trailer if present.
@@ -83,18 +84,20 @@ class Packet(object):
 
         return cls(BytesIO(s), lazy)
 
-    def check(self):
+    def get_errors(self):
         """Validate the packet using checksums and verifying fields."""
 
         if self.sync_pattern != 0xeb25:
-            return False
+            return InvalidPacket('Incorrect sync pattern!')
         elif self.header_sums != self.header_checksum:
-            return False
+            return InvalidPacket('Header checksum mismatch!')
         elif self.secondary_sums != self.secondary_checksum:
-            return False
+            return InvalidPacket('Secondary header checksum mismatch!')
         elif self.data_length > 524288:
-            return False
-        return True
+            return InvalidPacket('Data length larger than allowed!')
+
+    def check(self):
+        return self.get_errors() is None
 
     def __len__(self):
         return len(self.body)
@@ -115,3 +118,36 @@ class Packet(object):
 
     def __repr__(self):
         return '<C10 Packet {} {} bytes>'.format(self.data_type, len(self))
+
+    def __setstate__(self, state):
+        state['file'] = BytesIO(state['file'])
+        state['pos'] = 0
+        self.__dict__.update(state)
+
+    def __getstate__(self):
+        state, keys = {}, [
+            'sync_pattern',
+            'channel_id',
+            'data_length',
+            'data_type',
+            'flags',
+            'header_checksum',
+            'header_sums',
+            'header_version',
+            'lazy',
+            'packet_length',
+            'rtc',
+            'rtc_high',
+            'rtc_low',
+            'secondary_checksum',
+            'secondary_sums',
+            'sequence_number',
+            'sync_pattern',
+            'time',
+            'body',
+            'pos',
+        ]
+        for k in keys:
+            state[k] = getattr(self, k)
+        state['file'] = bytes(self)
+        return state
