@@ -96,6 +96,15 @@ class Base(object):
     def __len__(self):
         return self.packet.data_length
 
+    def __getstate__(self):
+        if not self.init:
+            self.parse()
+        state = self.__dict__.copy()
+        for k, v in state.items():
+            if callable(v):
+                del state[k]
+        return state
+
 
 class IterativeBase(Base):
     """Allows for easily packaging sub-elements into an iterable object based
