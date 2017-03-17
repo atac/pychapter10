@@ -117,7 +117,8 @@ class Packet(object):
     __str__ = __bytes__
 
     def __repr__(self):
-        return '<C10 Packet {} {} bytes>'.format(self.data_type, len(self))
+        return '<C10 Packet {} {} bytes>'.format(self.data_type,
+                                                 len(bytes(self)))
 
     def __setstate__(self, state):
         state['file'] = BytesIO(state['file'])
