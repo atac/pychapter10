@@ -8,7 +8,7 @@ from .base import IterativeBase
 class Computer(IterativeBase):
     """Computer generated data (eg. TMATS setup record)."""
 
-    def parse(self):
+    def _parse(self):
         if self._format > 3:
             raise NotImplementedError('Computer Generated Data Format %s is \
 reserved!' % self._format)
@@ -31,12 +31,11 @@ reserved!' % self._format)
             # Parse ASCII style TMATS.
             if self.format == 0:
                 for line in self.data.splitlines():
-                    line = line.decode()
                     if not line.strip():
                         continue
                     line = line.strip()[:-1]  # Strip the semicolon.
-                    if ':' in line:
-                        k, v = line.split(':', 1)
+                    if b':' in line:
+                        k, v = line.split(b':', 1)
                     else:
                         k, v = line, ''
                     self.all.append([k, v])
@@ -101,6 +100,7 @@ reserved!' % self._format)
                 self.packet.file.seek(end)
 
     def __getitem__(self, key):
+        key = bytearray(key, 'utf-8')
         if self._format == 1:
             return OrderedDict([line for line in self.all
                                 if line[0].startswith(key)])
