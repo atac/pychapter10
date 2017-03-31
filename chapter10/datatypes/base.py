@@ -42,6 +42,7 @@ class Base(object):
             self.parse()
 
     def lazy_getter(self, key):
+        print key
         if key == 'all' and not self.init:
             self.parse()
         try:
@@ -95,6 +96,20 @@ class Base(object):
 
     def __len__(self):
         return self.packet.data_length
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        self.__getattribute__ = self.lazy_getter
+        self.init = False
+
+    def __getstate__(self):
+        # if not self.init:
+        #     self.parse()
+        state = self.__dict__.copy()
+        for k, v in state.items():
+            if callable(v):
+                del state[k]
+        return state
 
 
 class IterativeBase(Base):
