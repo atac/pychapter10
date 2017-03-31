@@ -62,7 +62,7 @@ class Packet(object):
         # Read the secondary header (if any).
         self.time = None
         self.secondary_sums, self.secondary_checksum = (None, None)
-        if self.flags & (1 << 7):
+        if self.secondary_header:
             secondary = file.read(12)
             if len(secondary) < 12:
                 raise EOFError
