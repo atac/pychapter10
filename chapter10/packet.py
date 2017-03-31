@@ -48,6 +48,14 @@ class Packet(object):
         for i, field in enumerate(self.HEADER_KEYS):
             setattr(self, '_'.join(field.split()).lower(), values[i])
 
+        # Parse flags into attributes.
+        self.secondary_header = self.flags & (1 << 7)
+        self.ipts_source = self.flags & (1 << 6)
+        self.rtc_sync_error = self.flags & (1 << 5)
+        self.data_overflow_error = self.flags & (1 << 4)
+        self.data_overflow_error = self.flags & (1 << 4)
+
+        # Parse RTC into a single value.
         self.rtc, = struct.unpack(
             'Q', struct.pack('IHxx', self.rtc_low, self.rtc_high))
 
