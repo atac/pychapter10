@@ -10,7 +10,7 @@ from .buffer import Buffer
 class C10(object):
     """A Chapter 10 parser."""
 
-    def __init__(self, f, lazy=False):
+    def __init__(self, f, lazy=False, packet=Packet):
         """Takes a file or filename and reads packets."""
 
         atexit.register(self.close)
@@ -18,6 +18,7 @@ class C10(object):
             f = open(f, 'rb')
         self.file = f
         self.lazy = lazy
+        self.packet = packet
 
     @classmethod
     def from_string(cls, s):
@@ -39,7 +40,7 @@ class C10(object):
         while True:
             pos = self.file.tell()
             try:
-                return Packet(self.file, self.lazy)
+                return self.packet(self.file, self.lazy)
             except (struct.error, EOFError):
                 raise StopIteration
             except InvalidPacket:

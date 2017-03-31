@@ -53,7 +53,7 @@ class Analog(IterativeBase):
             if self.same:
                 csdw = self.subchannels[0]
             else:
-                csdw = self.subchannels[len(self) + 1]
+                csdw = self.subchannels[i]
 
             # Find the sample size (in bits).
             length = csdw['length'] or 64  # Length 0 = 64 bits
