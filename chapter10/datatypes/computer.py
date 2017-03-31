@@ -36,9 +36,12 @@ reserved!' % self._format)
                     line = line.strip()[:-1]  # Strip the semicolon.
                     if b':' in line:
                         k, v = line.split(b':', 1)
+                        self.all.append([k, v])
                     else:
-                        k, v = line, ''
-                    self.all.append([k, v])
+                        try:
+                            line = [str(line).encode('utf8').strip(), '']
+                        except UnicodeDecodeError:
+                            continue
             return
 
         # Recording Event
