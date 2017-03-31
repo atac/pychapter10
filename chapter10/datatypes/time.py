@@ -26,13 +26,14 @@ class Time(Base):
         ('time_source', 4),
     ),),)
 
-    def parse(self):
+    def _parse(self):
         if self._format != 1:
             raise NotImplementedError('Time Data format %s is reserved!'
                                       % self._format)
+
         self.parse_csdw()
 
-        self.data_format = ['=HHH', [
+        self.data_format = ['<HHH', [
             ((None, 1),
              ('TSn', 3),    # Tens of Seconds
              ('Sn', 4),     # Seconds

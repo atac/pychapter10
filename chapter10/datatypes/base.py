@@ -42,7 +42,6 @@ class Base(object):
             self.parse()
 
     def lazy_getter(self, key):
-        print key
         if key == 'all' and not self.init:
             self.parse()
         try:
@@ -69,13 +68,24 @@ class Base(object):
                 yield field, value
 
     def parse(self):
+        """Seek to packet body, call type-specific parsing, and return file
+        to its previous index.
+        """
+
+        pos = self.packet.file.tell()
+        header_len = 36 if self.packet.secondary_header else 24
+        self.packet.file.seek(self.packet.pos + header_len)
+        self._parse()
+        self.init = True
+        self.packet.file.seek(pos)
+
+    def _parse(self):
         """Reads the Channel Specific Data Word (csdw) and data into
         attributes.
         """
 
         self.parse_csdw()
         self.parse_data()
-        self.init = True
 
     def parse_csdw(self):
         fmt, structure = self.csdw_format
@@ -87,10 +97,12 @@ class Base(object):
                 setattr(self, k, v)
 
     def parse_data(self):
-        self.data = self.packet.file.read(self.packet.data_length - 4)
+        data_len = self.packet.packet_length - (
+            self.packet.secondary_header and 36 or 24)
+        self.data = self.packet.file.read(data_len - 4)
         if self.data_format is not None:
             fmt, structure = self.data_format
-            raw = struct.unpack(fmt, self.data)
+            raw = struct.unpack(fmt, self.data[:struct.calcsize(fmt)])
             for k, v in self._dissect(raw, structure):
                 setattr(self, k, v)
 
@@ -99,12 +111,12 @@ class Base(object):
 
     def __setstate__(self, state):
         self.__dict__.update(state)
-        self.__getattribute__ = self.lazy_getter
-        self.init = False
+        self.lazy = False
+        self.init = True
 
     def __getstate__(self):
-        # if not self.init:
-        #     self.parse()
+        if not self.init:
+            self.parse()
         state = self.__dict__.copy()
         for k, v in state.items():
             if callable(v):

@@ -15,6 +15,7 @@ def test_reserved(data_type):
         i = image.Image(Mock(
             file=Mock(tell=Mock(return_value=0),
                       read=Mock(return_value=b'1234')),
+            pos=0,
             data_type=data_type,
             data_length=2))
         i.parse()

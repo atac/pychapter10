@@ -9,7 +9,7 @@ class Video(IterativeBase):
     item_label = 'MPEG Packet'
     item_size = 188
 
-    def parse(self):
+    def _parse(self):
         """Process channel specific data word (cdsw) and parse data."""
 
         # Channel Specific Data Word (csdw).

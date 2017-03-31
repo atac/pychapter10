@@ -10,7 +10,7 @@ class Image(IterativeBase):
         self.csdw_format[1] = tuple(self.csdw_format[1])
         IterativeBase.parse_csdw(self)
 
-    def parse(self):
+    def _parse(self):
         self.csdw_format = ['=I', [[
             ('parts', 2),
             ('sum', 2),
@@ -40,4 +40,4 @@ class Image(IterativeBase):
 
             self.iph_format = ('=QI', ('intra_packet_timestamp', 'length'))
 
-            IterativeBase.parse(self)
+            IterativeBase._parse(self)

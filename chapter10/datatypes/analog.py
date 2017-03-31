@@ -31,7 +31,7 @@ class Analog(IterativeBase):
             self.__dict__.update(values)
         self.subchannels.append(values)
 
-    def parse(self):
+    def _parse(self):
         if self._format != 1:
             raise NotImplementedError('Analog format %s is reserved!'
                                       % self._format)
