@@ -148,6 +148,7 @@ class Packet(object):
             'rtc',
             'rtc_high',
             'rtc_low',
+            'secondary_header',
             'secondary_checksum',
             'secondary_sums',
             'sequence_number',
