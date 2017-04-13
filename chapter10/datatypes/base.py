@@ -148,7 +148,11 @@ class IterativeBase(Base):
                 iph = {}
                 if fmt is not None:
                     iph_size = struct.calcsize(fmt)
-                    iph = struct.unpack(fmt, self.packet.file.read(iph_size))
+                    iph_raw = self.packet.file.read(iph_size)
+                    if len(iph_raw) < iph_size:
+                        from ..packet import InvalidPacket
+                        raise InvalidPacket
+                    iph = struct.unpack(fmt, iph_raw)
                     iph = dict(self._dissect(iph, structure))
                     if 'length' in iph:
                         length = iph['length']
