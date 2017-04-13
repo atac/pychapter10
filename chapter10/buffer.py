@@ -10,8 +10,8 @@ class Buffer(object):
         self.io = BytesIO(*args, **kwargs)
         self.tell = self.io.tell
 
-    def read(self, size, *args, **kwargs):
-        value = self.io.read(*args, **kwargs)
+    def read(self, size=None):
+        value = self.io.read(size)
         if len(value) != size:
             raise EOFError
         return value
