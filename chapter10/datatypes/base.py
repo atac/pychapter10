@@ -182,3 +182,21 @@ class Item(object):
 
     def bytes(self):
         return self.data
+
+    def pack(self, format):
+        """Return bytes() containing the item's IPH and data."""
+
+        format, structure = format
+        data = []
+        for i, field in enumerate(structure):
+            if isinstance(field, tuple):
+                result, offset = 0, 0
+                for attr, size in reversed(field):
+                    if attr is not None:
+                        value = getattr(self, attr)
+                        result |= (value << offset)
+                    offset += size
+                data.append(result)
+            else:
+                data.append(getattr(self, field))
+        return struct.pack(format, *data) + self.data
