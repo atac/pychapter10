@@ -138,6 +138,7 @@ class IterativeBase(Base):
         Base.__init__(self, *args, **kwargs)
 
     def parse_data(self):
+        self.all = []
         if not self.iph_format:
             Base.parse_data(self)
         else:
