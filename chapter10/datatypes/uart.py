@@ -23,7 +23,9 @@ class UART(IterativeBase):
         self.parse_csdw()
 
         if self.intra_packet_header:
-            self.iph_format[0].insert(1, 'Q')
-            self.iph_format[1].insert(0, 'intra_packet_timestamp')
+            self.iph_format = UART.iph_format[:]
+            self.iph_format[0] = '=QI'
+            self.iph_format[1] = ('intra_packet_timestamp',) + tuple(
+                UART.iph_format[1])
 
         self.parse_data()
