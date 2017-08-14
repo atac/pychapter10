@@ -161,6 +161,9 @@ class IterativeBase(Base):
                 if length % 2:
                     self.packet.file.seek(1, 1)
 
+                if getattr(self, 'count', None) and len(self) == self.count:
+                    break
+
                 if self.packet.file.tell() >= end:
                     break
 
