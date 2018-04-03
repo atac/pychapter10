@@ -30,7 +30,8 @@ class Ethernet(IterativeBase):
 
         elif self._format == 1:
             self.csdw_format = ('=HH', ('iph_length', 'message_count'),)
-            self.iph_format = ('HBBxxHLLHH', (
+            self.iph_format = ('=QHBBxxHLLHH', (
+                'intra_packet_timestamp',
                 'length',
                 'error_bits',
                 'flags_bits',
