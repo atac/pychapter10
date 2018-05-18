@@ -118,7 +118,7 @@ class Base(object):
         if not self.init:
             self.parse()
         state = self.__dict__.copy()
-        for k, v in state.items():
+        for k, v in list(state.items()):
             if callable(v):
                 del state[k]
         return state
