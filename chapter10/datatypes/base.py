@@ -155,7 +155,8 @@ class IterativeBase(Base):
                         length = iph['length']
 
                 data = self.packet.file.read(length)
-                self.all.append(Item(data, self.item_label, **iph))
+                self.all.append(Item(data, self.item_label, self.iph_format,
+                                     **iph))
 
                 # Account for filler byte when length is odd.
                 if length % 2:
@@ -177,8 +178,9 @@ class IterativeBase(Base):
 class Item(object):
     """The base container for packet data."""
 
-    def __init__(self, data, label="Packet Data", **kwargs):
+    def __init__(self, data, label="Packet Data", item_format=None, **kwargs):
         self.__dict__.update(kwargs)
+        self.item_format = item_format
         self.data, self.label = data, label
 
     def __repr__(self):
@@ -187,9 +189,14 @@ class Item(object):
     def bytes(self):
         return self.data
 
-    def pack(self, format):
+    def __bytes__(self):
+        return self.pack()
+
+    def pack(self, format=None):
         """Return bytes() containing the item's IPH and data."""
 
+        if format is None:
+            format = self.item_format
         format, structure = format
         data = []
         for i, field in enumerate(structure):
