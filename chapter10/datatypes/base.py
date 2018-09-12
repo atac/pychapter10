@@ -192,6 +192,9 @@ class Item(object):
     def __bytes__(self):
         return self.pack()
 
+    def __str__(self):
+        return self.pack()
+
     def pack(self, format=None):
         """Return bytes() containing the item's IPH and data."""
 
