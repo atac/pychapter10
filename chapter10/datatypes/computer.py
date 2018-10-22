@@ -71,6 +71,9 @@ reserved!' % self._format)
 
         self.parse_csdw()
 
+        if self._format == 3:
+            self.count = self.index_entry_count
+
         if getattr(self, 'index_type', None) == 0:
             self.item_label = 'Root Index'
             item_format = ('Q', ['offset'])

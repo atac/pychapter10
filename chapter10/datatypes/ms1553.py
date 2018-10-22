@@ -18,7 +18,7 @@ class MS1553(IterativeBase):
             ),),)
             self.iph_format = ('=QHHH', ('intra_packet_timestamp', (
                 (None, 2),
-                ('bus_id', 1),
+                ('bus', 1),
                 ('message_error', 1),
                 ('rt_to_rt', 1),
                 ('format_error', 1),
