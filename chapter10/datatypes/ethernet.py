@@ -32,14 +32,17 @@ class Ethernet(IterativeBase):
             self.csdw_format = ('=HH', ('count', 'iph_length'),)
             self.iph_format = ('=QBBHHxxLLHH', (
                 'intra_packet_timestamp',
-                'length',
-                'error_bits',
+
                 'flags_bits',
+                'error_bits',
+                'length',
+
                 'virtual_link',
+
                 'source_ip',
                 'dest_ip',
+                'dst_port',
                 'src_port',
-                'dst_port')
-            )
+            ))
 
         IterativeBase.parse(self)
