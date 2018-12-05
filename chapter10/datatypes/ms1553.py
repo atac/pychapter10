@@ -16,19 +16,21 @@ class MS1553(IterativeBase):
                 (None, 6),
                 ('message_count', 24),
             ),),)
-            self.iph_format = ('=QHHH', ('intra_packet_timestamp', (
+            # TODO: review names and decide on long-form or short-form for
+            # both PyChapter10 and libirig106-python
+            self.iph_format = ('=QHHH', ('rtc', (
                 (None, 2),
                 ('bus', 1),
-                ('message_error', 1),
-                ('rt_to_rt', 1),
-                ('format_error', 1),
-                ('response_timeout', 1),
+                ('me', 1),
+                ('rt2rt', 1),
+                ('fe', 1),
+                ('timeout', 1),
                 (None, 3),
-                ('word_count_error', 1),
-                ('sync_type_error', 1),
-                ('invalid_word_error', 1),
+                ('le', 1),
+                ('se', 1),
+                ('we', 1),
                 (None, 3),
-            ), 'gap_times', 'length'))
+            ), 'gap_time', 'length'))
 
         elif self._format == 2:
             self.csdw_format = ('=I', ('message_count',))
