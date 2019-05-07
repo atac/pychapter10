@@ -1,6 +1,8 @@
 Chapter 10
 ==========
 
+|StatusImage|_
+
 This project seeks to provide a library and tools for dealing with `IRIG 106`_
 Chapter 10 format files.
 
@@ -61,3 +63,5 @@ Data Types (/datatypes)
 .. _pytest: http://pytest.org
 .. _Mock: http://www.voidspace.org.uk/python/mock/
 .. _tox: http://tox.readthedocs.org/en/latest/
+.. |StatusImage| image:: https://dev.azure.com/atac-bham/pychapter10/_apis/build/status/atac-bham.pychapter10?branchName=master
+.. _StatusImage: https://dev.azure.com/atac-bham/pychapter10/_apis/build/status/atac-bham.pychapter10?branchName=master
