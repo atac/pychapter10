@@ -41,7 +41,7 @@ steps:
     versionSpec: $(pythonVersion)
     architecture: 'x64'
 
-- script: python -m pip install -Ur requirements.txt
+- script: python -m pip install -U mock pytest
   displayName: 'Install dependencies'
 
 - script: pytest --junitxml=test-results.xml
