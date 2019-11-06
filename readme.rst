@@ -9,33 +9,23 @@ Chapter 10 format files.
 Dependencies
 ------------
 
-* Python_ 2.7 or greater (tested on 2.7 and 3.5)
-* pytest_ and Mock_ (for test suite)
+* Python_ 2.7 or greater (tested on 2.7, 3.6 and 3.7)
+* pytest_ (for test suite)
+* mock_ (for tests on 2.7)
 
 Installation
 ------------
 
 To install the library run::
 
-    python setup.py install_lib
-
-To automatically install required dependencies using pip_ use::
-
-    pip install -r requirements.txt
+    python setup.py install
 
 Running Tests
 -------------
 
 To run the included test suite run::
 
-    py.test
-
-Or, if you have tox_ installed you can use it instead::
-
-    tox
-
-This will run the test suite against both Python 2.7 and 3.5 if they are
-installed.
+    pytest
 
 To Do
 -----
