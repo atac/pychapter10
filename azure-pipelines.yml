@@ -1,46 +1,55 @@
 
+strategy:
+  matrix:
+    ubuntu-py27:
+      imageName: 'ubuntu-16.04'
+      pythonVersion: '2.7'
+    ubuntu-py36:
+      imageName: 'ubuntu-16.04'
+      pythonVersion: '3.6'
+    ubuntu-py37:
+      imageName: 'ubuntu-16.04'
+      pythonVersion: '3.7'
+    macos-py27:
+      imageName: 'macos-10.13'
+      pythonVersion: '2.7'
+    macos-py36:
+      imageName: 'macos-10.13'
+      pythonVersion: '3.6'
+    macos-py37:
+      imageName: 'macos-10.13'
+      pythonVersion: '3.7'
+    windows-py27:
+      imageName: 'vs2017-win2016'
+      pythonVersion: '2.7'
+    windows-py36:
+      imageName: 'vs2017-win2016'
+      pythonVersion: '3.6'
+    windows-py37:
+      imageName: 'vs2017-win2016'
+      pythonVersion: '3.7'
+
+pool:
+  vmImage: $(imageName)
+
 trigger:
 - master
 
 steps:
 - task: UsePythonVersion@0
   inputs:
-    versionSpec: '3.7'
+    versionSpec: $(pythonVersion)
     architecture: 'x64'
 
-- script: python -m pip install -U tox 
+- script: python -m pip install -Ur requirements.txt
   displayName: 'Install dependencies'
 
-- script: tox 
+- script: pytest --junitxml=test-results.xml
   displayName: 'Run tests'
 
-# - task: PublishTestResults@2
-#   inputs:
-#     testResultsFormat: 'JUnit'
-#     testResultsFiles: '**/test-results.xml'
-#     testRunTitle: 'Python $(python.version)'
-#   condition: succeededOrFailed()
-
-# - task: PublishPipelineArtifact@0
-#   displayName: 'Publish binary'
-#   inputs:
-#     artifactName: 'witdb'
-#     targetPath: 'dist/witdb.exe'
-
-# - script: python -m pip download -r requirements.txt -d ./deps
-#   displayName: 'Download dependencies'
-
-# - task: ArchiveFiles@2
-#   displayName: 'Zip dependencies'
-#   inputs:
-#     rootFolderOrFile: 'deps' 
-#     includeRootFolder: true 
-#     archiveType: 'zip'
-#     archiveFile: 'deps.zip' 
-#     replaceExistingArchive: true 
-
-# - task: PublishPipelineArtifact@0
-#   displayName: 'Publish dependencies'
-#   inputs:
-#     artifactName: 'dependencies'
-#     targetPath: 'deps.zip'
+- task: PublishTestResults@2
+  inputs:
+    testResultsFormat: 'JUnit'
+    testResultsFiles: '**/test-results.xml'
+    testRunTitle: 'Python $(python.version)'
+  condition: succeededOrFailed()
