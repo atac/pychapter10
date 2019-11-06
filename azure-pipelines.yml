@@ -44,6 +44,9 @@ steps:
 - script: python -m pip install -U mock pytest
   displayName: 'Install dependencies'
 
+- script: python -m pip install -e .
+  displayName: 'Install library'
+
 - script: pytest --junitxml=test-results.xml
   displayName: 'Run tests'
 
