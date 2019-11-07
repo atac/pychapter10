@@ -18,8 +18,8 @@ sys.path.insert(0, os.path.abspath('../..'))
 # -- Project information -----------------------------------------------------
 
 project = 'PyChapter10'
-copyright = '2019, Micah Ferrill'
-author = 'Micah Ferrill'
+copyright = '2019, ATAC'
+author = 'ATAC'
 
 # The full version, including alpha/beta/rc tags
 release = '0.1'

@@ -10,6 +10,7 @@ PyChapter10
     :maxdepth: 2
     :caption: Contents:
 
+    usage
     api/index
     samples/index
 

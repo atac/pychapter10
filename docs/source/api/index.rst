@@ -12,6 +12,8 @@ API Reference
     base_types
     datatypes
 
+.. py:module:: chapter10.c10
+
 .. py:class:: chapter10.C10(f, lazy=False, packet=Packet)
 
     Top-level Chapter10 object. Contains chapter 10 data from string or file.
@@ -42,6 +44,8 @@ API Reference
         Create a C10 object from a string.
 
     .. py:method:: close
+
+.. py:module:: chapter10.packet
 
 .. py:class:: chapter10.Packet(file, lazy=False)
 
