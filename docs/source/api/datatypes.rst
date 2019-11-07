@@ -13,8 +13,34 @@ Datatypes
 Helper Functions
 ----------------
 
-.. automodule:: chapter10.datatypes
-    :members:
+.. py:data:: TYPES
+
+    Sequence of (label, class) where label is a human-readable label for a
+    given data type and class is the parser class corresponding to that type.
+
+.. py:function:: format(data_type)
+
+    Take a data type and split it into type (see TYPES) and format as in "1553
+    format 0".
+
+    :param int data_type: The data type from the packet header.
+    :returns (int, int): (type, format)
+
+.. py:function:: get_handler(data_type)
+
+    Take a data type and return the appropriate data parser class. Defaults to
+    Base if data type doesn't match anything else.
+
+    :param int data_type: The data type from the packet header.
+    :returns class:
+
+.. py:function:: get_label(data_type)
+
+    Take a data type and return a human-readable label as in "Mil-STD-1553
+    (format 1)". Returns "unknown" if no match found.
+
+    :param int data_type: The data type from the packet header.
+    :returns str:
 
 .. py:module:: chapter10.datatypes.analog
 
@@ -72,8 +98,22 @@ Message Attributes
 Computer
 --------
 
-.. automodule:: chapter10.datatypes.computer
-    :members:
+.. py:class:: chapter10.datatypes.Computer(IterativeBase)
+
+    One of: TMATS setup, Recording Event, Recording Index.
+
+TMATS
++++++
+
+.. py:attribute:: chapter10.datatypes.Computer.format
+    
+    ASCII (0) or XML (1)
+
+.. py:attribute:: chapter10.datatypes.Computer.setup_record_configuration_change
+.. py:attribute:: chapter10.datatypes.Computer.version
+
+    Chapter 10 version.
+
 
 Discrete
 --------
