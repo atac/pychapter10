@@ -9,7 +9,8 @@ API Reference
     :maxdepth: 1
     :caption: Submodules:
 
-    datatypes/index
+    base_types
+    datatypes
 
 .. py:class:: chapter10.C10(f, lazy=False, packet=Packet)
 
