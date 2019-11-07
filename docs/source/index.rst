@@ -11,7 +11,7 @@ PyChapter10
     :caption: Contents:
 
     api/index
-
+    samples/index
 
 
 Indices and tables
