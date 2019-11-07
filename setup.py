@@ -1,6 +1,12 @@
+#!/usr/bin/env python
 
 from distutils.core import setup
 
+try:
+    from sphinx.setup_command import BuildDoc
+    cmdclass = {'build_docs': BuildDoc}
+except ImportError:
+    cmdclass = {}
 
 setup(
     name='Chapter10',
@@ -11,5 +17,6 @@ setup(
     packages=[
         'chapter10',
         'chapter10.datatypes',
-    ]
+    ],
+    cmdclass=cmdclass
 )
