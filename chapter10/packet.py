@@ -53,7 +53,7 @@ class Packet(object):
         self.ipts_source = self.flags & (1 << 6)
         self.rtc_sync_error = self.flags & (1 << 5)
         self.data_overflow_error = self.flags & (1 << 4)
-        self.data_overflow_error = self.flags & (1 << 4)
+        self.secondary_format = self.flags & (i << 2)
 
         # Parse RTC into a single value.
         self.rtc, = struct.unpack(

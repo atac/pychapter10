@@ -22,11 +22,11 @@ class C10(object):
 
     @classmethod
     def from_string(cls, s):
+        """Create a C10 object from a string."""
+
         return cls(Buffer(s))
 
     def close(self):
-        """Make sure we close our file if we can."""
-
         try:
             self.file.close()
         except:
