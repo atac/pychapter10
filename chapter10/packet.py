@@ -120,6 +120,8 @@ class Packet(object):
         self.file.seek(self.pos)
         raw = self.file.read(self.packet_length)
         self.file.seek(pos)
+        if not isinstance(raw, bytes):
+            raw = bytes(raw)
         return raw
 
     __str__ = __bytes__
