@@ -38,10 +38,10 @@ API Reference
 
     .. py:classmethod:: from_string
         
+        Create a C10 object from a string.
+
         :param str s: The string/bytes containing the packet data.
         :returns: C10
-
-        Create a C10 object from a string.
 
     .. py:method:: close
 

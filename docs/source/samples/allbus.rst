@@ -40,7 +40,7 @@ Make 1553 Data Single-Bus
                     out.write(raw)
                     continue
 
-                # Write out packet header secondary if applicable) and CSDW.
+                # Write out packet secondary header if applicable) and CSDW.
                 offset = 28
                 if packet.flags & (1 << 7):
                     offset += 12
