@@ -24,6 +24,8 @@ class Clean(cmd.Command):
 
     def run(self):
         shutil.rmtree('build', True)
+        shutil.rmtree('Chapter10.egg-info', True)
+        shutil.rmtree('docs/build', True)
 
 
 cmdclass['clean'] = Clean
