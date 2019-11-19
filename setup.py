@@ -1,12 +1,33 @@
 #!/usr/bin/env python
 
+from distutils import cmd
 from distutils.core import setup
+import shutil
 
+cmdclass = {}
 try:
     from sphinx.setup_command import BuildDoc
-    cmdclass = {'build_docs': BuildDoc}
+    cmdclass['build_docs'] = BuildDoc
 except ImportError:
-    cmdclass = {}
+    pass
+
+
+class Clean(cmd.Command):
+    description = 'cleanup build directory'
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        shutil.rmtree('build', True)
+
+
+cmdclass['clean'] = Clean
+
 
 setup(
     name='Chapter10',
