@@ -10,8 +10,6 @@ Dependencies
 ------------
 
 * Python_ 2.7 or greater (tested on 2.7, 3.6 and 3.7)
-* pytest_ (for test suite)
-* mock_ (for tests on 2.7)
 
 Installation
 ------------
@@ -23,35 +21,35 @@ To install the library run::
 Running Tests
 -------------
 
-To run the included test suite run::
+To run the included test suite install dependencies with pip::
+
+    pip install -r requirements.txt
+
+Then run::
 
     pytest
+
+Building the Documentation
+--------------------------
+
+Build the docs with::
+
+    python setup.py build_docs
+
+The docs will be built to build/sphinx/html
 
 To Do
 -----
 
-General
-.......
-
 * Implement standardized IPTS parsing.
 * Strengthen test suite with more robust and varied data.
-* Packet/file generation
-* Packet/file validation
-
-Data Types (/datatypes)
-.......................
-
-* message.py - Implement support for segmented messages
-* computer.py - Implement TMATS XML parser
-* ms1553.py - Finish message parsing
+* Implement support for segmented Message data
+* Implement TMATS XML parser
+* Finish 1553 message parsing
 * Implement TSPI/CTS parser
 
 
-.. _pip: http://pip-installer.org
 .. _Irig 106: http://irig106.org
 .. _Python: http://python.org
-.. _pytest: http://pytest.org
-.. _Mock: http://www.voidspace.org.uk/python/mock/
-.. _tox: http://tox.readthedocs.org/en/latest/
 .. |StatusImage| image:: https://dev.azure.com/atac-bham/pychapter10/_apis/build/status/atac-bham.pychapter10?branchName=master
 .. _StatusImage: https://dev.azure.com/atac-bham/pychapter10/_build/latest?definitionId=4&branchName=master
