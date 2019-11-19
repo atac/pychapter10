@@ -1,15 +1,11 @@
-Chapter 10
-==========
+
+PyChapter10
+===========
 
 |StatusImage|_
 
-This project seeks to provide a library and tools for dealing with `IRIG 106`_
-Chapter 10 format files.
-
-Dependencies
-------------
-
-* Python_ 2.7 or greater (tested on 2.7, 3.6 and 3.7)
+PyChapter10 is an open source pure Python library for reading and writing IRIG 106 
+Chapter 10 (now 11) files. Tested on all 3 major platforms and Python 2.7 and 3.6+.
 
 Installation
 ------------
@@ -32,11 +28,11 @@ Then run::
 Building the Documentation
 --------------------------
 
-Build the docs with::
+After installing dependencies (or just "pip install sphinx") Build the docs with::
 
     python setup.py build_docs
 
-The docs will be built to build/sphinx/html
+The generated HTML will be in build/sphinx/html
 
 To Do
 -----
@@ -49,7 +45,6 @@ To Do
 * Implement TSPI/CTS parser
 
 
-.. _Irig 106: http://irig106.org
 .. _Python: http://python.org
 .. |StatusImage| image:: https://dev.azure.com/atac-bham/pychapter10/_apis/build/status/atac-bham.pychapter10?branchName=master
 .. _StatusImage: https://dev.azure.com/atac-bham/pychapter10/_build/latest?definitionId=4&branchName=master
