@@ -3,6 +3,7 @@
 from distutils import cmd
 from distutils.core import setup
 import shutil
+import os
 
 cmdclass = {}
 try:
@@ -13,7 +14,7 @@ except ImportError:
 
 
 class Clean(cmd.Command):
-    description = 'cleanup build directory'
+    description = 'cleanup build files'
     user_options = []
 
     def initialize_options(self):
@@ -24,6 +25,11 @@ class Clean(cmd.Command):
 
     def run(self):
         shutil.rmtree('build', True)
+        shutil.rmtree('dist', True)
+        try:
+            os.remove('MANIFEST')
+        except os.error:
+            pass
         shutil.rmtree('Chapter10.egg-info', True)
         shutil.rmtree('docs/build', True)
 
