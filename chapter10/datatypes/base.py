@@ -211,10 +211,10 @@ class Item(object):
                 result, offset = 0, 0
                 for attr, size in reversed(field):
                     if attr is not None:
-                        value = getattr(self, attr)
+                        value = getattr(self, attr, 0)
                         result |= (value << offset)
                     offset += size
                 data.append(result)
             else:
-                data.append(getattr(self, field))
+                data.append(getattr(self, field, 0))
         return struct.pack(format, *data) + self.data
