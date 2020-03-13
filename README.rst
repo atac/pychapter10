@@ -34,17 +34,6 @@ After installing dependencies (or just "pip install sphinx") Build the docs with
 
 The generated HTML will be in build/sphinx/html
 
-To Do
------
-
-* Implement standardized IPTS parsing.
-* Strengthen test suite with more robust and varied data.
-* Implement support for segmented Message data
-* Implement TMATS XML parser
-* Finish 1553 message parsing
-* Implement TSPI/CTS parser
-
-
 .. _Python: http://python.org
 .. |StatusImage| image:: https://dev.azure.com/atac-bham/pychapter10/_apis/build/status/atac-bham.pychapter10?branchName=master
 .. _StatusImage: https://dev.azure.com/atac-bham/pychapter10/_build/latest?definitionId=4&branchName=master
