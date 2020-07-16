@@ -3,6 +3,8 @@ from io import BytesIO
 from array import array
 import struct
 
+from bitstruct.c import unpack
+
 from . import datatypes
 
 
@@ -49,11 +51,13 @@ class Packet(object):
             setattr(self, '_'.join(field.split()).lower(), values[i])
 
         # Parse flags into attributes.
-        self.secondary_header = self.flags & (1 << 7)
-        self.ipts_source = self.flags & (1 << 6)
-        self.rtc_sync_error = self.flags & (1 << 5)
-        self.data_overflow_error = self.flags & (1 << 4)
-        self.secondary_format = self.flags & (i << 2)
+        (self.secondary_header,
+         self.ipts_source,
+         self.rtc_sync_error,
+         self.data_overflow_error,
+         self.secondary_format,
+         self.data_checksum_present) = unpack('u1u1u1u1u2u2',
+                                              bytes(header[14:15]))
 
         # Parse RTC into a single value.
         self.rtc, = struct.unpack(
