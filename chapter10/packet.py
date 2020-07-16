@@ -1,9 +1,8 @@
 
 from io import BytesIO
 from array import array
-import struct
 
-from bitstruct.c import unpack
+import cbitstruct as bitstruct
 
 from . import datatypes
 
@@ -12,23 +11,41 @@ class InvalidPacket(Exception):
     pass
 
 
+def compile_fmt(src):
+    fmt_str = ''
+    names = []
+    for line in src.strip().splitlines():
+        fmt, name = line.strip().split()
+        fmt_str += fmt
+        names.append(name)
+
+    return bitstruct.compile(fmt_str + '<', names=names)
+
+
 class Packet(object):
     """Reads header and associates a datatype specific object."""
 
-    # Attribute names for header fields.
-    HEADER_KEYS = (
-        'Sync Pattern',
-        'Channel ID',
-        'Packet Length',
-        'Data Length',
-        'Header Version',
-        'Sequence Number',
-        'Flags',
-        'Data Type',
-        'RTC Low',
-        'RTC High',
-        'Header Checksum'
-    )
+    FORMAT = compile_fmt('''
+        u16 sync_pattern
+        u16 channel_id
+        u32 packet_length
+        u32 data_length
+        u8 header_version
+        u8 sequence_number
+        u1 secondary_header
+        u1 ipts_source
+        u1 rtc_sync_error
+        u1 data_overflow_error
+        u2 secondary_format
+        u2 data_checksum_present
+        u8 data_type
+        u48 rtc
+        u16 header_checksum''')
+
+    SECONDARY_FORMAT = compile_fmt('''
+        u64 secondary_time
+        p16 reserved
+        u16 secondary_checksum''')
 
     def __init__(self, file, lazy=False):
         """Takes an open file object with its cursor at this packet."""
@@ -46,37 +63,14 @@ class Packet(object):
         self.header_sums = sum(array('H', header)[:-1]) & 0xffff
 
         # Parse header fields into attributes.
-        values = struct.unpack('HHIIBBBBIHH', header)
-        for i, field in enumerate(self.HEADER_KEYS):
-            setattr(self, '_'.join(field.split()).lower(), values[i])
-
-        # Parse flags into attributes.
-        (self.secondary_header,
-         self.ipts_source,
-         self.rtc_sync_error,
-         self.data_overflow_error,
-         self.secondary_format,
-         self.data_checksum_present) = unpack('u1u1u1u1u2u2',
-                                              bytes(header[14:15]))
-
-        # Parse RTC into a single value.
-        self.rtc, = struct.unpack(
-            'Q', struct.pack('IHxx', self.rtc_low, self.rtc_high))
+        self.__dict__.update(self.FORMAT.unpack(header).items())
 
         # Read the secondary header (if any).
         self.time = None
-        self.secondary_sums, self.secondary_checksum = (None, None)
         if self.secondary_header:
             secondary = file.read(12)
-            if len(secondary) < 12:
-                raise EOFError
-
-            # Store our sums for checking later on (masked for bit length).
             self.secondary_sums = sum(array('H', secondary)[:-1]) & 0xffff
-
-            # Parse the secondary header time and checksum.
-            self.time, self.secondary_checksum = struct.unpack('qxxH',
-                                                               secondary)
+            self.__dict__.update(self.SECONDARY_FORMAT.unpack(file.read(12)))
 
         # Parse the body based on type.
         datatype = datatypes.get_handler(self.data_type)
@@ -103,8 +97,9 @@ class Packet(object):
             return InvalidPacket('Incorrect sync pattern!')
         elif self.header_sums != self.header_checksum:
             return InvalidPacket('Header checksum mismatch!')
-        elif self.secondary_sums != self.secondary_checksum:
-            return InvalidPacket('Secondary header checksum mismatch!')
+        elif self.secondary_header:
+            if self.secondary_sums != self.secondary_checksum:
+                return InvalidPacket('Secondary header checksum mismatch!')
         elif self.data_length > 524288:
             return InvalidPacket('Data length larger than allowed!')
 
