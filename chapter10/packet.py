@@ -2,24 +2,12 @@
 from io import BytesIO
 from array import array
 
-import cbitstruct as bitstruct
-
 from . import datatypes
+from .util import compile_fmt
 
 
 class InvalidPacket(Exception):
     pass
-
-
-def compile_fmt(src):
-    fmt_str = ''
-    names = []
-    for line in src.strip().splitlines():
-        fmt, name = line.strip().split()
-        fmt_str += fmt
-        names.append(name)
-
-    return bitstruct.compile(fmt_str + '<', names=names)
 
 
 class Packet(object):
@@ -52,14 +40,10 @@ class Packet(object):
 
         self.lazy = lazy
 
-        # Mark our location in the file and read the header.
         self.file, self.pos = file, file.tell()
 
-        # Read the packet header and save header sums for later (masked for bit
-        # length).
+        # Read the packet header and save header sums for later.
         header = file.read(24)
-        if len(header) < 24:
-            raise EOFError
         self.header_sums = sum(array('H', header)[:-1]) & 0xffff
 
         # Parse header fields into attributes.

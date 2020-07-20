@@ -1,4 +1,5 @@
 
+from ..util import compile_fmt
 from .base import IterativeBase
 
 
@@ -11,36 +12,41 @@ class MS1553(IterativeBase):
                                       % self._format)
 
         if self._format == 1:
-            self.csdw_format = ('=I', ((
-                ('time_tag_bits', 2),
-                (None, 6),
-                ('message_count', 24),
-            ),),)
-            # TODO: review names and decide on long-form or short-form for
-            # both PyChapter10 and libirig106-python
-            self.iph_format = ('=QHHH', ('rtc', (
-                (None, 2),
-                ('bus', 1),
-                ('me', 1),
-                ('rt2rt', 1),
-                ('fe', 1),
-                ('timeout', 1),
-                (None, 3),
-                ('le', 1),
-                ('se', 1),
-                ('we', 1),
-                (None, 3),
-            ), 'gap_time', 'length'))
+            self.csdw_format = compile_fmt('''
+                u24 message_count
+                p6
+                u2 time_tag_bits''')
+
+            # TODO: bit/byte order is weird for 16-bit groupings
+            self.iph_format = compile_fmt('''
+                u64 ipts
+                p2 reserved
+                u1 le
+                u1 se
+                u1 we
+                p5 reserved
+                u1 bus
+                u1 me
+                u1 rt2rt
+                u1 fe
+                u1 timeout
+                p1 reserved
+                u16 gap_time
+                u16 length''')
 
         elif self._format == 2:
-            self.csdw_format = ('=I', ('message_count',))
+            self.csdw_format = compile_fmt('u32 message_count')
 
-            self.iph_format = ('=QHH', ('intra_packet_timestamp', 'length', (
-                ('transaction_error', 1),
-                ('reset', 1),
-                ('message_timeout', 1),
-                ('status_error', 1),
-                ('echo_error', 1),
-            )))
+            self.iph_format = compile_fmt('''
+                u64 ipts
+                u16 length
+                u1 se
+                u1 reserved
+                u1 ee
+                p3 reserved
+                u1 te
+                u1 re
+                u1 tm
+                p6 reserved''')
 
         IterativeBase.parse(self)

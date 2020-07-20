@@ -88,13 +88,21 @@ class Base(object):
         self.parse_data()
 
     def parse_csdw(self):
-        fmt, structure = self.csdw_format
-        raw = struct.unpack(fmt, self.packet.file.read(4))
-        if structure is None:
-            self.csdw = raw[0]
+
+        # @TODO: remove this once all types use bitstruct
+        if isinstance(self.csdw_format, tuple):
+            fmt, structure = self.csdw_format
+            raw = struct.unpack(fmt, self.packet.file.read(4))
+            if structure is None:
+                self.csdw = raw[0]
+            else:
+                for k, v in self._dissect(raw, structure):
+                    setattr(self, k, v)
+
+        # New form
         else:
-            for k, v in self._dissect(raw, structure):
-                setattr(self, k, v)
+            self.__dict__.update(
+                self.csdw_format.unpack(self.packet.file.read(4)))
 
     def parse_data(self):
         data_len = self.packet.packet_length - (
@@ -145,18 +153,26 @@ class IterativeBase(Base):
             end = self.pos + self.packet.data_length
             while True:
                 length = getattr(self, 'item_size', 0)
-                fmt, structure = self.iph_format
-                iph = {}
-                if fmt is not None:
-                    iph_size = struct.calcsize(fmt)
-                    iph_raw = self.packet.file.read(iph_size)
-                    if len(iph_raw) < iph_size:
-                        from ..packet import InvalidPacket
-                        raise InvalidPacket
-                    iph = struct.unpack(fmt, iph_raw)
-                    iph = dict(self._dissect(iph, structure))
-                    if 'length' in iph:
-                        length = iph['length']
+
+                if isinstance(self.iph_format, tuple):
+                    fmt, structure = self.iph_format
+                    iph = {}
+                    if fmt is not None:
+                        iph_size = struct.calcsize(fmt)
+                        iph_raw = self.packet.file.read(iph_size)
+                        if len(iph_raw) < iph_size:
+                            from ..packet import InvalidPacket
+                            raise InvalidPacket
+                        iph = struct.unpack(fmt, iph_raw)
+                        iph = dict(self._dissect(iph, structure))
+
+                else:
+                    iph_size = self.iph_format.calcsize() // 8
+                    raw = self.packet.file.read(iph_size)
+                    iph = self.iph_format.unpack(raw)
+
+                if 'length' in iph:
+                    length = iph['length']
 
                 data = self.packet.file.read(length)
                 self.all.append(Item(data, self.item_label, self.iph_format,

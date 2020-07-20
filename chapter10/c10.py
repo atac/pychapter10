@@ -1,10 +1,11 @@
 
+from io import BytesIO
 import atexit
 import os
 import struct
 
 from .packet import Packet, InvalidPacket
-from .buffer import Buffer
+from .util import Buffer
 
 
 class C10(object):
@@ -16,15 +17,15 @@ class C10(object):
         atexit.register(self.close)
         if isinstance(f, str):
             f = open(f, 'rb')
-        self.file = f
+        self.file = Buffer(f)
         self.lazy = lazy
         self.packet = packet
 
     @classmethod
     def from_string(cls, s):
-        """Create a C10 object from a string."""
+        """Create a C10 object from a string or bytes."""
 
-        return cls(Buffer(s))
+        return cls(BytesIO(s))
 
     def close(self):
         try:

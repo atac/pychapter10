@@ -14,7 +14,7 @@ def test_construct(monkeypatch):
     monkeypatch.setattr(c10, 'Packet', Mock(side_effect=EOFError,
                                             return_value=[]))
     f = Mock()
-    assert c10.C10(f).file == f
+    assert c10.C10(f).file.io == f
 
 
 def test_next(monkeypatch):
