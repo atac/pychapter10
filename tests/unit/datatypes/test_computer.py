@@ -41,7 +41,7 @@ def test_tmats():
 def test_events():
     for packet in C10(EVENTS):
         if packet.data_type == 2:
-            assert len(packet.body) == packet.body.recording_event_entry_count
+            assert len(packet.body) == packet.body.count
 
 
 def test_index():

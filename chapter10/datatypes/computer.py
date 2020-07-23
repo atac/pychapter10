@@ -2,6 +2,7 @@
 from collections import OrderedDict
 import struct
 
+from ..util import compile_fmt
 from .base import IterativeBase
 
 
@@ -19,12 +20,10 @@ reserved!' % self._format)
 
         # TMATS
         elif self._format == 1:
-            self.csdw_format = ('=I', ((
-                (None, 22),
-                ('format', 1),     # Format: 0 = ASCII, 1 = XML.
-                ('setup_record_configuration_change', 1),
-                ('version', 8),  # Chapter 10 version
-            ),),)
+            self.csdw_format = compile_fmt('''
+                u8 version
+                u1 configuration_change
+                u1 format''')
             self.parse_csdw()
             self.parse_data()
 
@@ -46,49 +45,44 @@ reserved!' % self._format)
 
         # Recording Event
         if self._format == 2:
-            self.csdw_format = ('=I', ((
-                ('intra_packet_data_header', 1),
-                (None, 19),
-                ('recording_event_entry_count', 12),
-            ),),)
+            self.csdw_format = compile_fmt('''
+                u12 count
+                p19
+                u1 ipdh''')
             self.item_label = 'Recording Event'
-            item_format = ('I', [(
-                (None, 3),
-                ('event_occurrence', 1),
-                ('event_count', 16),
-                ('event_number', 12),
-            )],)
+            item_format = '''
+                u12 number
+                u16 count
+                u1 occurrence
+                p3'''
 
         # Recording Index
         elif self._format == 3:
-            self.csdw_format = ('=I', ((
-                ('index_type', 1),
-                ('file_size_present', 1),
-                ('intra_packet_data_header', 1),
-                (None, 13),
-                ('index_entry_count', 16),
-            ),),)
+            self.csdw_format = compile_fmt('''
+                u16 count
+                p13
+                u1 ipdh
+                u1 file_size_present
+                u1 index_type''')
 
         self.parse_csdw()
 
-        if self._format == 3:
-            self.count = self.index_entry_count
-
         if getattr(self, 'index_type', None) == 0:
             self.item_label = 'Root Index'
-            item_format = ('Q', ['offset'])
+            item_format = 'u64 offset'
         elif getattr(self, 'index_type', None) == 1:
             self.item_label = 'Node Index'
-            item_format = ('xBHQ', ['data_type', 'channel_id', 'offset'])
+            item_format = '''
+                u16 channel_id
+                u8 data_type
+                u8 offset'''
 
-        self.iph_format = ['=Q', ['intra_packet_timestamp']]
+        self.iph_format = 'u64 ipts'
 
-        if self.intra_packet_data_header:
-            self.iph_format[0] += 'Q'
-            self.iph_format[1].append('intra_packet_data_header')
+        if self.ipdh:
+            self.iph_format += '\nu64 ipdh'
 
-        self.iph_format[0] += item_format[0]
-        self.iph_format[1] = tuple(self.iph_format[1] + item_format[1])
+        self.iph_format = compile_fmt(self.iph_format + '\n' + item_format)
 
         if getattr(self, 'file_size_present', False):
             self.file_size, = struct.unpack('Q', self.packet.file.read(8))
