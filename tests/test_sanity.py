@@ -1,15 +1,15 @@
 
 import struct
 
+import pytest
+
 from chapter10 import Packet
 from chapter10.packet import InvalidPacket
 
 
-# Highest numerical datatype available.
-TYPE_RANGE = 120
-
-
 def dummy_packet(type, size):
+    """Create a dummy packet of given type and size. Returns bytes."""
+
     header = [
         0xeb25,
         0,
@@ -24,30 +24,16 @@ def dummy_packet(type, size):
     ]
     header.append(sum(header))
     header = struct.pack('HHIIBBBBIHH', *header)
-    return Packet.from_string(header + (b'\x00' * size))
+    return header + (b'\x00' * size)
 
 
-# The various data lengths to try.
-SIZES = [
-    6,
-    8,
-    10,
-    12,
-    16
-]
+@pytest.mark.parametrize('size', (6, 8, 10, 12, 16))
+@pytest.mark.parametrize('data_type', range(120))
+def test_sanity(data_type, size):
+    """Test default constructors for every data type and 5 base sizes."""
 
-
-def test_sanity():
-    for i in range(TYPE_RANGE):
-
-        # Call dummy parse() to build all possible format definitions.
-        # @NOTE: analog packets are not tested with this method.
-        try:
-            for s in SIZES:
-                try:
-                    dummy_packet(i, s)
-                    break
-                except (struct.error, InvalidPacket):
-                    pass
-        except NotImplementedError:
-            continue
+    raw = dummy_packet(data_type, size)
+    try:
+        Packet.from_string(raw)
+    except (NotImplementedError, struct.error, InvalidPacket, TypeError):
+        return
