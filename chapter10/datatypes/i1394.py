@@ -1,4 +1,5 @@
 
+from ..util import compile_fmt
 from .base import IterativeBase
 
 
@@ -11,18 +12,19 @@ class I1394(IterativeBase):
                                       % self._format)
 
         if self._format == 0:
-            self.csdw_format = ('=I', ((
-                ('packet_body_type', 3),
-                ('sync_code', 4),
-                (None, 9),
-                ('transaction_count', 16),
-            ),),)
+            self.csdw_format = compile_fmt('''
+                u16 count
+                p9
+                u4 sync
+                u3 packet_body_type''')
 
             self.parse_csdw()
 
             # Bus Status
             if self.packet_body_type == 0:
-                self.iph_format = ('=I', ((('reset', 1),),),)
+                self.iph_format = compile_fmt('''
+                    p31
+                    u1''')
 
             # Data Streaming
             elif self.packet_body_type == 1:
@@ -32,19 +34,21 @@ class I1394(IterativeBase):
             elif self.packet_body_type == 2:
                 self.item_size = (
                     (self.packet.data_length - 4) / self.transaction_count) - 8
-                self.iph_format = ('=Q', ('intra_packet_timestamp',),)
+                self.iph_format = compile_fmt('u64 ipts')
 
             self.parse_data()
 
         elif self._format == 1:
-            self.csdw_format = ('=xxH', ('intra_packet_count',))
-            self.iph_format = ('=QHH', ('intra_packet_timestamp', (
-                ('status', 8),
-                ('speed', 4),
-                ('transfer_overflow_error', 2),
-                ('local_buffer_overflow', 1),
-                (None, 1),
-                ('length', 16),
-            ),),)
+            self.csdw_format = compile_fmt('''
+                u16 count
+                p16''')
+            self.iph_format = compile_fmt('''
+                u64 ipts
+                u16 length
+                p1
+                u1 buffer_overflow
+                u2 overflow_error
+                u4 speed
+                u8 status''')
 
             IterativeBase.parse(self)
