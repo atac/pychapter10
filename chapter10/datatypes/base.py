@@ -109,10 +109,14 @@ class Base(object):
             self.packet.secondary_header and 36 or 24)
         self.data = self.packet.file.read(data_len - 4)
         if self.data_format is not None:
-            fmt, structure = self.data_format
-            raw = struct.unpack(fmt, self.data[:struct.calcsize(fmt)])
-            for k, v in self._dissect(raw, structure):
-                setattr(self, k, v)
+            if isinstance(self.data_format, (tuple, list)):
+                fmt, structure = self.data_format
+                raw = struct.unpack(fmt, self.data[:struct.calcsize(fmt)])
+                for k, v in self._dissect(raw, structure):
+                    setattr(self, k, v)
+            else:
+                raw = self.data[:self.data_format.calcsize()]
+                self.__dict__.update(self.data_format.unpack(raw))
 
     def __len__(self):
         return self.packet.data_length

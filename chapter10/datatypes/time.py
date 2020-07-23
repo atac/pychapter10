@@ -1,30 +1,19 @@
 
 from datetime import datetime, timedelta
 
+from ..util import compile_fmt
 from .base import Base
 
 
 class Time(Base):
-    csdw_format = ('=I', ((
-        (None, 22),
-        # 0 = IRIG day available
-        # 1 = Month and year available
-        ('date_format', 1),
-        ('leap', 1),
-        # 0 = IRIG-B
-        # 1 = IRIG-A
-        # 2 = IRIG-G
-        # 3 = Real-Time Clock
-        # 4 = UTC Time from GPS
-        # 5 = Native GPS Time
-        # F = None (payload invalid)
-        ('time_format', 4),
-        # 0 = Internal (to the recorder)
-        # 1 = External (to the recorder)
-        # 2 = Internal from RMM
-        # F = None
-        ('time_source', 4),
-    ),),)
+    csdw_format = compile_fmt('''
+        u4 time_source
+        u4 time_format
+        u1 leap
+        u1 date_format
+        p2
+        u4 irig_source
+        p16''')
 
     def _parse(self):
         if self._format != 1:
@@ -33,39 +22,46 @@ class Time(Base):
 
         self.parse_csdw()
 
-        self.data_format = ['<HHH', [
-            ((None, 1),
-             ('TSn', 3),    # Tens of Seconds
-             ('Sn', 4),     # Seconds
-             ('Hmn', 4),    # Hundreds of milliseconds
-             ('Tmn', 4),),  # Tens of milliseconds
-            ((None, 2),
-             ('THn', 2),    # Tens of hours
-             ('Hn', 4),     # Hours
-             (None, 1),
-             ('TMn', 3),    # Tens of minutes
-             ('Mn', 4),),   # Minutes
-            ((None, 6),
-             ('HDn', 2),    # Hundreds of days
-             ('TDn', 4),    # Tens of days
-             ('Dn', 4),)    # Days
-        ]]
+        self.data_format = compile_fmt('''
+                u4 Tmn
+                u4 Hmn
+                u4 Sn
+                u3 TSn
+                p1
+                u4 Mn
+                u3 TMn
+                p1
+                u4 Hn
+                u2 THn
+                p2
+                u4 Dn
+                u4 TDn
+                u1 HDn
+                p6''')
 
         if self.date_format:
-            self.data_format[0] += 'H'
-            del self.data_format[1][2]
-            self.data_format[1] += [
-                ((None, 3),
-                 ('TOn', 1),   # Tens of months
-                 ('On', 4),    # Months
-                 ('TDn', 4),   # Tens of days
-                 ('Dn', 4),),  # Days
-                ((None, 2),
-                 ('OYn', 2),   # Thousands of years
-                 ('HYn', 4),   # Hundreds of years
-                 ('TYn', 4),   # Tens of years
-                 ('Yn', 4),),  # Years
-            ]
+            self.data_format = compile_fmt('''
+                u4 Tmn
+                u4 Hmn
+                u4 Sn
+                u3 TSn
+                p1
+                u4 Mn
+                u3 TMn
+                p1
+                u4 Hn
+                u2 THn
+                p2
+                u4 Dn
+                u4 TDn
+                u4 On
+                u1 Ton
+                p3
+                u4 Yn
+                u4 TYn
+                u4 HYn
+                u2 OYn
+                p2''')
 
         self.parse_data()
 
