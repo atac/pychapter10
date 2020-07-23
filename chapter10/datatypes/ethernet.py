@@ -1,4 +1,5 @@
 
+from ..util import compile_fmt
 from .base import IterativeBase
 
 
@@ -12,37 +13,39 @@ class Ethernet(IterativeBase):
 
         # CSDW
         if self._format == 0:
-            self.csdw_format = ('=I', ((
-                ('format', 4),
-                (None, 12),
-                ('number_of_frames', 16),
-            ),),)
-            self.iph_format = ('=QI', ('intra_packet_timestamp', (
-                ('frame_crc_error', 1),      # Frame CRC Error
-                ('frame_error', 1),       # Frame Error
-                ('captured_data_content', 2),
-                ('ethernet_speed', 4),    # Ethernet Speed
-                ('network_identifier', 8),
-                ('data_crc_error', 1),      # Data CRC Error
-                ('data_length_error', 1),       # Data Length Error
-                ('length', 14),
-            ),),)
+            # TODO: replace number_of_frames with count or msg_count?
+            self.csdw_format = compile_fmt('''
+                u16 number_of_frames
+                p9 reserved
+                u3 ttb
+                u4 format''')
+            # Note: bitfields may need to be listed in reverse of expected
+            # order.
+            self.iph_format = compile_fmt('''
+                u64 ipts
+                u14 length
+                u1 data_length_error
+                u1 data_crc_error
+                u8 network_id
+                u1 crc_error
+                u1 frame_error
+                u2 content
+                u4 ethernet_speed''')
 
         elif self._format == 1:
-            self.csdw_format = ('=HH', ('count', 'iph_length'),)
-            self.iph_format = ('=QBBHHxxLLHH', (
-                'intra_packet_timestamp',
-
-                'flags_bits',
-                'error_bits',
-                'length',
-
-                'virtual_link',
-
-                'source_ip',
-                'dest_ip',
-                'dst_port',
-                'src_port',
-            ))
+            self.csdw_format = compile_fmt('''
+                u16 count
+                u16 iph_length''')
+            self.iph_format = compile_fmt('''
+                u64 ipts
+                u8 flags
+                u8 error
+                u16 length
+                u16 virtual_link
+                p16
+                u32 src_ip
+                u32 dst_ip
+                u16 dst_port
+                u16 src_port''')
 
         IterativeBase.parse(self)
