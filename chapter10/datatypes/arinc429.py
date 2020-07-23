@@ -1,21 +1,20 @@
 
+from ..util import compile_fmt
 from .base import IterativeBase
 
 
 class ARINC429(IterativeBase):
 
-    csdw_format = ('=I', ((
-        (None, 16),
-        ('message_count', 16),
-    ),),)
-    iph_format = ('=I', ((
-        ('bus', 8),
-        ('format_error', 1),        # Format error flag
-        ('parity_error', 1),        # Parity error flag
-        ('bus_speed', 1),        # Bus speed (0 = low, 1 = high)
-        (None, 1),
-        ('gap_time', 20),
-    ),),)
+    csdw_format = compile_fmt('''
+        u16 count
+        p16''')
+    iph_format = compile_fmt('''
+        u20 gap_time
+        p1
+        u1 bus_speed
+        u1 parity_error
+        u1 format_error
+        u8 bus''')
     item_size = 4
     item_label = 'ARINC-429 Data Word'
 
