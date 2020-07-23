@@ -1,16 +1,16 @@
 
+from ..util import compile_fmt
 from .base import IterativeBase
 
 
 class Discrete(IterativeBase):
-    csdw_format = ('=I', ((
-        (None, 24),
-        ('length', 5),
-        ('mode', 3),
-    ),),)
+    csdw_format = compile_fmt('''
+        u3 mode
+        u5 length
+        p24''')
     item_label = 'Discrete data'
     item_size = 4
-    iph_format = ('=Q', ('intra_packet_timestamp',))
+    iph_format = compile_fmt('u64 ipts')
 
     def parse(self):
         if self._format != 1:
