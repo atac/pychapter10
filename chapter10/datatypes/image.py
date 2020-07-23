@@ -1,14 +1,10 @@
 
+from ..util import compile_fmt
 from .base import IterativeBase
 
 
 class Image(IterativeBase):
     item_label = 'Image Segment'
-
-    def parse_csdw(self):
-        self.csdw_format[1][0] = tuple(self.csdw_format[1][0])
-        self.csdw_format[1] = tuple(self.csdw_format[1])
-        IterativeBase.parse_csdw(self)
 
     def _parse(self):
         self.csdw_format = ['=I', [[
@@ -22,22 +18,38 @@ class Image(IterativeBase):
                                       % self._format)
 
         if self._format == 0:
-            self.csdw_format[1][0].append(('length', 27))
+            self.csdw_format = compile_fmt('''
+                u27 length
+                u1 iph
+                u2 sum
+                u2 parts''')
 
             self.parse_csdw()
             self.item_length = self.length
 
-            if self.intra_packet_header:
-                self.iph_format = ('=Q', ('intra_packet_timestamp',))
+            if self.iph:
+                self.iph_format = compile_fmt('u64 ipts')
 
             self.parse_data()
 
         else:
             if self._format == 1:
-                self.csdw_format[1][0] += [('format', 4), (None, 24)]
+                self.csdw_format = compile_fmt('''
+                    p23
+                    u4 format
+                    u1 iph
+                    u2 sum
+                    u2 parts''')
             elif self._format == 2:
-                self.csdw_format[1][0] += [('format', 6), (None, 21)]
+                self.csdw_format = compile_fmt('''
+                    p21
+                    u6 format
+                    u1 iph
+                    u2 sum
+                    u2 parts''')
 
-            self.iph_format = ('=QI', ('intra_packet_timestamp', 'length'))
+            self.iph_format = compile_fmt('''
+                u64 ipts
+                u32 length''')
 
             IterativeBase._parse(self)
