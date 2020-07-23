@@ -1,22 +1,21 @@
 
+from ..util import compile_fmt
 from .base import IterativeBase
 
 
 class Message(IterativeBase):
 
-    csdw_format = ('=I', ((
-        ('packet_type', 2),
-        ('counter', 16)
-    ),),)
+    csdw_format = compile_fmt('''
+        u16 count
+        u2 packet_type
+        p14''')
 
-    iph_format = ('=qI', (
-        'intra_packet_timestamp', (
-            ('data_error', 1),
-            ('format_error', 1),
-            ('subchannel', 14),
-            ('length', 16)
-        ),
-    ))
+    iph_format = compile_fmt('''
+        u64 ipts
+        u16 length
+        u14 subchannel
+        u1 format_error
+        u1 data_error''')
     item_label = 'Message Data'
 
     def parse(self):
