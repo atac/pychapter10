@@ -1,32 +1,24 @@
 
-import struct
+from ..util import compile_fmt
 
 from .base import IterativeBase, Item
 
 
-try:
-    range = xrange
-except NameError:
-    pass
-
-
 class Analog(IterativeBase):
 
-    csdw_format = ('=I', ((
-        ('same', 1),     # Is the CSDW the same for all subchannels?
-        ('factor', 4),   # Sampling rate factor.
-        ('totchan', 8),  # Subchannel count.
-        ('subchan', 8),  # Subchannel ID.
-        ('length', 6),   # Sample length.
-        ('mode', 2),     # Alignment and packing mode.
-    ),),)
+    csdw_format = compile_fmt('''
+        u2 mode
+        u6 length
+        u8 subchannel
+        u8 channel_count
+        u4 factor
+        u1 same
+        p2''')
     item_label = 'Analog Sample'
     iph_format = (None, None)
 
     def parse_csdw(self):
-        fmt, structure = self.csdw_format
-        raw = struct.unpack(fmt, self.packet.file.read(4))
-        values = dict(self._dissect(raw, structure))
+        values = self.csdw_format.unpack(self.packet.file.read(4))
         if self.subchannels == []:
             self.__dict__.update(values)
         self.subchannels.append(values)
@@ -39,7 +31,7 @@ class Analog(IterativeBase):
         # Parse one CSDW and see how many there are.
         self.subchannels = []
         self.parse_csdw()
-        count = self.totchan or 256  # totchan: 0 = 256
+        count = self.channel_count or 256  # 0 = 256
 
         # Read CSDWs for subchannels if applicable.
         if not self.same:
@@ -49,7 +41,7 @@ class Analog(IterativeBase):
         self.parse_data()
 
     def parse_data(self):
-        for i in range(self.totchan):
+        for i in range(self.channel_count):
             if self.same:
                 csdw = self.subchannels[0]
             else:
