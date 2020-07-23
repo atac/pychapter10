@@ -1,18 +1,12 @@
 
+from ..util import compile_fmt
 from .base import IterativeBase
 
 
 class UART(IterativeBase):
-    csdw_format = ('=I', ((
-        ('intra_packet_header', 1),
-        (None, 31),
-    ),),)
-    iph_format = ['=I', [
-        (('parity_error', 1),
-         (None, 1),
-         ('subchannel', 14),
-         ('length', 16),),
-    ]]
+    csdw_format = compile_fmt('''
+        p31
+        u1 iph''')
     item_label = 'UART Data'
 
     def _parse(self):
@@ -22,10 +16,14 @@ class UART(IterativeBase):
 
         self.parse_csdw()
 
-        if self.intra_packet_header:
-            self.iph_format = UART.iph_format[:]
-            self.iph_format[0] = '=QI'
-            self.iph_format[1] = ('intra_packet_timestamp',) + tuple(
-                UART.iph_format[1])
+        iph_format = ''
+        if self.iph:
+            iph_format = 'u64 ipts'
+
+        self.iph_format = compile_fmt(iph_format + '''
+            u16 length
+            u14 subchannel
+            p1
+            u1 parity_error''')
 
         self.parse_data()
