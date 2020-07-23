@@ -1,30 +1,25 @@
 
+from ..util import compile_fmt
 from .base import IterativeBase
 
 
 class PCM(IterativeBase):
 
-    csdw_format = ('=I', ((
-        ('intra_packet_header', 1),
-        ('major_frame_indicator', 1),
-        ('minor_frame_indicator', 1),
-        ('minor_frame_status', 2),
-        ('major_frame_status', 2),
-        (None, 2),
-        ('alignment', 1),
-        ('throughput', 1),
-        ('packed', 1),
-        ('unpacked', 1),
-        ('sync_offset', 18),
-    ),),)
+    csdw_format = compile_fmt('''
+        u18 sync_offset
+        u1 unpacked
+        u1 packed
+        u1 throughput
+        u1 alignment
+        p2
+        u2 major_frame_status
+        u2 minor_frame_status
+        u1 minor_frame_indicator
+        u1 major_frame_indicator
+        u1 iph
+        p1''')
     item_label = 'PCM Frame'
     item_size = 12  # Two words sync, four data.
-    iph_format = ['=QH', (
-        'intra_packet_timestamp', (
-            ('lock_status', 4),
-            (None, 12),
-        )
-    )]
 
     def _parse(self):
         if self._format != 1:
@@ -38,9 +33,15 @@ class PCM(IterativeBase):
             return
 
         # Figure out the correct IPH format based on CSDW.
-        if self.intra_packet_header:
-            # Extra IPH word in 32 bit alignment.
-            if self.alignment:
-                self.iph_format[0] = self.iph_format[0][:-1] + 'I'
+        iph_format = '''
+            u64 ipts
+            p12
+            u4 lock_status'''
+
+        # Extra IPH word in 32 bit alignment.
+        if self.iph and self.alignment:
+            iph_format += '\np16'
+
+        self.iph_format = compile_fmt(iph_format)
 
         self.parse_data()
