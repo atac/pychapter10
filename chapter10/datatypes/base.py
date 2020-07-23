@@ -1,19 +1,4 @@
 
-import struct
-
-
-mask_cache = {}
-
-
-def mask(bitlength):
-    """Create a mask of i length."""
-
-    if bitlength not in mask_cache:
-        mask_cache[bitlength] = 0
-        for i in range(bitlength):
-            mask_cache[bitlength] |= (1 << i)
-    return mask_cache[bitlength]
-
 
 class Base(object):
     """Base object for packet data. All data types include a "csdw" attribute
@@ -22,7 +7,7 @@ class Base(object):
     the parse method to process the raw data into more useful forms.
     """
 
-    csdw_format = ('=I', None)
+    csdw_format = None
     data_format = None
 
     def __init__(self, packet):
@@ -53,20 +38,6 @@ class Base(object):
         self.parse()
         return object.__getattribute__(self, key)
 
-    def _dissect(self, data, structure):
-        for i, field in enumerate(structure):
-            value = data[i]
-            if isinstance(field, (tuple, list)):
-                for attr, size in reversed(field):
-                    result = None
-                    if attr is not None:
-                        result = value & mask(size)
-                    value = value >> size
-                    if result is not None:
-                        yield attr, result
-            else:
-                yield field, value
-
     def parse(self):
         """Seek to packet body, call type-specific parsing, and return file
         to its previous index.
@@ -88,19 +59,7 @@ class Base(object):
         self.parse_data()
 
     def parse_csdw(self):
-
-        # @TODO: remove this once all types use bitstruct
-        if isinstance(self.csdw_format, (tuple, list)):
-            fmt, structure = self.csdw_format
-            raw = struct.unpack(fmt, self.packet.file.read(4))
-            if structure is None:
-                self.csdw = raw[0]
-            else:
-                for k, v in self._dissect(raw, structure):
-                    setattr(self, k, v)
-
-        # New form
-        else:
+        if self.csdw_format:
             self.__dict__.update(
                 self.csdw_format.unpack(self.packet.file.read(4)))
 
@@ -109,14 +68,8 @@ class Base(object):
             self.packet.secondary_header and 36 or 24)
         self.data = self.packet.file.read(data_len - 4)
         if self.data_format is not None:
-            if isinstance(self.data_format, (tuple, list)):
-                fmt, structure = self.data_format
-                raw = struct.unpack(fmt, self.data[:struct.calcsize(fmt)])
-                for k, v in self._dissect(raw, structure):
-                    setattr(self, k, v)
-            else:
-                raw = self.data[:self.data_format.calcsize()]
-                self.__dict__.update(self.data_format.unpack(raw))
+            raw = self.data[:self.data_format.calcsize()]
+            self.__dict__.update(self.data_format.unpack(raw))
 
     def __len__(self):
         return self.packet.data_length
@@ -160,23 +113,9 @@ class IterativeBase(Base):
             while True:
                 length = getattr(self, 'item_size', 0)
 
-                # @TODO: remove this once all types use bitstruct
-                if isinstance(self.iph_format, (tuple, list)):
-                    fmt, structure = self.iph_format
-                    iph = {}
-                    if fmt is not None:
-                        iph_size = struct.calcsize(fmt)
-                        iph_raw = self.packet.file.read(iph_size)
-                        if len(iph_raw) < iph_size:
-                            from ..packet import InvalidPacket
-                            raise InvalidPacket
-                        iph = struct.unpack(fmt, iph_raw)
-                        iph = dict(self._dissect(iph, structure))
-
-                else:
-                    iph_size = self.iph_format.calcsize() // 8
-                    raw = self.packet.file.read(iph_size)
-                    iph = self.iph_format.unpack(raw)
+                iph_size = self.iph_format.calcsize() // 8
+                raw = self.packet.file.read(iph_size)
+                iph = self.iph_format.unpack(raw)
 
                 if 'length' in iph:
                     length = iph['length']
@@ -227,20 +166,4 @@ class Item(object):
 
         if format is None:
             format = self.item_format
-        if isinstance(format, (tuple, list)):
-            format, structure = format
-            data = []
-            for i, field in enumerate(structure):
-                if isinstance(field, (tuple, list)):
-                    result, offset = 0, 0
-                    for attr, size in reversed(field):
-                        if attr is not None:
-                            value = getattr(self, attr, 0)
-                            result |= (value << offset)
-                        offset += size
-                    data.append(result)
-                else:
-                    data.append(getattr(self, field, 0))
-            return struct.pack(format, *data) + self.data
-        else:
-            return format.pack(self.__dict__)
+        return format.pack(self.__dict__)

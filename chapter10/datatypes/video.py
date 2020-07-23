@@ -6,7 +6,6 @@ from .base import IterativeBase
 class Video(IterativeBase):
     """Parse video (type 0x40-0x47)."""
 
-    iph_format = (None, None)
     item_label = 'MPEG Packet'
     item_size = 188
 
