@@ -27,8 +27,15 @@ def test_reserved(data_type):
         e.parse()
 
 
-def test_count():
+def test_format_0_count():
     for packet in C10(SAMPLE):
-        if isinstance(packet.body, ethernet.Ethernet):
+        if packet.data_type == 0x68:
             break
     assert len(packet.body) == packet.body.number_of_frames
+
+
+def test_format_1_count():
+    for packet in C10(SAMPLE):
+        if packet.data_type == 0x69:
+            break
+    assert len(packet.body) == packet.body.count

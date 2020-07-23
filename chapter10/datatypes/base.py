@@ -56,7 +56,7 @@ class Base(object):
     def _dissect(self, data, structure):
         for i, field in enumerate(structure):
             value = data[i]
-            if isinstance(field, tuple):
+            if isinstance(field, (tuple, list)):
                 for attr, size in reversed(field):
                     result = None
                     if attr is not None:
@@ -90,7 +90,7 @@ class Base(object):
     def parse_csdw(self):
 
         # @TODO: remove this once all types use bitstruct
-        if isinstance(self.csdw_format, tuple):
+        if isinstance(self.csdw_format, (tuple, list)):
             fmt, structure = self.csdw_format
             raw = struct.unpack(fmt, self.packet.file.read(4))
             if structure is None:
@@ -132,12 +132,14 @@ class Base(object):
         return state
 
 
+# TODO: switch to a generator instead of building .all immediately?
 class IterativeBase(Base):
     """Allows for easily packaging sub-elements into an iterable object based
     on an "all" attribute. Subclasses merely populate this attribute (a list)
     and length, iteration, etc. should just work.
     """
 
+    # TODO: rename to message label & format?
     item_label = None
     iph_format = None
 
@@ -154,7 +156,8 @@ class IterativeBase(Base):
             while True:
                 length = getattr(self, 'item_size', 0)
 
-                if isinstance(self.iph_format, tuple):
+                # @TODO: remove this once all types use bitstruct
+                if isinstance(self.iph_format, (tuple, list)):
                     fmt, structure = self.iph_format
                     iph = {}
                     if fmt is not None:
@@ -213,24 +216,27 @@ class Item(object):
         return self.pack()
 
     def __str__(self):
-        return self.pack()
+        return str(self.pack())
 
     def pack(self, format=None):
         """Return bytes() containing the item's IPH and data."""
 
         if format is None:
             format = self.item_format
-        format, structure = format
-        data = []
-        for i, field in enumerate(structure):
-            if isinstance(field, tuple):
-                result, offset = 0, 0
-                for attr, size in reversed(field):
-                    if attr is not None:
-                        value = getattr(self, attr, 0)
-                        result |= (value << offset)
-                    offset += size
-                data.append(result)
-            else:
-                data.append(getattr(self, field, 0))
-        return struct.pack(format, *data) + self.data
+        if isinstance(format, (tuple, list)):
+            format, structure = format
+            data = []
+            for i, field in enumerate(structure):
+                if isinstance(field, (tuple, list)):
+                    result, offset = 0, 0
+                    for attr, size in reversed(field):
+                        if attr is not None:
+                            value = getattr(self, attr, 0)
+                            result |= (value << offset)
+                        offset += size
+                    data.append(result)
+                else:
+                    data.append(getattr(self, field, 0))
+            return struct.pack(format, *data) + self.data
+        else:
+            return format.pack(self.__dict__)
