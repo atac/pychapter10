@@ -69,7 +69,6 @@ class C10(object):
                 t, f = format(header['data_type'])
                 try:
                     handler = TYPES[t][1]
-                    print(handler)
                 except IndexError:
                     handler = Packet
                 self.file.seek(pos)
