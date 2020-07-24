@@ -3,13 +3,13 @@ from collections import OrderedDict
 import struct
 
 from ..util import compile_fmt
-from .base import IterativeBase
+from .base import Base
 
 
-class Computer(IterativeBase):
+class Computer(Base):
     """Computer generated data (eg. TMATS setup record)."""
 
-    def _parse(self):
+    def parse(self):
         if self._format > 3:
             raise NotImplementedError('Computer Generated Data Format %s is \
 reserved!' % self._format)
@@ -89,7 +89,7 @@ reserved!' % self._format)
 
         self.parse_data()
 
-        end = self.pos + self.packet.data_length
+        end = self.packet.packet_length
         if self.packet.file.tell() > end:
             self.all.pop()
             if getattr(self, 'index_type', None) == 0:
@@ -104,4 +104,4 @@ reserved!' % self._format)
         if self._format == 1:
             return OrderedDict([line for line in self.all
                                 if line[0].startswith(key)])
-        return IterativeBase.__getitem__(self, key)
+        return Base.__getitem__(self, key)

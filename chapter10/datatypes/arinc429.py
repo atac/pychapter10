@@ -1,9 +1,9 @@
 
 from ..util import compile_fmt
-from .base import IterativeBase
+from .base import Base
 
 
-class ARINC429(IterativeBase):
+class ARINC429(Base):
 
     csdw_format = compile_fmt('''
         u16 count
@@ -23,4 +23,4 @@ class ARINC429(IterativeBase):
             raise NotImplementedError('ARINC-429 format %s is reserved!'
                                       % self._format)
 
-        IterativeBase.parse(self)
+        Base.parse(self)

@@ -47,7 +47,7 @@ def get_handler(data_type):
     t, f = format(data_type)
     try:
         return TYPES[t][1]
-    except:
+    except IndexError:
         return Base
 
 

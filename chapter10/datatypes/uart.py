@@ -1,15 +1,15 @@
 
 from ..util import compile_fmt
-from .base import IterativeBase
+from .base import Base
 
 
-class UART(IterativeBase):
+class UART(Base):
     csdw_format = compile_fmt('''
         p31
         u1 iph''')
     item_label = 'UART Data'
 
-    def _parse(self):
+    def parse(self):
         if self._format > 0:
             raise NotImplementedError('UART format %s is reserved!'
                                       % self._format)

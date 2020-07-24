@@ -1,9 +1,9 @@
 
 from ..util import compile_fmt
-from .base import IterativeBase
+from .base import Base
 
 
-class Message(IterativeBase):
+class Message(Base):
 
     csdw_format = compile_fmt('''
         u16 count
@@ -23,4 +23,4 @@ class Message(IterativeBase):
             raise NotImplementedError('Message format %s is reserved!'
                                       % self._format)
 
-        IterativeBase.parse(self)
+        Base.parse(self)

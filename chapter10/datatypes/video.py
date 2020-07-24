@@ -1,15 +1,15 @@
 
 from ..util import compile_fmt
-from .base import IterativeBase
+from .base import Base
 
 
-class Video(IterativeBase):
+class Video(Base):
     """Parse video (type 0x40-0x47)."""
 
     item_label = 'MPEG Packet'
     item_size = 188
 
-    def _parse(self):
+    def parse(self):
         """Process channel specific data word (cdsw) and parse data."""
 
         # Channel Specific Data Word (csdw).

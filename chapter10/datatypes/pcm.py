@@ -1,9 +1,9 @@
 
 from ..util import compile_fmt
-from .base import IterativeBase
+from .base import Base
 
 
-class PCM(IterativeBase):
+class PCM(Base):
 
     csdw_format = compile_fmt('''
         u18 sync_offset
@@ -21,7 +21,7 @@ class PCM(IterativeBase):
     item_label = 'PCM Frame'
     item_size = 12  # Two words sync, four data.
 
-    def _parse(self):
+    def parse(self):
         if self._format != 1:
             raise NotImplementedError(
                 'PCM Format %s is reserved!' % self._format)

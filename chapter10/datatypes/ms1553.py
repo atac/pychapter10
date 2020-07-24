@@ -1,9 +1,9 @@
 
 from ..util import compile_fmt
-from .base import IterativeBase
+from .base import Base
 
 
-class MS1553(IterativeBase):
+class MS1553(Base):
     item_label = 'Message'
 
     def parse(self):
@@ -49,4 +49,4 @@ class MS1553(IterativeBase):
                 u1 tm
                 p6 reserved''')
 
-        IterativeBase.parse(self)
+        Base.parse(self)

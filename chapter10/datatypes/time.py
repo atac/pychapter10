@@ -15,7 +15,7 @@ class Time(Base):
         u4 irig_source
         p16''')
 
-    def _parse(self):
+    def parse(self):
         if self._format != 1:
             raise NotImplementedError('Time Data format %s is reserved!'
                                       % self._format)

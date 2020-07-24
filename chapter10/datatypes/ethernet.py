@@ -1,9 +1,9 @@
 
 from ..util import compile_fmt
-from .base import IterativeBase
+from .base import Base
 
 
-class Ethernet(IterativeBase):
+class Ethernet(Base):
     item_label = 'Ethernet Frame'
 
     def parse(self):
@@ -48,4 +48,4 @@ class Ethernet(IterativeBase):
                 u16 dst_port
                 u16 src_port''')
 
-        IterativeBase.parse(self)
+        Base.parse(self)

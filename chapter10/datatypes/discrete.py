@@ -1,9 +1,9 @@
 
 from ..util import compile_fmt
-from .base import IterativeBase
+from .base import Base
 
 
-class Discrete(IterativeBase):
+class Discrete(Base):
     csdw_format = compile_fmt('''
         u3 mode
         u5 length
@@ -17,4 +17,4 @@ class Discrete(IterativeBase):
             raise NotImplementedError('Discrete data format %s is reserved!'
                                       % self._format)
 
-        IterativeBase.parse(self)
+        Base.parse(self)

@@ -1,10 +1,10 @@
 
 from ..util import compile_fmt
 
-from .base import IterativeBase, Item
+from .base import Base, Item
 
 
-class Analog(IterativeBase):
+class Analog(Base):
 
     csdw_format = compile_fmt('''
         u2 mode
@@ -23,7 +23,7 @@ class Analog(IterativeBase):
             self.__dict__.update(values)
         self.subchannels.append(values)
 
-    def _parse(self):
+    def parse(self):
         if self._format != 1:
             raise NotImplementedError('Analog format %s is reserved!'
                                       % self._format)

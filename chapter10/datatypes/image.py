@@ -1,12 +1,12 @@
 
 from ..util import compile_fmt
-from .base import IterativeBase
+from .base import Base
 
 
-class Image(IterativeBase):
+class Image(Base):
     item_label = 'Image Segment'
 
-    def _parse(self):
+    def parse(self):
         self.csdw_format = ['=I', [[
             ('parts', 2),
             ('sum', 2),
@@ -52,4 +52,4 @@ class Image(IterativeBase):
                 u64 ipts
                 u32 length''')
 
-            IterativeBase._parse(self)
+            Base.parse(self)

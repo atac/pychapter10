@@ -1,9 +1,9 @@
 
 from ..util import compile_fmt
-from .base import IterativeBase
+from .base import Base
 
 
-class I1394(IterativeBase):
+class I1394(Base):
     item_label = 'IEEE-1394 Transaction'
 
     def parse(self):
@@ -51,4 +51,4 @@ class I1394(IterativeBase):
                 u4 speed
                 u8 status''')
 
-            IterativeBase.parse(self)
+            Base.parse(self)

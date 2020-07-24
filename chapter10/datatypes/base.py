@@ -9,14 +9,14 @@ class Base(object):
 
     csdw_format = None
     data_format = None
+    # TODO: rename to message label & format?
+    iph_format = None
+    item_label = None
 
     def __init__(self, packet):
         """Logs the file cursor location for later and skips past the data."""
 
         self.packet = packet
-
-        # Find the body position.
-        self.pos = self.packet.file.tell()
 
         # Get our type and format.
         from . import format
@@ -28,66 +28,25 @@ class Base(object):
         to its previous index.
         """
 
-        header_len = 36 if self.packet.secondary_header else 24
-        self.packet.file.seek(header_len)
-        self._parse()
-
-    def _parse(self):
-        """Reads the Channel Specific Data Word (csdw) and data into
-        attributes.
-        """
-
         self.parse_csdw()
         self.parse_data()
 
     def parse_csdw(self):
         if self.csdw_format:
-            self.__dict__.update(
-                self.csdw_format.unpack(self.packet.file.read(4)))
-
-    def parse_data(self):
-        data_len = self.packet.packet_length - (
-            self.packet.secondary_header and 36 or 24)
-        self.data = self.packet.file.read(data_len - 4)
-        if self.data_format is not None:
-            raw = self.data[:self.data_format.calcsize()]
-            self.__dict__.update(self.data_format.unpack(raw))
-
-    def __len__(self):
-        return self.packet.data_length
-
-    def __setstate__(self, state):
-        self.__dict__.update(state)
-
-    def __getstate__(self):
-        state = self.__dict__.copy()
-        for k, v in list(state.items()):
-            if callable(v):
-                del state[k]
-        return state
-
-
-# TODO: switch to a generator instead of building .all immediately?
-class IterativeBase(Base):
-    """Allows for easily packaging sub-elements into an iterable object based
-    on an "all" attribute. Subclasses merely populate this attribute (a list)
-    and length, iteration, etc. should just work.
-    """
-
-    # TODO: rename to message label & format?
-    item_label = None
-    iph_format = None
-
-    def __init__(self, *args, **kwargs):
-        self.all = []
-        Base.__init__(self, *args, **kwargs)
+            self.__dict__.update(self.csdw_format.unpack(
+                self.packet.file.read(4)))
 
     def parse_data(self):
         self.all = []
         if not self.iph_format:
-            Base.parse_data(self)
+            data_len = self.packet.packet_length - (
+                self.packet.secondary_header and 36 or 24)
+            self.data = self.packet.file.read(data_len - 4)
+            if self.data_format is not None:
+                raw = self.data[:self.data_format.calcsize()]
+                self.__dict__.update(self.data_format.unpack(raw))
         else:
-            end = self.pos + self.packet.data_length
+            end = self.packet.file.tell() - 4 + self.packet.data_length
             while True:
                 length = getattr(self, 'item_size', 0)
 
@@ -112,11 +71,22 @@ class IterativeBase(Base):
                 if self.packet.file.tell() >= end:
                     break
 
+    # TODO: switch to a generator instead of building .all immediately?
     def __iter__(self):
         return iter(self.all)
 
     def __len__(self):
         return len(self.all)
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        for k, v in list(state.items()):
+            if callable(v):
+                del state[k]
+        return state
 
 
 class Item(object):
