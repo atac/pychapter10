@@ -10,5 +10,4 @@ from test_sanity import dummy_packet
 def test_reserved(data_type):
     with pytest.raises(NotImplementedError):
         raw = dummy_packet(data_type, 20)
-        t = time.Time.from_string(raw)
-        t.parse()
+        time.Time.from_string(raw)
