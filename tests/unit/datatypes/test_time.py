@@ -5,17 +5,14 @@ except ImportError:
     from mock import Mock
 import pytest
 
-from chapter10.datatypes import time
+from chapter10 import time
+from test_sanity import dummy_packet
 
 
 @pytest.mark.parametrize(
     ('data_type',), [(t,) for t in range(0x12, 0x18)])
 def test_reserved(data_type):
     with pytest.raises(NotImplementedError):
-        t = time.Time(Mock(
-            file=Mock(tell=Mock(return_value=0),
-                      read=Mock(return_value=b'1234')),
-            pos=0,
-            data_type=data_type,
-            data_length=2))
+        raw = dummy_packet(data_type, 20)
+        t = time.Time.from_string(raw)
         t.parse()

@@ -1,11 +1,11 @@
 
 from datetime import datetime, timedelta
 
-from ..util import compile_fmt
-from .base import Base
+from .util import compile_fmt
+from .packet import Packet
 
 
-class Time(Base):
+class Time(Packet):
     csdw_format = compile_fmt('''
         u4 time_source
         u4 time_format
