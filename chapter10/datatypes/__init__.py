@@ -9,7 +9,7 @@ from ..message import Message
 from ..arinc429 import ARINC429
 from ..video import Video
 from ..image import Image
-from .uart import UART
+from ..uart import UART
 from .i1394 import I1394
 from .parallel import Parallel
 from .ethernet import Ethernet
@@ -46,7 +46,7 @@ def get_handler(data_type):
 
     t, f = format(data_type)
     try:
-        if t > 8:
+        if t > 9:
             raise IndexError
         return TYPES[t][1]
     except IndexError:

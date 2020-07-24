@@ -1,9 +1,9 @@
 
-from ..util import compile_fmt
-from .base import Base
+from .util import compile_fmt
+from .packet import Packet
 
 
-class UART(Base):
+class UART(Packet):
     csdw_format = compile_fmt('''
         p31
         u1 iph''')
