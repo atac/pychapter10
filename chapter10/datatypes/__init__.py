@@ -2,7 +2,7 @@ from .base import Base
 from ..computer import Computer
 from ..pcm import PCM
 from ..time import Time
-from .ms1553 import MS1553
+from ..ms1553 import MS1553
 from .analog import Analog
 from .discrete import Discrete
 from .message import Message
@@ -46,7 +46,7 @@ def get_handler(data_type):
 
     t, f = format(data_type)
     try:
-        if t > 2:
+        if t > 3:
             raise IndexError
         return TYPES[t][1]
     except IndexError:

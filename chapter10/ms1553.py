@@ -1,9 +1,9 @@
 
-from ..util import compile_fmt
-from .base import Base
+from .util import compile_fmt
+from .packet import Packet
 
 
-class MS1553(Base):
+class MS1553(Packet):
     item_label = 'Message'
 
     def parse(self):
@@ -49,4 +49,4 @@ class MS1553(Base):
                 u1 tm
                 p6 reserved''')
 
-        Base.parse(self)
+        Packet.parse(self)
