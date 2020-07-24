@@ -1,9 +1,9 @@
 
-from ..util import compile_fmt
-from .base import Base
+from .util import compile_fmt
+from .packet import Packet
 
 
-class Image(Base):
+class Image(Packet):
     item_label = 'Image Segment'
 
     def parse(self):
@@ -52,4 +52,4 @@ class Image(Base):
                 u64 ipts
                 u32 length''')
 
-            Base.parse(self)
+            Packet.parse(self)

@@ -8,7 +8,7 @@ from ..discrete import Discrete
 from ..message import Message
 from ..arinc429 import ARINC429
 from ..video import Video
-from .image import Image
+from ..image import Image
 from .uart import UART
 from .i1394 import I1394
 from .parallel import Parallel
