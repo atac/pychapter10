@@ -1,10 +1,9 @@
 
-from ..util import compile_fmt
+from .util import compile_fmt
+from .packet import Packet, Item
 
-from .base import Base, Item
 
-
-class Analog(Base):
+class Analog(Packet):
 
     csdw_format = compile_fmt('''
         u2 mode
