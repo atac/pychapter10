@@ -20,10 +20,15 @@ def test_construct(monkeypatch):
 def test_next(monkeypatch):
     with open(
             os.path.join(os.path.dirname(__file__), 'sample.c10'), 'rb') as f:
-        monkeypatch.setattr(c10, 'Packet', Mock(
+        monkeypatch.setattr(c10.datatypes, 'get_handler', Mock(
+            name='get_handler',
             return_value=Mock(
-                packet_length=26, check=Mock(return_value=True))))
-        assert c10.C10(f).next().packet_length == 6680
+                name='Packet class',
+                return_value=Mock('Packet instance',
+                                  name='Packet',
+                                  packet_length=26,
+                                  check=Mock(return_value=True)))))
+        assert c10.C10(f).next().packet_length == 26
 
 
 def test_next_stop(monkeypatch):

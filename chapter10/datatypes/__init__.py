@@ -1,5 +1,5 @@
 from .base import Base
-from .computer import Computer
+from ..computer import Computer
 from .pcm import PCM
 from .time import Time
 from .ms1553 import MS1553
@@ -46,9 +46,12 @@ def get_handler(data_type):
 
     t, f = format(data_type)
     try:
+        if t not in (0,):
+            raise IndexError
         return TYPES[t][1]
     except IndexError:
-        return Base
+        from ..packet import Packet
+        return Packet
 
 
 def get_label(data_type):

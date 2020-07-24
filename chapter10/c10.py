@@ -5,6 +5,7 @@ import struct
 
 from .packet import Packet, InvalidPacket
 from .util import Buffer
+from . import datatypes
 
 
 class C10(object):
@@ -32,7 +33,10 @@ class C10(object):
         while True:
             pos = self.file.tell()
             try:
-                return self.packet(self.file)
+                header = Packet.FORMAT.unpack(self.file.read(24))
+                handler = datatypes.get_handler(header['data_type'])
+                self.file.seek(pos)
+                return handler(self.file)
             except (struct.error, EOFError):
                 raise StopIteration
             except InvalidPacket:

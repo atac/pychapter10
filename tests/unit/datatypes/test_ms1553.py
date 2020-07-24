@@ -29,6 +29,6 @@ def test_reserved(data_type):
 
 def test_count():
     for packet in C10(SAMPLE):
-        if isinstance(packet.body, ms1553.MS1553):
+        if isinstance(packet, ms1553.MS1553):
             break
-    assert packet.body.message_count == len(packet.body)
+    assert packet.message_count == len(packet)

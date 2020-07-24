@@ -28,6 +28,6 @@ def test_reserved(data_type):
 
 def test_count():
     for packet in C10(SAMPLE):
-        if isinstance(packet.body, ARINC429):
+        if isinstance(packet, ARINC429):
             break
-    assert packet.body.count == len(packet.body)
+    assert packet.count == len(packet)

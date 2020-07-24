@@ -2,11 +2,11 @@
 from collections import OrderedDict
 import struct
 
-from ..util import compile_fmt
-from .base import Base
+from .util import compile_fmt
+from .packet import Packet
 
 
-class Computer(Base):
+class Computer(Packet):
     """Computer generated data (eg. TMATS setup record)."""
 
     def parse(self):
@@ -85,23 +85,23 @@ reserved!' % self._format)
         self.iph_format = compile_fmt(self.iph_format + '\n' + item_format)
 
         if getattr(self, 'file_size_present', False):
-            self.file_size, = struct.unpack('Q', self.packet.file.read(8))
+            self.file_size, = struct.unpack('Q', self.file.read(8))
 
         self.parse_data()
 
-        end = self.packet.packet_length
-        if self.packet.file.tell() > end:
+        end = self.packet_length
+        if self.file.tell() > end:
             self.all.pop()
             if getattr(self, 'index_type', None) == 0:
-                self.packet.file.seek(end - 8)
+                self.file.seek(end - 8)
                 self.root_offset, = struct.unpack(
-                    'Q', self.packet.file.read(8))
+                    'Q', self.file.read(8))
             else:
-                self.packet.file.seek(end)
+                self.file.seek(end)
 
     def __getitem__(self, key):
         key = bytearray(key, 'utf-8')
         if self._format == 1:
             return OrderedDict([line for line in self.all
                                 if line[0].startswith(key)])
-        return Base.__getitem__(self, key)
+        return Packet.__getitem__(self, key)
