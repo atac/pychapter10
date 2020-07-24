@@ -1,9 +1,9 @@
 
-from ..util import compile_fmt
-from .base import Base
+from .util import compile_fmt
+from .packet import Packet
 
 
-class ARINC429(Base):
+class ARINC429(Packet):
 
     csdw_format = compile_fmt('''
         u16 count
@@ -23,4 +23,4 @@ class ARINC429(Base):
             raise NotImplementedError('ARINC-429 format %s is reserved!'
                                       % self._format)
 
-        Base.parse(self)
+        Packet.parse(self)
