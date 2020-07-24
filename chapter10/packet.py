@@ -2,7 +2,7 @@
 from io import BytesIO
 from array import array
 
-from .util import compile_fmt, format
+from .util import compile_fmt
 
 
 class InvalidPacket(Exception):
@@ -36,7 +36,6 @@ class Packet(object):
 
     csdw_format = None
     data_format = None
-    # TODO: rename to message label & format?
     iph_format = None
     item_label = None
 
@@ -46,8 +45,6 @@ class Packet(object):
         # Read the packet header and save header sums for later.
         header = file.read(24)
         self.header_sums = sum(array('H', header)[:-1]) & 0xffff
-
-        # Parse header fields into attributes.
         self.__dict__.update(self.FORMAT.unpack(header).items())
 
         # Read the secondary header (if any).
@@ -67,7 +64,8 @@ class Packet(object):
         if error:
             raise error
 
-        self.type, self._format = format(self.data_type)
+        self.type = self.data_type // 8
+        self._format = self.data_type % 8
         self.parse()
 
     def parse(self):

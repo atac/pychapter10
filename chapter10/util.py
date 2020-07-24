@@ -5,21 +5,6 @@ except ImportError:
     import bitstruct
 
 
-def format(data_type):
-    """Find the type index (see TYPES) and format number for a datatype."""
-
-    t = int(data_type / 8.0)
-    return (t, data_type - (t * 8))
-
-# TODO: move this to packet
-# def get_label(data_type):
-#     """Return a human readable format label."""
-
-#     t, f = format(data_type)
-#     return '%s (format %i)' % ('unknown' if t > (len(TYPES) - 1)
-#                                else TYPES[t][0], f)
-
-
 def compile_fmt(src):
     """Compile helper that takes a readable string and creates a bitstruct
     CompiledFormatDict.

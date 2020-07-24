@@ -4,7 +4,7 @@ import os
 import struct
 
 from .packet import Packet, InvalidPacket
-from .util import Buffer, format
+from .util import Buffer
 from .computer import Computer
 from .pcm import PCM
 from .time import Time
@@ -66,9 +66,8 @@ class C10(object):
             pos = self.file.tell()
             try:
                 header = Packet.FORMAT.unpack(self.file.read(24))
-                t, f = format(header['data_type'])
                 try:
-                    handler = TYPES[t][1]
+                    handler = TYPES[header['data_type'] // 8][1]
                 except IndexError:
                     handler = Packet
                 self.file.seek(pos)
