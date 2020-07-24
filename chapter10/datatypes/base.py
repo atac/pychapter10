@@ -13,7 +13,7 @@ class Base(object):
     def __init__(self, packet):
         """Logs the file cursor location for later and skips past the data."""
 
-        self.packet, self.init = (packet, False)
+        self.packet = packet
 
         # Find the body position.
         self.pos = self.packet.file.tell()
@@ -21,22 +21,7 @@ class Base(object):
         # Get our type and format.
         from . import format
         self.type, self._format = format(self.packet.data_type)
-        if self.packet.lazy:
-            self.__getattribute__ = self.lazy_getter
-        else:
-            self.parse()
-
-    def lazy_getter(self, key):
-        if key == 'all' and not self.init:
-            self.parse()
-        try:
-            return object.__getattribute__(self, key)
-        except AttributeError:
-            if self.init:
-                raise
-
         self.parse()
-        return object.__getattribute__(self, key)
 
     def parse(self):
         """Seek to packet body, call type-specific parsing, and return file
@@ -47,7 +32,6 @@ class Base(object):
         header_len = 36 if self.packet.secondary_header else 24
         self.packet.file.seek(self.packet.pos + header_len)
         self._parse()
-        self.init = True
         self.packet.file.seek(pos)
 
     def _parse(self):
@@ -76,12 +60,8 @@ class Base(object):
 
     def __setstate__(self, state):
         self.__dict__.update(state)
-        self.lazy = False
-        self.init = True
 
     def __getstate__(self):
-        if not self.init:
-            self.parse()
         state = self.__dict__.copy()
         for k, v in list(state.items()):
             if callable(v):

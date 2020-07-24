@@ -35,10 +35,8 @@ class Packet(object):
         p16 reserved
         u16 secondary_checksum''')
 
-    def __init__(self, file, lazy=False):
+    def __init__(self, file):
         """Takes an open file object with its cursor at this packet."""
-
-        self.lazy = lazy
 
         self.file, self.pos = file, file.tell()
 
@@ -69,10 +67,10 @@ class Packet(object):
         self.file.seek(self.pos + self.packet_length)
 
     @classmethod
-    def from_string(cls, s, lazy=False):
+    def from_string(cls, s):
         """Create a packet object from a string."""
 
-        return cls(BytesIO(s), lazy)
+        return cls(BytesIO(s))
 
     def get_errors(self):
         """Validate the packet using checksums and verifying fields."""
@@ -128,7 +126,6 @@ class Packet(object):
             'header_checksum',
             'header_sums',
             'header_version',
-            'lazy',
             'packet_length',
             'rtc',
             'rtc_high',

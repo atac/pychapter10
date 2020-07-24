@@ -1,6 +1,5 @@
 
 from io import BytesIO
-import atexit
 import os
 import struct
 
@@ -11,14 +10,12 @@ from .util import Buffer
 class C10(object):
     """A Chapter 10 parser."""
 
-    def __init__(self, f, lazy=False, packet=Packet):
+    def __init__(self, f, packet=Packet):
         """Takes a file or filename and reads packets."""
 
-        atexit.register(self.close)
         if isinstance(f, str):
             f = open(f, 'rb')
         self.file = Buffer(f)
-        self.lazy = lazy
         self.packet = packet
 
     @classmethod
@@ -26,12 +23,6 @@ class C10(object):
         """Create a C10 object from a string or bytes."""
 
         return cls(BytesIO(s))
-
-    def close(self):
-        try:
-            self.file.close()
-        except:
-            pass
 
     def __next__(self):
         """Walk a chapter 10 file using python's iterator protocol and return
@@ -41,7 +32,7 @@ class C10(object):
         while True:
             pos = self.file.tell()
             try:
-                return self.packet(self.file, self.lazy)
+                return self.packet(self.file)
             except (struct.error, EOFError):
                 raise StopIteration
             except InvalidPacket:
