@@ -2,7 +2,7 @@
 from io import BytesIO
 from array import array
 
-from .util import compile_fmt
+from .util import compile_fmt, format
 
 
 class InvalidPacket(Exception):
@@ -67,7 +67,6 @@ class Packet(object):
         if error:
             raise error
 
-        from .datatypes import format
         self.type, self._format = format(self.data_type)
         self.parse()
 

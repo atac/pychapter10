@@ -1,9 +1,9 @@
 
-from ..util import compile_fmt
-from .base import Base
+from .util import compile_fmt
+from .packet import Packet
 
 
-class I1394(Base):
+class I1394(Packet):
     item_label = 'IEEE-1394 Transaction'
 
     def parse(self):
@@ -51,4 +51,4 @@ class I1394(Base):
                 u4 speed
                 u8 status''')
 
-            Base.parse(self)
+            Packet.parse(self)

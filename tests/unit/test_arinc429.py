@@ -1,13 +1,10 @@
 
-import os
-
 import pytest
 
-from chapter10 import C10
-from chapter10 import arinc429
+from chapter10 import C10, arinc429
 from test_sanity import dummy_packet
 
-SAMPLE = os.path.join(os.path.dirname(__file__), '..', 'sample.c10')
+from fixtures import SAMPLE
 
 
 @pytest.mark.parametrize(

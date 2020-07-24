@@ -1,9 +1,9 @@
 
-from ..util import compile_fmt
-from .base import Base
+from .util import compile_fmt
+from .packet import Packet
 
 
-class Ethernet(Base):
+class Ethernet(Packet):
     item_label = 'Ethernet Frame'
 
     def parse(self):
@@ -48,4 +48,4 @@ class Ethernet(Base):
                 u16 dst_port
                 u16 src_port''')
 
-        Base.parse(self)
+        Packet.parse(self)

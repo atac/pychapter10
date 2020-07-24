@@ -1,20 +1,9 @@
 
-import os
-
-try:
-    from unittest.mock import Mock
-except ImportError:
-    from mock import Mock
 import pytest
-
-from test_sanity import dummy_packet
 
 from chapter10 import computer
 from chapter10 import C10
-
-SAMPLE = os.path.join(os.path.dirname(__file__), '..', 'sample.c10')
-EVENTS = os.path.join(os.path.dirname(__file__), '..', 'event.c10')
-INDEX = os.path.join(os.path.dirname(__file__), '..', 'index.c10')
+from fixtures import SAMPLE, EVENTS, INDEX, dummy_packet
 
 
 @pytest.mark.parametrize(

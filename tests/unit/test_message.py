@@ -1,13 +1,8 @@
 
-import os
-
 import pytest
 
-from chapter10 import C10
-from chapter10 import message
-from test_sanity import dummy_packet
-
-SAMPLE = os.path.join(os.path.dirname(__file__), '..', 'sample.c10')
+from chapter10 import C10, message
+from fixtures import dummy_packet, SAMPLE
 
 
 @pytest.mark.parametrize(

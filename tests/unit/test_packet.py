@@ -1,25 +1,21 @@
 
-import os
-
 from chapter10 import packet
+from fixtures import SAMPLE
 
 
 def test_construct():
-    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                           'sample.c10'), 'rb') as f:
+    with open(SAMPLE, 'rb') as f:
         assert packet.Packet(f).data_type == 1
 
 
 def test_raw():
-    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                           'sample.c10'), 'rb') as f:
+    with open(SAMPLE, 'rb') as f:
         p = packet.Packet(f)
         f.seek(0)
         assert f.read(p.packet_length) == bytes(p)
 
 
 def test_string():
-    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                           'sample.c10'), 'rb') as f:
+    with open(SAMPLE, 'rb') as f:
         p = packet.Packet.from_string(f.read())
         assert p.check()

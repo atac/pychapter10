@@ -1,18 +1,9 @@
 
-import os
-
-try:
-    from unittest.mock import Mock
-except ImportError:
-    from mock import Mock
 import pytest
 
 from chapter10 import C10
 from chapter10 import ms1553
-from test_sanity import dummy_packet
-
-
-SAMPLE = os.path.join(os.path.dirname(__file__), '..', 'sample.c10')
+from fixtures import dummy_packet, SAMPLE
 
 
 @pytest.mark.parametrize(

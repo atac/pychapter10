@@ -1,11 +1,11 @@
 
-from .base import Base
+from .packet import Packet
 
 
-class Parallel(Base):
+class Parallel(Packet):
     def parse(self):
         if self._format > 0:
             raise NotImplementedError('Parallel data format %s is reserved!'
                                       % self._format)
 
-        Base.parse(self)
+        Packet.parse(self)

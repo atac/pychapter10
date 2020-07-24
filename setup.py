@@ -43,9 +43,6 @@ setup(
     author='Micah Ferrill',
     author_email='ferrillm@avtest.com',
     description='A parser library for the IRIG 106 Chapter 10 data format.',
-    packages=[
-        'chapter10',
-        'chapter10.datatypes',
-    ],
+    packages=['chapter10'],
     cmdclass=cmdclass
 )
