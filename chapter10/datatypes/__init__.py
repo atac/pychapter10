@@ -5,7 +5,7 @@ from ..time import Time
 from ..ms1553 import MS1553
 from ..analog import Analog
 from ..discrete import Discrete
-from .message import Message
+from ..message import Message
 from .arinc429 import ARINC429
 from .video import Video
 from .image import Image
@@ -46,7 +46,7 @@ def get_handler(data_type):
 
     t, f = format(data_type)
     try:
-        if t > 5:
+        if t > 6:
             raise IndexError
         return TYPES[t][1]
     except IndexError:
