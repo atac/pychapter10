@@ -1,4 +1,5 @@
 
+from array import array
 import struct
 
 import pytest
@@ -16,14 +17,16 @@ def dummy_packet(type, size):
         size + 24,
         size,
         1,
-        1,
+        0,
         0,
         type,
         0,
-        0,
+        0
     ]
-    header.append(sum(header))
-    header = struct.pack('HHIIBBBBIHH', *header)
+    header[2] += 4 - (header[2] % 4)
+    checksum = sum(array('H', struct.pack('=HHIIBBBBIH', *header))) & 0xffff
+    header.append(checksum)
+    header = struct.pack('=HHIIBBBBIHH', *header)
     return header + (b'\x00' * size)
 
 
