@@ -43,6 +43,7 @@ setup(
     author='Micah Ferrill',
     author_email='ferrillm@avtest.com',
     description='A parser library for the IRIG 106 Chapter 10 data format.',
+    install_requires=['bitstruct==8.11.0'],
     packages=['chapter10'],
     cmdclass=cmdclass
 )
