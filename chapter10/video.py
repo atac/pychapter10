@@ -1,9 +1,9 @@
 
-from ..util import compile_fmt
-from .base import Base
+from .util import compile_fmt
+from .packet import Packet
 
 
-class Video(Base):
+class Video(Packet):
     """Parse video (type 0x40-0x47)."""
 
     item_label = 'MPEG Packet'
