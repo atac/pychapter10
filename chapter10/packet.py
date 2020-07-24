@@ -38,8 +38,6 @@ class Packet(object):
     def __init__(self, file):
         """Takes an open file object with its cursor at this packet."""
 
-        self.file, self.pos = file, file.tell()
-
         # Read the packet header and save header sums for later.
         header = file.read(24)
         self.header_sums = sum(array('H', header)[:-1]) & 0xffff
@@ -49,10 +47,16 @@ class Packet(object):
 
         # Read the secondary header (if any).
         self.time = None
+        secondary = bytes()
         if self.secondary_header:
             secondary = file.read(12)
             self.secondary_sums = sum(array('H', secondary)[:-1]) & 0xffff
             self.__dict__.update(self.SECONDARY_FORMAT.unpack(file.read(12)))
+
+        header_size = len(header + secondary)
+        body = file.read(self.packet_length - header_size)
+        self.file = BytesIO(header + secondary + body)
+        self.file.seek(header_size)
 
         # Parse the body based on type.
         datatype = datatypes.get_handler(self.data_type)
@@ -61,10 +65,6 @@ class Packet(object):
         error = self.get_errors()
         if error:
             raise error
-
-        # Skip packet body and trailer.
-        # @TODO: parse trailer if present.
-        self.file.seek(self.pos + self.packet_length)
 
     @classmethod
     def from_string(cls, s):
@@ -97,13 +97,8 @@ class Packet(object):
     def __bytes__(self):
         """Returns the entire packet as raw bytes."""
 
-        pos = self.file.tell()
-        self.file.seek(self.pos)
-        raw = self.file.read(self.packet_length)
-        self.file.seek(pos)
-        if not isinstance(raw, bytes):
-            raw = bytes(raw)
-        return raw
+        self.file.seek(0)
+        return self.file.read()
 
     __str__ = __bytes__
 

@@ -28,11 +28,9 @@ class Base(object):
         to its previous index.
         """
 
-        pos = self.packet.file.tell()
         header_len = 36 if self.packet.secondary_header else 24
-        self.packet.file.seek(self.packet.pos + header_len)
+        self.packet.file.seek(header_len)
         self._parse()
-        self.packet.file.seek(pos)
 
     def _parse(self):
         """Reads the Channel Specific Data Word (csdw) and data into
