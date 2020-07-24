@@ -1,6 +1,6 @@
 from .base import Base
 from ..computer import Computer
-from .pcm import PCM
+from ..pcm import PCM
 from .time import Time
 from .ms1553 import MS1553
 from .analog import Analog
@@ -46,7 +46,7 @@ def get_handler(data_type):
 
     t, f = format(data_type)
     try:
-        if t not in (0,):
+        if t > 1:
             raise IndexError
         return TYPES[t][1]
     except IndexError:
