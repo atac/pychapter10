@@ -1,9 +1,9 @@
 
-from ..util import compile_fmt
-from .base import Base
+from .util import compile_fmt
+from .packet import Packet
 
 
-class Discrete(Base):
+class Discrete(Packet):
     csdw_format = compile_fmt('''
         u3 mode
         u5 length
@@ -17,4 +17,4 @@ class Discrete(Base):
             raise NotImplementedError('Discrete data format %s is reserved!'
                                       % self._format)
 
-        Base.parse(self)
+        Packet.parse(self)

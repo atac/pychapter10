@@ -1,21 +1,14 @@
 
-try:
-    from unittest.mock import Mock
-except ImportError:
-    from mock import Mock
 import pytest
 
-from chapter10.datatypes import discrete
+from chapter10 import discrete
+from test_sanity import dummy_packet
 
 
 @pytest.mark.parametrize(
     ('data_type',), [(0x28,)] + [(t,) for t in range(0x2a, 0x30)])
 def test_reserved(data_type):
     with pytest.raises(NotImplementedError):
-        b = discrete.Discrete(Mock(
-            file=Mock(tell=Mock(return_value=0),
-                      read=Mock(return_value=b'1234')),
-            pos=0,
-            data_type=data_type,
-            data_length=2))
+        raw = dummy_packet(data_type, 20)
+        b = discrete.Discrete.from_string(raw)
         b.parse()
