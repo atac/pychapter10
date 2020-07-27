@@ -17,7 +17,7 @@ def test_format_0_count():
     for packet in C10(ETHERNET):
         if packet.data_type == 0x68:
             break
-    assert len(packet) == packet.number_of_frames
+    assert len(packet) == packet.count
 
 
 def test_format_1_count():

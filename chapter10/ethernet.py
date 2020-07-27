@@ -15,7 +15,7 @@ class Ethernet(Packet):
         if self._format == 0:
             # TODO: replace number_of_frames with count or msg_count?
             self.csdw_format = compile_fmt('''
-                u16 number_of_frames
+                u16 count
                 p9 reserved
                 u3 ttb
                 u4 format''')

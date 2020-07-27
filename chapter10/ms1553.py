@@ -13,7 +13,7 @@ class MS1553(Packet):
 
         if self._format == 1:
             self.csdw_format = compile_fmt('''
-                u24 message_count
+                u24 count
                 p6
                 u2 time_tag_bits''')
 

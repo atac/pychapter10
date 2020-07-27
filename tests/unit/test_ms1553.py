@@ -19,4 +19,4 @@ def test_count():
     for packet in C10(SAMPLE):
         if isinstance(packet, ms1553.MS1553):
             break
-    assert packet.message_count == len(packet)
+    assert packet.count == len(packet)
