@@ -7,7 +7,7 @@ from .packet import Packet, InvalidPacket
 from .util import Buffer
 from .computer import Computer
 from .pcm import PCM
-from .time import Time
+from .time import TimeF1
 from .ms1553 import MS1553
 from .analog import Analog
 from .discrete import Discrete
@@ -23,7 +23,7 @@ from .ethernet import Ethernet
 # Top level data types.
 TYPES_LIST = (('Computer Generated', Computer),
               ('PCM', PCM),
-              ('Time', Time),
+              ('Time', TimeF1),
               ('Mil-STD-1553', MS1553),
               ('Analog', Analog),
               ('Discrete', Discrete),
@@ -40,6 +40,7 @@ TYPES_LIST = (('Computer Generated', Computer),
               )
 
 TYPES = {
+    0x11: TimeF1,
     0x30: MessageF0,
 }
 

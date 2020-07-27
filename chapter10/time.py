@@ -5,7 +5,7 @@ from .util import compile_fmt
 from .packet import Packet
 
 
-class Time(Packet):
+class TimeF1(Packet):
     csdw_format = compile_fmt('''
         u4 time_source
         u4 time_format
@@ -15,45 +15,29 @@ class Time(Packet):
         u4 irig_source
         p16''')
 
-    def parse(self):
-        if self._format != 1:
-            raise NotImplementedError('Time Data format %s is reserved!'
-                                      % self._format)
+    def __init__(self, *args, **kwargs):
+        Packet.__init__(self, *args, **kwargs)
 
-        self.parse_csdw()
+        self.data_format = '''
+            u4 Tmn
+            u4 Hmn
+            u4 Sn
+            u3 TSn
+            p1
+            u4 Mn
+            u3 TMn
+            p1
+            u4 Hn
+            u2 THn
+            p2
+            u4 Dn
+            u4 TDn
+            '''
 
-        self.data_format = compile_fmt('''
-                u4 Tmn
-                u4 Hmn
-                u4 Sn
-                u3 TSn
-                p1
-                u4 Mn
-                u3 TMn
-                p1
-                u4 Hn
-                u2 THn
-                p2
-                u4 Dn
-                u4 TDn
-                u1 HDn
-                p6''')
-
-        if self.date_format:
-            self.data_format = compile_fmt('''
-                u4 Tmn
-                u4 Hmn
-                u4 Sn
-                u3 TSn
-                p1
-                u4 Mn
-                u3 TMn
-                p1
-                u4 Hn
-                u2 THn
-                p2
-                u4 Dn
-                u4 TDn
+        if not self.date_format:
+            self.data_format += 'u1 HDn\np6'
+        else:
+            self.data_format += '''
                 u4 On
                 u1 Ton
                 p3
@@ -61,9 +45,10 @@ class Time(Packet):
                 u4 TYn
                 u4 HYn
                 u2 OYn
-                p2''')
+                p2'''
 
-        self.parse_data()
+        self.data_format = compile_fmt(self.data_format)
+        self.__dict__.update(self.data_format.unpack(self.data))
 
         microseconds = ((self.Hmn * 10) + self.Tmn)
         seconds = self.Sn + (self.TSn * 10)

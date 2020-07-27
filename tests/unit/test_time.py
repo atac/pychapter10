@@ -1,13 +1,10 @@
 
-import pytest
-
-from chapter10 import time
-from test_sanity import dummy_packet
+from chapter10 import time, C10
+from fixtures import SAMPLE
 
 
-@pytest.mark.parametrize(
-    ('data_type',), [(t,) for t in range(0x12, 0x18)])
-def test_reserved(data_type):
-    with pytest.raises(NotImplementedError):
-        raw = dummy_packet(data_type, 20)
-        time.Time.from_string(raw)
+def test_time():
+    for packet in C10(SAMPLE):
+        if isinstance(packet, time.TimeF1):
+            break
+    assert packet.time.strftime('%j %H:%M:%S') == '034 11:34:11'

@@ -35,7 +35,6 @@ class Packet(object):
         u16 secondary_checksum''')
 
     csdw_format = None
-    data_format = None
     iph_format = None
     item_label = None
 
@@ -87,9 +86,6 @@ class Packet(object):
             data_len = self.packet_length - (
                 self.secondary_header and 36 or 24)
             self.data = self.file.read(data_len - 4)
-            if self.data_format is not None:
-                raw = self.data[:self.data_format.calcsize()]
-                self.__dict__.update(self.data_format.unpack(raw))
         else:
             end = self.file.tell() - 4 + self.data_length
             while True:
