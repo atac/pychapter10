@@ -9,7 +9,7 @@ from .computer import ComputerF0, ComputerF1, ComputerF2, ComputerF3
 from .pcm import PCMF1
 from .time import TimeF1
 from .ms1553 import MS1553F1, MS1553F2
-from .analog import Analog
+from .analog import AnalogF1
 from .discrete import Discrete
 from .message import MessageF0
 from .arinc429 import ARINC429
@@ -25,7 +25,7 @@ TYPES_LIST = (('Computer Generated', ComputerF1),
               ('PCM', PCMF1),
               ('Time', TimeF1),
               ('Mil-STD-1553', MS1553F1),
-              ('Analog', Analog),
+              ('Analog', AnalogF1),
               ('Discrete', Discrete),
               ('Message', MessageF0),
               ('ARINC 429', ARINC429),
@@ -48,6 +48,7 @@ TYPES = {
     0x11: TimeF1,
     0x19: MS1553F1,
     0x1A: MS1553F2,
+    0x21: AnalogF1,
     0x30: MessageF0,
 }
 

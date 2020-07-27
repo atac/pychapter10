@@ -3,8 +3,7 @@ from .util import compile_fmt
 from .packet import Packet, Item
 
 
-class Analog(Packet):
-
+class AnalogF1(Packet):
     csdw_format = compile_fmt('''
         u2 mode
         u6 length
@@ -14,47 +13,42 @@ class Analog(Packet):
         u1 same
         p2''')
     item_label = 'Analog Sample'
-    iph_format = (None, None)
 
-    def parse_csdw(self):
-        values = self.csdw_format.unpack(self.packet.file.read(4))
-        if self.subchannels == []:
-            self.__dict__.update(values)
-        self.subchannels.append(values)
+    def __init__(self, *args, **kwargs):
+        Packet.__init__(self, *args, **kwargs)
 
-    def parse(self):
-        if self._format != 1:
-            raise NotImplementedError('Analog format %s is reserved!'
-                                      % self._format)
+        self._subchannel = 0
 
-        # Parse one CSDW and see how many there are.
-        self.subchannels = []
-        self.parse_csdw()
-        count = self.channel_count or 256  # 0 = 256
+        keys = (
+            'mode', 'length', 'subchannel', 'channel_count', 'factor', 'same')
+        self.subchannels = [[getattr(self, k) for k in keys]]
 
         # Read CSDWs for subchannels if applicable.
         if not self.same:
-            for i in range(count - 1):
-                self.parse_csdw()
+            for i in range(len(self)):
+                self.subchannels.append(
+                    self.csdw_format.unpack(self.file.read(4)))
 
-        self.parse_data()
+    def __len__(self):
+        return self.channel_count or 256
 
-    def parse_data(self):
-        for i in range(self.channel_count):
-            if self.same:
-                csdw = self.subchannels[0]
-            else:
-                csdw = self.subchannels[i]
+    def __next__(self):
+        subchannel = self._subchannel
+        if self.same:
+            csdw = self.subchannels[0]
+        else:
+            csdw = self.subchannels[subchannel]
 
-            # Find the sample size (in bits).
-            length = csdw['length'] or 64  # Length 0 = 64 bits
+        # Find the sample size in bytes (16 bit aligned).
+        length = csdw['length'] or 64  # Length 0 = 64 bits
+        length = length // 8 + (length % 16 and 1 or 0)
 
-            # Convert length to bytes (align on 16 bits first of course).
-            length = int(length / 16) + (length % 16 and 1 or 0)
+        data = self.file.read(length)
 
-            data = self.packet.file.read(length)
-            self.all.append(Item(data, self.item_label))
+        # Account for filler byte when length is odd.
+        if length % 2:
+            self.packet.file.seek(1, 1)
 
-            # Account for filler byte when length is odd.
-            if length % 2:
-                self.packet.file.seek(1, 1)
+        self._subchannel += 1
+
+        return Item(data, self.item_label, **csdw)
