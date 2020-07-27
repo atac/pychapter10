@@ -87,16 +87,17 @@ class Packet(object):
             self.data = self.file.read(data_len - 4)
 
     def __next__(self):
-        if getattr(self, 'count', None) and len(self) == self.count:
-            raise StopIteration
 
+        # Exit when we reach the end of the packet body
         end = self.data_length + (self.secondary_header and 36 or 24)
         if self.file.tell() >= end:
             raise StopIteration
 
+        # Read and parse the IPH
         raw = self.file.read(self.iph_format.calcsize() // 8)
         iph = self.iph_format.unpack(raw)
 
+        # Read the message data
         length = getattr(self, 'item_size', 0)
         if 'length' in iph:
             length = iph['length']

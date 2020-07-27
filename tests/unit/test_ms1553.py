@@ -1,22 +1,12 @@
 
-import pytest
-
-from chapter10 import C10
-from chapter10 import ms1553
-from fixtures import dummy_packet, SAMPLE
-
-
-@pytest.mark.parametrize(
-    ('data_type',), [(t,) for t in [0x18] + list(range(0x1B, 0x20))])
-def test_reserved(data_type):
-    with pytest.raises(NotImplementedError):
-        raw = dummy_packet(data_type, 20)
-        m = ms1553.MS1553.from_string(raw)
-        m.parse()
+from chapter10 import C10, ms1553
+from fixtures import SAMPLE
 
 
 def test_count():
     for packet in C10(SAMPLE):
-        if isinstance(packet, ms1553.MS1553):
+        if isinstance(packet, ms1553.MS1553F1):
+            for i, msg in enumerate(packet):
+                assert len(msg.data) == msg.length
             break
-    assert packet.count == len(packet)
+    assert i+1 == len(packet)
