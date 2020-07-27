@@ -81,36 +81,36 @@ class Packet(object):
                 self.file.read(4)))
 
     def parse_data(self):
-        self.all = []
         if not self.iph_format:
             data_len = self.packet_length - (
                 self.secondary_header and 36 or 24)
             self.data = self.file.read(data_len - 4)
-        else:
-            end = self.file.tell() - 4 + self.data_length
-            while True:
-                length = getattr(self, 'item_size', 0)
 
-                iph_size = self.iph_format.calcsize() // 8
-                raw = self.file.read(iph_size)
-                iph = self.iph_format.unpack(raw)
+    def __next__(self):
+        if getattr(self, 'count', None) and len(self) == self.count:
+            self.file.seek(self.secondary_header and 36 or 24)
+            raise StopIteration
 
-                if 'length' in iph:
-                    length = iph['length']
+        if self.file.tell() >= self.packet_length:
+            self.file.seek(self.secondary_header and 36 or 24)
+            raise StopIteration
 
-                data = self.file.read(length)
-                self.all.append(Item(data, self.item_label, self.iph_format,
-                                     **iph))
+        raw = self.file.read(self.iph_format.calcsize())
+        iph = self.iph_format.unpack(raw)
 
-                # Account for filler byte when length is odd.
-                if length % 2:
-                    self.file.seek(1, 1)
+        length = getattr(self, 'item_size', 0)
+        if 'length' in iph:
+            length = iph['length']
+        data = self.file.read(length)
 
-                if getattr(self, 'count', None) and len(self) == self.count:
-                    break
+        # Account for filler byte when length is odd.
+        if length % 2:
+            self.file.seek(1, 1)
 
-                if self.file.tell() >= end:
-                    break
+        return Item(data, self.item_label, self.iph_format, **iph)
+
+    def __iter__(self):
+        return self
 
     @classmethod
     def from_string(cls, s):
@@ -134,12 +134,10 @@ class Packet(object):
     def check(self):
         return self.get_errors() is None
 
-    # TODO: switch to a generator instead of building .all immediately?
-    def __iter__(self):
-        return iter(self.all)
-
     def __len__(self):
-        return len(self.all)
+        if hasattr(self, 'count'):
+            return self.count
+        raise NotImplementedError('%s has no len' % self.__class__)
 
     def __bytes__(self):
         """Returns the entire packet as raw bytes."""

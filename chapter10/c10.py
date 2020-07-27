@@ -5,7 +5,7 @@ import struct
 
 from .packet import Packet, InvalidPacket
 from .util import Buffer
-from .computer import Computer
+from .computer import ComputerF0, ComputerF1, ComputerF2, ComputerF3
 from .pcm import PCM
 from .time import TimeF1
 from .ms1553 import MS1553
@@ -21,7 +21,7 @@ from .parallel import Parallel
 from .ethernet import Ethernet
 
 # Top level data types.
-TYPES_LIST = (('Computer Generated', Computer),
+TYPES_LIST = (('Computer Generated', ComputerF1),
               ('PCM', PCM),
               ('Time', TimeF1),
               ('Mil-STD-1553', MS1553),
@@ -40,6 +40,10 @@ TYPES_LIST = (('Computer Generated', Computer),
               )
 
 TYPES = {
+    0x00: ComputerF0,
+    0x01: ComputerF1,  # TMATS
+    0x02: ComputerF2,  # Event
+    0x03: ComputerF3,  # Index
     0x11: TimeF1,
     0x30: MessageF0,
 }

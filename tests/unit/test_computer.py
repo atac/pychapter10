@@ -1,18 +1,6 @@
 
-import pytest
-
-from chapter10 import computer
 from chapter10 import C10
-from fixtures import SAMPLE, EVENTS, INDEX, dummy_packet
-
-
-@pytest.mark.parametrize(
-    ('data_type',), [(t,) for t in range(0x04, 0x08)])
-def test_reserved(data_type):
-    with pytest.raises(NotImplementedError):
-        raw = dummy_packet(data_type, 20)
-        p = computer.Computer.from_string(raw)
-        p.parse()
+from fixtures import SAMPLE, EVENTS, INDEX
 
 
 def test_tmats():
