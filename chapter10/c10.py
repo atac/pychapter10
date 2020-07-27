@@ -11,7 +11,7 @@ from .time import Time
 from .ms1553 import MS1553
 from .analog import Analog
 from .discrete import Discrete
-from .message import Message
+from .message import MessageF0
 from .arinc429 import ARINC429
 from .video import Video
 from .image import Image
@@ -21,23 +21,27 @@ from .parallel import Parallel
 from .ethernet import Ethernet
 
 # Top level data types.
-TYPES = (('Computer Generated', Computer),
-         ('PCM', PCM),
-         ('Time', Time),
-         ('Mil-STD-1553', MS1553),
-         ('Analog', Analog),
-         ('Discrete', Discrete),
-         ('Message', Message),
-         ('ARINC 429', ARINC429),
-         ('Video', Video),
-         ('Image', Image),
-         ('UART', UART),
-         ('IEEE-1394', I1394),
-         ('Parallel', Parallel),
-         ('Ethernet', Ethernet),
-         # ('TSPI/CTS Data', Base),
-         # ('Controller Area Network Bus', Base),
-         )
+TYPES_LIST = (('Computer Generated', Computer),
+              ('PCM', PCM),
+              ('Time', Time),
+              ('Mil-STD-1553', MS1553),
+              ('Analog', Analog),
+              ('Discrete', Discrete),
+              ('Message', MessageF0),
+              ('ARINC 429', ARINC429),
+              ('Video', Video),
+              ('Image', Image),
+              ('UART', UART),
+              ('IEEE-1394', I1394),
+              ('Parallel', Parallel),
+              ('Ethernet', Ethernet),
+              # ('TSPI/CTS Data', Base),
+              # ('Controller Area Network Bus', Base),
+              )
+
+TYPES = {
+    0x30: MessageF0,
+}
 
 
 class C10(object):
@@ -67,9 +71,12 @@ class C10(object):
             try:
                 header = Packet.FORMAT.unpack(self.file.read(24))
                 try:
-                    handler = TYPES[header['data_type'] // 8][1]
+                    handler = TYPES[header['data_type']]
+                except KeyError:
+                    handler = TYPES_LIST[header['data_type'] // 8][1]
                 except IndexError:
-                    handler = Packet
+                    raise NotImplementedError('Type %s not implemented',
+                                              hex(header['data_type'])[2:])
                 self.file.seek(pos)
                 return handler(self.file)
             except (struct.error, EOFError):

@@ -179,10 +179,7 @@ class Item(object):
         self.data, self.label = data, label
 
     def __repr__(self):
-        return '<%s>' % (self.label)
-
-    def bytes(self):
-        return self.data
+        return '<%s %s bytes>' % (self.label, len(self.data))
 
     def __bytes__(self):
         return self.pack()
@@ -195,4 +192,4 @@ class Item(object):
 
         if format is None:
             format = self.item_format
-        return format.pack(self.__dict__)
+        return format.pack(self.__dict__) + self.data
