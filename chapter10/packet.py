@@ -81,21 +81,20 @@ class Packet(object):
                 self.file.read(4)))
 
     def parse_data(self):
-        if not self.iph_format:
+        if not self.item_label:
             data_len = self.packet_length - (
                 self.secondary_header and 36 or 24)
             self.data = self.file.read(data_len - 4)
 
     def __next__(self):
         if getattr(self, 'count', None) and len(self) == self.count:
-            self.file.seek(self.secondary_header and 36 or 24)
             raise StopIteration
 
-        if self.file.tell() >= self.packet_length:
-            self.file.seek(self.secondary_header and 36 or 24)
+        end = self.data_length + (self.secondary_header and 36 or 24)
+        if self.file.tell() >= end:
             raise StopIteration
 
-        raw = self.file.read(self.iph_format.calcsize())
+        raw = self.file.read(self.iph_format.calcsize() // 8)
         iph = self.iph_format.unpack(raw)
 
         length = getattr(self, 'item_size', 0)
@@ -137,6 +136,10 @@ class Packet(object):
     def __len__(self):
         if hasattr(self, 'count'):
             return self.count
+        elif hasattr(self, 'item_size'):
+            msg_size = self.item_size + (self.iph_format.calcsize() // 8)
+            msg_size += msg_size % 2
+            return (self.data_length - 4) // msg_size
         raise NotImplementedError('%s has no len' % self.__class__)
 
     def __bytes__(self):
@@ -145,11 +148,12 @@ class Packet(object):
         self.file.seek(0)
         return self.file.read()
 
-    __str__ = __bytes__
+    def __str__(self):
+        return str(bytes(self))
 
     def __repr__(self):
-        return '<C10 Packet {} {} bytes>'.format(self.data_type,
-                                                 len(bytes(self)))
+        return '<{} {} bytes>'.format(
+            self.__class__.__name__, len(bytes(self)))
 
     def __setstate__(self, state):
         state['file'] = BytesIO(state['file'])

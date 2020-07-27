@@ -1,14 +1,12 @@
 
-import pytest
-
-from chapter10 import pcm
-from test_sanity import dummy_packet
+from chapter10 import C10, pcm
+from fixtures import PCM
 
 
-@pytest.mark.parametrize(
-    ('data_type',), [(t,) for t in [0x8] + list(range(0x0A, 0x10))])
-def test_reserved(data_type):
-    with pytest.raises(NotImplementedError):
-        raw = dummy_packet(data_type, 20)
-        p = pcm.PCM.from_string(raw)
-        p.parse()
+def test_pcm():
+    for packet in C10(PCM):
+        if isinstance(packet, pcm.PCMF1):
+            for i, word in enumerate(packet):
+                assert len(word.data) == 12
+            break
+    assert i == len(packet)

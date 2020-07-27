@@ -3,7 +3,7 @@ from .util import compile_fmt
 from .packet import Packet
 
 
-class PCM(Packet):
+class PCMF1(Packet):
 
     csdw_format = compile_fmt('''
         u18 sync_offset
@@ -21,27 +21,20 @@ class PCM(Packet):
     item_label = 'PCM Frame'
     item_size = 12  # Two words sync, four data.
 
-    def parse(self):
-        if self._format != 1:
-            raise NotImplementedError(
-                'PCM Format %s is reserved!' % self._format)
-
-        self.parse_csdw()
+    def __init__(self, *args, **kwargs):
+        Packet.__init__(self, *args, **kwargs)
 
         # Throughput basically means we don't need to do anything.
-        if self.throughput:
-            return
+        if not self.throughput:
 
-        # Figure out the correct IPH format based on CSDW.
-        iph_format = '''
-            u64 ipts
-            p12
-            u4 lock_status'''
+            # Figure out the correct IPH format based on CSDW.
+            iph_format = '''
+                u64 ipts
+                p12
+                u4 lock_status'''
 
-        # Extra IPH word in 32 bit alignment.
-        if self.iph and self.alignment:
-            iph_format += '\np16'
+            # Extra IPH word in 32 bit alignment.
+            if self.iph and self.alignment:
+                iph_format += '\np16'
 
-        self.iph_format = compile_fmt(iph_format)
-
-        self.parse_data()
+            self.iph_format = compile_fmt(iph_format)
