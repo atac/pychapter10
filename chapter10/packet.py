@@ -37,6 +37,7 @@ class Packet(object):
     csdw_format = None
     iph_format = None
     item_label = None
+    item_size = None
 
     def __init__(self, file):
         """Takes an open file object with its cursor at this packet."""
@@ -137,9 +138,8 @@ class Packet(object):
     def __len__(self):
         if hasattr(self, 'count'):
             return self.count
-        elif hasattr(self, 'item_size'):
+        elif self.item_size:
             msg_size = self.item_size + (self.iph_format.calcsize() // 8)
-            msg_size += msg_size % 2
             return (self.data_length - 4) // msg_size
         raise NotImplementedError('%s has no len' % self.__class__)
 
