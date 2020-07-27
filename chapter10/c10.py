@@ -10,7 +10,7 @@ from .pcm import PCMF1
 from .time import TimeF1
 from .ms1553 import MS1553F1, MS1553F2
 from .analog import AnalogF1
-from .discrete import Discrete
+from .discrete import DiscreteF1
 from .message import MessageF0
 from .arinc429 import ARINC429
 from .video import Video
@@ -26,7 +26,7 @@ TYPES_LIST = (('Computer Generated', ComputerF1),
               ('Time', TimeF1),
               ('Mil-STD-1553', MS1553F1),
               ('Analog', AnalogF1),
-              ('Discrete', Discrete),
+              ('Discrete', DiscreteF1),
               ('Message', MessageF0),
               ('ARINC 429', ARINC429),
               ('Video', Video),
@@ -49,6 +49,7 @@ TYPES = {
     0x19: MS1553F1,
     0x1A: MS1553F2,
     0x21: AnalogF1,
+    0x29: DiscreteF1,
     0x30: MessageF0,
 }
 
