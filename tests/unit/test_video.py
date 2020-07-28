@@ -1,14 +1,30 @@
 
-import pytest
-
-from chapter10 import video
-from test_sanity import dummy_packet
+from chapter10 import video, C10
+from fixtures import SAMPLE
 
 
-@pytest.mark.parametrize(
-    ('data_type',), [(t,) for t in range(0x43, 0x48)])
-def test_reserved(data_type):
-    with pytest.raises(NotImplementedError):
-        raw = dummy_packet(data_type, 20)
-        v = video.Video.from_string(raw)
-        v.parse()
+def test_videof0():
+    for packet in C10(SAMPLE):
+        if isinstance(packet, video.VideoF0):
+            for msg in packet:
+                assert len(msg.data) == 188
+            break
+    assert len(packet) == 83
+
+
+def test_videof1():
+    for packet in C10(SAMPLE):
+        if isinstance(packet, video.VideoF1):
+            for msg in packet:
+                assert len(msg.data) == 188
+            break
+    assert len(packet) == 83
+
+
+def test_videof2():
+    for packet in C10(SAMPLE):
+        if isinstance(packet, video.VideoF2):
+            for msg in packet:
+                assert len(msg.data) == 188
+            break
+    assert len(packet) == 83

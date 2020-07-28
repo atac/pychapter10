@@ -96,8 +96,10 @@ class Packet(object):
             raise StopIteration
 
         # Read and parse the IPH
-        raw = self.file.read(self.iph_format.calcsize() // 8)
-        iph = self.iph_format.unpack(raw)
+        iph = {}
+        if self.iph_format:
+            raw = self.file.read(self.iph_format.calcsize() // 8)
+            iph = self.iph_format.unpack(raw)
 
         # Read the message data
         length = getattr(self, 'item_size', 0)
@@ -144,9 +146,11 @@ class Packet(object):
         if hasattr(self, 'count'):
             return self.count
         elif self.item_size:
-            msg_size = self.item_size + (self.iph_format.calcsize() // 8)
+            msg_size = self.item_size
+            if self.iph_format:
+                msg_size += self.iph_format.calcsize() // 8
             return (self.data_length - 4) // msg_size
-        raise NotImplementedError('%s has no len' % self.__class__)
+        raise TypeError("object of type '%s' has no len()" % self.__class__)
 
     def __bytes__(self):
         """Returns the entire packet as raw bytes."""
