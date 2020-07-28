@@ -47,7 +47,7 @@ steps:
 - script: python -m pip install -e .
   displayName: 'Install library'
 
-- script: pytest --junitxml=test-results.xml
+- script: pytest tests --junitxml=test-results.xml
   displayName: 'Run tests'
 
 - task: PublishTestResults@2
