@@ -1,11 +1,10 @@
 
 from .packet import Packet
+from .util import compile_fmt
 
 
-class Parallel(Packet):
-    def parse(self):
-        if self._format > 0:
-            raise NotImplementedError('Parallel data format %s is reserved!'
-                                      % self._format)
-
-        Packet.parse(self)
+class ParallelF0(Packet):
+    csdw_format = compile_fmt('''
+        u24 scan_number
+        u8 type
+    ''')
