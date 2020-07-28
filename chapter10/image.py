@@ -6,50 +6,48 @@ from .packet import Packet
 class Image(Packet):
     item_label = 'Image Segment'
 
-    def parse(self):
-        self.csdw_format = ['=I', [[
-            ('parts', 2),
-            ('sum', 2),
-            ('intra_packet_header', 1),
-        ]]]
+    def __init__(self, *args, **kwargs):
+        Packet.__init__(self, *args, **kwargs)
 
-        if self._format > 2:
-            raise NotImplementedError('Image format %s is reserved!'
-                                      % self._format)
+        if self.iph:
+            self.iph_format = 'u64 ipts\n'
 
-        if self._format == 0:
-            self.csdw_format = compile_fmt('''
-                u27 length
-                u1 iph
-                u2 sum
-                u2 parts''')
 
-            self.parse_csdw()
-            self.item_length = self.length
+class ImageF0(Image):
+    csdw_format = compile_fmt('''
+        u27 segment_length
+        u1 iph
+        u3 sum
+        u3 parts''')
 
-            if self.iph:
-                self.iph_format = compile_fmt('u64 ipts')
+    def __init__(self, *args, **kwargs):
+        Image.__init__(self, *args, **kwargs)
 
-            self.parse_data()
+        self.item_length = self.segment_length
+        self.iph_format = compile_fmt(self.iph_format)
 
-        else:
-            if self._format == 1:
-                self.csdw_format = compile_fmt('''
-                    p23
-                    u4 format
-                    u1 iph
-                    u2 sum
-                    u2 parts''')
-            elif self._format == 2:
-                self.csdw_format = compile_fmt('''
-                    p21
-                    u6 format
-                    u1 iph
-                    u2 sum
-                    u2 parts''')
 
-            self.iph_format = compile_fmt('''
-                u64 ipts
-                u32 length''')
+class ImageF1(Image):
+    csdw_format = compile_fmt('''
+        p23
+        u4 format
+        u1 iph
+        u2 sum
+        u2 parts''')
 
-            Packet.parse(self)
+    def __init__(self, *args, **kwargs):
+        Image.__init__(self, *args, **kwargs)
+        self.iph_format = compile_fmt(self.iph_format + 'u32 length')
+
+
+class ImageF2(Image):
+    csdw_format = compile_fmt('''
+        p21
+        u6 format
+        u1 iph
+        u2 sum
+        u2 parts''')
+
+    def __init__(self, *args, **kwargs):
+        Image.__init__(self, *args, **kwargs)
+        self.iph_format = compile_fmt(self.iph_format + 'u32 length')

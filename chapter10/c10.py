@@ -14,7 +14,7 @@ from .discrete import DiscreteF1
 from .message import MessageF0
 from .arinc429 import ARINC429F0
 from .video import VideoF0, VideoF1, VideoF2
-from .image import Image
+from .image import ImageF0, ImageF1, ImageF2
 from .uart import UART
 from .i1394 import I1394
 from .parallel import Parallel
@@ -30,7 +30,7 @@ TYPES_LIST = (('Computer Generated', ComputerF1),
               ('Message', MessageF0),
               ('ARINC 429', ARINC429F0),
               ('Video', VideoF0),
-              ('Image', Image),
+              ('Image', ImageF0),
               ('UART', UART),
               ('IEEE-1394', I1394),
               ('Parallel', Parallel),
@@ -55,6 +55,9 @@ TYPES = {
     0x40: VideoF0,
     0x41: VideoF1,
     0x42: VideoF2,
+    0x48: ImageF0,
+    0x49: ImageF1,
+    0x4A: ImageF2,
 }
 
 
