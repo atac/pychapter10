@@ -4,7 +4,7 @@ import os
 import struct
 
 
-BASEDIR = os.path.dirname(__file__)
+BASEDIR = os.path.dirname(os.path.abspath(__file__))
 ETHERNET = os.path.join(BASEDIR, 'eth.c10')
 EVENTS = os.path.join(BASEDIR, 'event.c10')
 INDEX = os.path.join(BASEDIR, 'index.c10')
