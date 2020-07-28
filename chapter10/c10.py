@@ -18,7 +18,7 @@ from .image import ImageF0, ImageF1, ImageF2
 from .uart import UARTF0
 from .i1394 import I1394F0, I1394F1
 from .parallel import ParallelF0
-from .ethernet import Ethernet
+from .ethernet import EthernetF0, EthernetF1
 
 # Top level data types.
 TYPES_LIST = (('Computer Generated', ComputerF1),
@@ -34,7 +34,7 @@ TYPES_LIST = (('Computer Generated', ComputerF1),
               ('UART', UARTF0),
               ('IEEE-1394', I1394F0),
               ('Parallel', ParallelF0),
-              ('Ethernet', Ethernet),
+              ('Ethernet', EthernetF0),
               # ('TSPI/CTS Data', Base),
               # ('Controller Area Network Bus', Base),
               )
@@ -62,6 +62,8 @@ TYPES = {
     0x58: I1394F0,
     0x59: I1394F1,
     0x60: ParallelF0,
+    0x68: EthernetF0,
+    0x69: EthernetF1,
 }
 
 
