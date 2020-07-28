@@ -42,14 +42,14 @@ Make 1553 Data Single-Bus
 
                 # Write out packet secondary header if applicable) and CSDW.
                 offset = 28
-                if packet.flags & (1 << 7):
+                if packet.secondary_header:
                     offset += 12
                 out.write(raw[:offset])
 
                 # Walk through messages and update bus ID as needed.
                 for msg in packet:
                     msg.bus = bus
-                    packed = bytes(msg)
+                    packed = msg.pack()
                     out.write(packed)
                     offset += len(packed)
 

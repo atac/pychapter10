@@ -10,7 +10,72 @@ class InvalidPacket(Exception):
 
 
 class Packet(object):
-    """Reads header and associates a datatype specific object."""
+    """Reads header and associates a datatype specific object.
+
+    :param file: Source file to read from.
+    :type file: file-like
+    :param header: Optionally pass in header values (used by C10 class)
+    :type header: tuple (bytes, dict)
+
+    **Chapter 10 Header attributes**
+
+    .. py:attribute:: sync_pattern
+    .. py:attribute:: channel_id
+    .. py:attribute:: packet_length
+    .. py:attribute:: data_length
+    .. py:attribute:: header_version
+    .. py:attribute:: sequence_number
+    .. py:attribute:: secondary_header
+    .. py:attribute:: ipts_source
+    .. py:attribute:: rtc_sync_error
+    .. py:attribute:: data_overflow_error
+    .. py:attribute:: secondary_format
+    .. py:attribute:: data_checksum_present
+    .. py:attribute:: data_type
+    .. py:attribute:: rtc
+    .. py:attribute:: header_checksum
+
+    **Constants**
+
+    .. py:attribute:: FORMAT
+        :type: BitFormat
+
+        Description of the chapter 10 header
+
+    .. py:attribute:: SECONDARY_FORMAT
+        :type: BitFormat
+
+        Describes the secondary header
+
+    **Format Specification**
+
+    .. py:attribute:: csdw_format
+        :type: BitFormat
+        :value: None
+
+        Describes a datatype's channel specific data word (CSDW)
+
+    .. py:attribute:: iph_format
+        :type: BitFormat
+        :value: None
+
+        Describes a datatype's intra-packet header (IPH)
+
+    .. py:attribute:: item_label
+        :type: str
+        :value: None
+
+        Human-readable label for messages. A not None value indicates a
+        datatype contains messages.
+
+    .. py:attribute:: item_size
+        :type: int
+        :value: None
+
+        Byte size of message body. If not specified will look for a 'length'
+        field in the IPH.
+
+    """
 
     FORMAT = compile_fmt('''
         u16 sync_pattern
@@ -40,8 +105,6 @@ class Packet(object):
     item_size = None
 
     def __init__(self, file, header=None):
-        """Takes an open file object with its cursor at this packet."""
-
         # Read the packet header and save header sums for later.
         if header:
             header, values = header
@@ -138,13 +201,13 @@ class Packet(object):
     def __bytes__(self):
         """Returns the entire packet as raw bytes."""
 
-        self.file.seek(0)
-        return self.file.read()
+        return self.file.getvalue()
 
     def __repr__(self):
         return '<{} {} bytes>'.format(
             self.__class__.__name__, len(bytes(self)))
 
+    # Pickle compatability.
     def __setstate__(self, state):
         state['file'] = BytesIO(state['file'])
         self.__dict__.update(state)
@@ -159,7 +222,22 @@ class Packet(object):
 
 
 class Item(object):
-    """The base container for packet data."""
+    """The base container for packet message data.
+
+    :param bytes data: The binary data to be stored. May be empty (for
+        instance, if item_format fully describes the format).
+    :param str label: Human-readable label for this type. Will be used for
+        repr()
+    :param item_format: Describes the IPH and/or data format.
+    :type item_format: BitFormat or None
+    :param kwargs: Arbitrary key-value pairs to add as attributes to the item
+        instance. Used for IPH values.
+
+    .. py:attribute:: data
+        :type: bytes
+
+        Raw data not identified in item_format
+    """
 
     def __init__(self, data, label="Packet Data", item_format=None, **kwargs):
         self.__dict__.update(kwargs)
@@ -168,12 +246,6 @@ class Item(object):
 
     def __repr__(self):
         return '<%s %s bytes>' % (self.label, len(self.data))
-
-    def __bytes__(self):
-        return self.pack()
-
-    def __str__(self):
-        return str(self.pack())
 
     def pack(self, format=None):
         """Return bytes() containing the item's IPH and data."""

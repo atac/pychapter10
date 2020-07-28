@@ -8,6 +8,13 @@ except ImportError:
 class BitFormat:
     """Bitstruct wrapper that allows for compiling from readable format
     strings.
+
+    :param str src: "struct" like format with newline separated pairs of <fmt>,
+        <name> where fmt is a bitstruct format string (generally as
+        "<bitsize>") and name is the attribute name to use.
+    :param str byteswap: Optional bitstruct style byteswap description. See
+        bitstruct docs
+    :value byteswap: None
     """
 
     def __init__(self, src, byteswap=None):
@@ -37,20 +44,27 @@ class BitFormat:
         return getattr(self._compiled, name, default)
 
     def unpack(self, data):
+        """Use compiled format to unpack data. Uses self.byteswap if provided.
+
+        :param bytes data: Raw data to unpack
+        :returns dict: Unpacked values based on compiled format.
+        """
+
         if self.byteswap:
             data = bitstruct.byteswap(self.byteswap, data)
         self.raw = data
         return self._compiled.unpack(data)
 
 
+# TODO: remove (replace with bitformat)
 def compile_fmt(src, byteswap=None):
-    """Compile helper that takes a readable string and creates a bitstruct
-    CompiledFormatDict.
+    """Compile helper that takes a readable string and returns a BitFormat.
     """
 
     return BitFormat(src, byteswap)
 
 
+# TODO: is this needed any more?
 class Buffer(object):
     """File wrapper that raises EOF on a short read."""
 

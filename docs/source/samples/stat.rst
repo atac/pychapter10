@@ -9,8 +9,7 @@ handling::
 
     import sys
 
-    from chapter10 import C10
-    from chapter10.datatypes import get_label
+    from chapter10 import C10, TYPES
 
 
     if __name__ == '__main__':
@@ -36,15 +35,17 @@ handling::
             channels[key]['size'] += packet.packet_length
 
         # Print details for each channel.
-        print('Channel ID     Data Type' + 'Packets'.rjust(39), 'Size'.rjust(16))
+        print('{} {:>13} {:>38} {:>16}'.format(
+            'Channel ID', 'Data Type', 'Packets', 'Size'))
         print('-' * 80)
         packets, size = 0, 0
         for key, channel in sorted(channels.items()):
             print('Channel {:<7}'.format(channel['id']), end='')
-            hextype, label = hex(channel['type'])[2:], get_label(channel['type'])
+            hextype = hex(channel['type'])[2:]
+            label = TYPES[channel['type']].__name__
             print('{:>2} - {:<30}'.format(hextype, label), end='')
             print('{:,}'.format(channel['packets']).rjust(13), end='')
-            print('{:>17,}'.format(channel['size']))
+            print('{:>16,}b'.format(channel['size']))
             packets += channel['packets']
             size += channel['size']
 
@@ -53,4 +54,4 @@ handling::
         print('''Summary for {}:
         Channels: {}
         Packets: {:,}
-        Size: {:,}'''.format(filename, len(channels), packets, size))
+        Size: {:,} bytes'''.format(filename, len(channels), packets, size))

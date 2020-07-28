@@ -1,6 +1,9 @@
 
+Library Overview
+================
+
 Basic Structure & Usage
-=======================
+-----------------------
 
 PyChapter10 makes every effort to provide a pythonic interface to Chapter 10
 data as in the following example::
@@ -10,9 +13,45 @@ data as in the following example::
             print(message.rtc)
 
 The top-level C10 object represents a given Chapter 10 file or stream. C10
-objects contain Packet objects. Packet objects read the header and associate a
-datatype-specific parser with the packet record as packet.body. Packet bodies
-often consist of a number of messages which can also be iterated over.
+objects contain Packet objects of various data types. Packets often consist of
+a number of messages which can also be iterated over.
 
 All of these types and classes respond to the usual python introspection
 resources such as help() and dir().
+
+Data Type Descriptions
+----------------------
+
+Data formats are specified using bitstruct_. Every data type has a channel
+specific data word (CSDW) that may look something like (for Message format 1)::
+
+    csdw_format = compile_fmt('''
+        u16 count
+        u2 packet_type
+        p14''')
+
+Similar to a C struct fields are specified with a type (uint by default) and
+bit length. "p" signifies padding or "reserved" as the chapter 10 standard
+may call it. Various data types will also specify some combination of
+iph_format, item_label, and item_size. These define the message format for a
+given data type be that 1553, ethernet, etc. Going back to the generic Message
+example::
+
+    iph_format = compile_fmt('''
+        u64 ipts
+        u16 length
+        u14 subchannel
+        u1 format_error
+        u1 data_error''')
+    item_label = 'Message Data'
+
+Now we have the intra-packet/message header defined and since it includes a
+"length" field the appropriate number of bytes are read each time we get a new
+message. Also the "item_label" attribute gives us a human-readable message
+label as well as indicating clearly that this datatype includes messages. For
+some datatypes such as time, there may be a custom constructor to parse that
+particular format.
+
+
+.. _bitstruct: https://bitstruct.readthedocs.io/en/latest/
+

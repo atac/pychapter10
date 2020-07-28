@@ -19,6 +19,8 @@ from .i1394 import I1394F0, I1394F1
 from .parallel import ParallelF0
 from .ethernet import EthernetF0, EthernetF1
 
+__all__ = ('TYPES', 'C10')
+
 # Top level data types.
 TYPES = {
     0x00: ComputerF0,
@@ -49,11 +51,13 @@ TYPES = {
 
 
 class C10(object):
-    """A Chapter 10 parser."""
+    """A Chapter 10/11 parser.
+
+    :param f: A file like object or file path to read from.
+    :type f: file or str
+    """
 
     def __init__(self, f):
-        """Takes a file or filename and reads packets."""
-
         if isinstance(f, str):
             f = open(f, 'rb')
         self.file = Buffer(f)
