@@ -47,8 +47,9 @@ class TimeF1(Packet):
                 u2 OYn
                 p2'''
 
+        raw = self.file.read(self.data_length - 4)
         self.data_format = compile_fmt(self.data_format)
-        self.__dict__.update(self.data_format.unpack(self.data))
+        self.__dict__.update(self.data_format.unpack(raw))
 
         microseconds = ((self.Hmn * 10) + self.Tmn)
         seconds = self.Sn + (self.TSn * 10)

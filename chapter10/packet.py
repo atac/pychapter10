@@ -64,28 +64,9 @@ class Packet(object):
         if error:
             raise error
 
-        self.type = self.data_type // 8
-        self._format = self.data_type % 8
-        self.parse()
-
-    def parse(self):
-        """Seek to packet body, call type-specific parsing, and return file
-        to its previous index.
-        """
-
-        self.parse_csdw()
-        self.parse_data()
-
-    def parse_csdw(self):
         if self.csdw_format:
             raw = self.file.read(4)
             self.__dict__.update(self.csdw_format.unpack(raw))
-
-    def parse_data(self):
-        if not self.item_label:
-            data_len = self.packet_length - (
-                self.secondary_header and 36 or 24)
-            self.data = self.file.read(data_len - 4)
 
     def __next__(self):
         """Return the next message until the end, then raise StopIteration."""
@@ -98,7 +79,10 @@ class Packet(object):
         # Read and parse the IPH
         iph = {}
         if self.iph_format:
-            raw = self.file.read(self.iph_format.calcsize() // 8)
+            iph_size = self.iph_format.calcsize() // 8
+            raw = self.file.read(iph_size)
+            if len(raw) < iph_size:
+                raise StopIteration
             iph = self.iph_format.unpack(raw)
 
         # Read the message data

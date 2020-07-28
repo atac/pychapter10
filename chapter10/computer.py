@@ -20,6 +20,10 @@ class ComputerF1(Packet):
         u1 configuration_change
         u1 format''')
 
+    def __init__(self, *args, **kwargs):
+        Packet.__init__(self, *args, **kwargs)
+        self.data = self.file.read(self.data_length - 4)
+
     def __getitem__(self, key):
         key = bytearray(key, 'utf-8')
         d = OrderedDict()
@@ -63,6 +67,7 @@ class ComputerF3(Packet):
         u1 ipdh
         u1 file_size_present
         u1 index_type''')
+    item_size = 0
 
     def __init__(self, *args, **kwargs):
         Packet.__init__(self, *args, **kwargs)
@@ -76,10 +81,8 @@ class ComputerF3(Packet):
 
         if self.index_type == 0:
             self.item_label = 'Root Index'
-            self.item_size = 8
             item_format = '\nu64 offset'
         elif self.index_type == 1:
-            self.item_size = 12
             self.item_label = 'Node Index'
             item_format = '''
                 u16 channel_id
@@ -90,6 +93,22 @@ class ComputerF3(Packet):
 
         if self.index_type == 0:
             pos = self.file.tell()
-            self.file.seek(self.packet_length - 8)
+            self.file.seek(self.data_length - 8)
             self.root_offset, = struct.unpack('Q', self.file.read(8))
             self.file.seek(pos)
+
+    def __len__(self):
+        data_size = self.data_length - 4
+        if self.file_size_present:
+            data_size -= 8
+
+        # Root index
+        if not self.index_type:
+            msg_size = 16
+            data_size -= 8
+        else:
+            msg_size = 20
+        if self.ipdh:
+            msg_size += 8
+
+        return data_size // msg_size
