@@ -16,7 +16,7 @@ from .arinc429 import ARINC429F0
 from .video import VideoF0, VideoF1, VideoF2
 from .image import ImageF0, ImageF1, ImageF2
 from .uart import UARTF0
-from .i1394 import I1394
+from .i1394 import I1394F0, I1394F1
 from .parallel import Parallel
 from .ethernet import Ethernet
 
@@ -32,7 +32,7 @@ TYPES_LIST = (('Computer Generated', ComputerF1),
               ('Video', VideoF0),
               ('Image', ImageF0),
               ('UART', UARTF0),
-              ('IEEE-1394', I1394),
+              ('IEEE-1394', I1394F0),
               ('Parallel', Parallel),
               ('Ethernet', Ethernet),
               # ('TSPI/CTS Data', Base),
@@ -59,6 +59,8 @@ TYPES = {
     0x49: ImageF1,
     0x4A: ImageF2,
     0x50: UARTF0,
+    0x58: I1394F0,
+    0x59: I1394F1,
 }
 
 

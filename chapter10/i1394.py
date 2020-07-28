@@ -3,52 +3,43 @@ from .util import compile_fmt
 from .packet import Packet
 
 
-class I1394(Packet):
+class I1394F0(Packet):
     item_label = 'IEEE-1394 Transaction'
+    csdw_format = compile_fmt('''
+        u16 count
+        p9
+        u4 sync
+        u3 packet_body_type''')
 
-    def parse(self):
-        if self._format > 1:
-            raise NotImplementedError('IEEE-1394 format %s is reserved!'
-                                      % self._format)
+    def __init__(self, *args, **kwargs):
+        Packet.__init__(self, *args, **kwargs)
 
-        if self._format == 0:
-            self.csdw_format = compile_fmt('''
-                u16 count
-                p9
-                u4 sync
-                u3 packet_body_type''')
-
-            self.parse_csdw()
-
-            # Bus Status
-            if self.packet_body_type == 0:
-                self.iph_format = compile_fmt('''
-                    p31
-                    u1''')
-
-            # Data Streaming
-            elif self.packet_body_type == 1:
-                self.item_size = self.packet.data_length - 4
-
-            # General Purpose
-            elif self.packet_body_type == 2:
-                self.item_size = (
-                    (self.packet.data_length - 4) / self.transaction_count) - 8
-                self.iph_format = compile_fmt('u64 ipts')
-
-            self.parse_data()
-
-        elif self._format == 1:
-            self.csdw_format = compile_fmt('''
-                u16 count
-                p16''')
+        # Bus Status
+        if self.packet_body_type == 0:
             self.iph_format = compile_fmt('''
-                u64 ipts
-                u16 length
-                p1
-                u1 buffer_overflow
-                u2 overflow_error
-                u4 speed
-                u8 status''')
+                p31
+                u1''')
 
-            Packet.parse(self)
+        # Data Streaming
+        elif self.packet_body_type == 1:
+            self.item_size = self.packet.data_length - 4
+
+        # General Purpose
+        elif self.packet_body_type == 2:
+            self.item_size = (
+                (self.packet.data_length - 4) / self.transaction_count) - 8
+            self.iph_format = compile_fmt('u64 ipts')
+
+
+class I1394F1(Packet):
+    csdw_format = compile_fmt('''
+        u16 count
+        p16''')
+    iph_format = compile_fmt('''
+        u64 ipts
+        u16 length
+        p1
+        u1 buffer_overflow
+        u2 overflow_error
+        u4 speed
+        u8 status''')
