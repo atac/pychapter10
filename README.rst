@@ -5,7 +5,7 @@ PyChapter10
 |StatusImage|_
 
 PyChapter10 is an open source pure Python library for reading and writing IRIG 106 
-Chapter 10 (now 11) files. Tested on all 3 major platforms and Python 2.7 and 3.6+.
+Chapter 10 (now 11) files. Tested on all 3 major platforms with Python 3.6+.
 
 Installation
 ------------
