@@ -1,7 +1,6 @@
 
 from io import BytesIO
 import os
-import struct
 
 from .packet import Packet, InvalidPacket
 from .util import Buffer
@@ -21,24 +20,6 @@ from .parallel import ParallelF0
 from .ethernet import EthernetF0, EthernetF1
 
 # Top level data types.
-TYPES_LIST = (('Computer Generated', ComputerF1),
-              ('PCM', PCMF1),
-              ('Time', TimeF1),
-              ('Mil-STD-1553', MS1553F1),
-              ('Analog', AnalogF1),
-              ('Discrete', DiscreteF1),
-              ('Message', MessageF0),
-              ('ARINC 429', ARINC429F0),
-              ('Video', VideoF0),
-              ('Image', ImageF0),
-              ('UART', UARTF0),
-              ('IEEE-1394', I1394F0),
-              ('Parallel', ParallelF0),
-              ('Ethernet', EthernetF0),
-              # ('TSPI/CTS Data', Base),
-              # ('Controller Area Network Bus', Base),
-              )
-
 TYPES = {
     0x00: ComputerF0,
     0x01: ComputerF1,  # TMATS
@@ -70,13 +51,12 @@ TYPES = {
 class C10(object):
     """A Chapter 10 parser."""
 
-    def __init__(self, f, packet=Packet):
+    def __init__(self, f):
         """Takes a file or filename and reads packets."""
 
         if isinstance(f, str):
             f = open(f, 'rb')
         self.file = Buffer(f)
-        self.packet = packet
 
     @classmethod
     def from_string(cls, s):
@@ -92,23 +72,19 @@ class C10(object):
         while True:
             pos = self.file.tell()
             try:
-                header = Packet.FORMAT.unpack(self.file.read(24))
-                try:
-                    handler = TYPES[header['data_type']]
-                except KeyError:
-                    handler = TYPES_LIST[header['data_type'] // 8][1]
-                except IndexError:
+                raw = self.file.read(24)
+                header = Packet.FORMAT.unpack(raw)
+                handler = TYPES.get(header['data_type'], None)
+                if handler:
+                    return handler(self.file, (raw, header))
+                else:
                     raise NotImplementedError('Type %s not implemented',
                                               hex(header['data_type'])[2:])
-                self.file.seek(pos)
-                return handler(self.file)
-            except (struct.error, EOFError):
+            except EOFError:
                 raise StopIteration
             except InvalidPacket:
                 # @TODO: search for sync pattern and start from there.
                 self.file.seek(pos + 1)
-
-    next = __next__
 
     def __repr__(self):
         return '<C10: {}>'.format(os.path.basename(self.file.name))

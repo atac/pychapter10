@@ -39,13 +39,18 @@ class Packet(object):
     item_label = None
     item_size = None
 
-    def __init__(self, file):
+    def __init__(self, file, header=None):
         """Takes an open file object with its cursor at this packet."""
 
         # Read the packet header and save header sums for later.
-        header = file.read(24)
+        if header:
+            header, values = header
+        else:
+            header = file.read(24)
+            values = self.FORMAT.unpack(header)
+
         self.header_sums = sum(array('H', header)[:-1]) & 0xffff
-        self.__dict__.update(self.FORMAT.unpack(header).items())
+        self.__dict__.update(values)
 
         # Read the secondary header (if any).
         self.time = None
@@ -99,12 +104,6 @@ class Packet(object):
 
     def __iter__(self):
         return self
-
-    @classmethod
-    def from_string(cls, s):
-        """Create a packet object from a string."""
-
-        return cls(BytesIO(s))
 
     def get_errors(self):
         """Validate the packet using checksums and verifying fields."""

@@ -13,9 +13,3 @@ def test_raw():
         p = packet.Packet(f)
         f.seek(0)
         assert f.read(p.packet_length) == bytes(p)
-
-
-def test_string():
-    with open(SAMPLE, 'rb') as f:
-        p = packet.Packet.from_string(f.read())
-        assert p.check()

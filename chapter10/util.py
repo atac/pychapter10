@@ -6,6 +6,10 @@ except ImportError:
 
 
 class BitFormat:
+    """Bitstruct wrapper that allows for compiling from readable format
+    strings.
+    """
+
     def __init__(self, src, byteswap=None):
         self.byteswap = byteswap
         fmt_str = ''
@@ -28,13 +32,14 @@ class BitFormat:
         self._compiled = bitstruct.compile(fmt_str, names=names)
 
     def __getattr__(self, name, default=None):
-        if name in ('byteswap', 'unpack'):
+        if name in ('byteswap', 'unpack', 'raw'):
             return object.__getattr__(self, name, default)
         return getattr(self._compiled, name, default)
 
     def unpack(self, data):
         if self.byteswap:
             data = bitstruct.byteswap(self.byteswap, data)
+        self.raw = data
         return self._compiled.unpack(data)
 
 
