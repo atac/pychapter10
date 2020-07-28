@@ -1,9 +1,6 @@
 
 strategy:
   matrix:
-    ubuntu-py27:
-      imageName: 'ubuntu-16.04'
-      pythonVersion: '2.7'
     ubuntu-py36:
       imageName: 'ubuntu-16.04'
       pythonVersion: '3.6'
@@ -13,9 +10,6 @@ strategy:
     ubuntu-py38:
       imageName: 'ubuntu-16.04'
       pythonVersion: '3.8'
-    macos-py27:
-      imageName: 'macos-10.13'
-      pythonVersion: '2.7'
     macos-py36:
       imageName: 'macos-10.13'
       pythonVersion: '3.6'
@@ -25,9 +19,6 @@ strategy:
     macos-py38:
       imageName: 'macos-10.13'
       pythonVersion: '3.8'
-    windows-py27:
-      imageName: 'vs2017-win2016'
-      pythonVersion: '2.7'
     windows-py36:
       imageName: 'vs2017-win2016'
       pythonVersion: '3.6'
