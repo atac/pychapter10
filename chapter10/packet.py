@@ -78,8 +78,8 @@ class Packet(object):
 
     def parse_csdw(self):
         if self.csdw_format:
-            self.__dict__.update(self.csdw_format.unpack(
-                self.file.read(4)))
+            raw = self.file.read(4)
+            self.__dict__.update(self.csdw_format.unpack(raw))
 
     def parse_data(self):
         if not self.item_label:
@@ -88,6 +88,7 @@ class Packet(object):
             self.data = self.file.read(data_len - 4)
 
     def __next__(self):
+        """Return the next message until the end, then raise StopIteration."""
 
         # Exit when we reach the end of the packet body
         end = self.data_length + (self.secondary_header and 36 or 24)
@@ -133,9 +134,13 @@ class Packet(object):
             return InvalidPacket('Data length larger than allowed!')
 
     def check(self):
+        """Return validity boolean. See get_errors method."""
+
         return self.get_errors() is None
 
     def __len__(self):
+        """Return length if we can find one, else raise NotImplementedError."""
+
         if hasattr(self, 'count'):
             return self.count
         elif self.item_size:
@@ -148,9 +153,6 @@ class Packet(object):
 
         self.file.seek(0)
         return self.file.read()
-
-    def __str__(self):
-        return str(bytes(self))
 
     def __repr__(self):
         return '<{} {} bytes>'.format(

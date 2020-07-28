@@ -10,20 +10,26 @@ class MS1553F1(Packet):
         p6
         u2 time_tag_bits''')
 
-    # TODO: bitstruct bit/byte order is weird for 16-bit groupings
+    # Note: bitfields from status word are listed in different order than shown
+    # in the standard. bitstruct doesn't allow for specifying bit order across
+    # multiple fields.
     iph_format = compile_fmt('''
         u64 ipts
-        p2 reserved
+
+        p2
         u1 le
         u1 se
         u1 we
-        p5 reserved
+        p3
+
+        p2
         u1 bus
         u1 me
-        u1 rt2rt
+        p1
         u1 fe
         u1 timeout
-        p1 reserved
+        p1
+
         u16 gap_time
         u16 length''')
 
@@ -35,10 +41,10 @@ class MS1553F2(Packet):
         u64 ipts
         u16 length
         u1 se
-        u1 reserved
+        p1
         u1 ee
-        p3 reserved
+        p3
         u1 te
         u1 re
         u1 tm
-        p6 reserved''')
+        p6''')

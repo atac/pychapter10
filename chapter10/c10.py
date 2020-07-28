@@ -12,7 +12,7 @@ from .ms1553 import MS1553F1, MS1553F2
 from .analog import AnalogF1
 from .discrete import DiscreteF1
 from .message import MessageF0
-from .arinc429 import ARINC429
+from .arinc429 import ARINC429F0
 from .video import Video
 from .image import Image
 from .uart import UART
@@ -28,7 +28,7 @@ TYPES_LIST = (('Computer Generated', ComputerF1),
               ('Analog', AnalogF1),
               ('Discrete', DiscreteF1),
               ('Message', MessageF0),
-              ('ARINC 429', ARINC429),
+              ('ARINC 429', ARINC429F0),
               ('Video', Video),
               ('Image', Image),
               ('UART', UART),
@@ -51,6 +51,7 @@ TYPES = {
     0x21: AnalogF1,
     0x29: DiscreteF1,
     0x30: MessageF0,
+    0x38: ARINC429F0,
 }
 
 
