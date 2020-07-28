@@ -125,7 +125,7 @@ class Packet(object):
         return self.get_errors() is None
 
     def __len__(self):
-        """Return length if we can find one, else raise NotImplementedError."""
+        """Return length if we can find one, else raise TypeError."""
 
         if hasattr(self, 'count'):
             return self.count
