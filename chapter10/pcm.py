@@ -7,7 +7,10 @@ class PCMF1(Packet):
 
     csdw_format = compile_fmt('''
         u18 sync_offset
-        u4 mode
+        u1 alignment
+        u1 throughput
+        u1 packed
+        u1 unpacked
         p2
         u2 major_frame_status
         u2 minor_frame_status
@@ -20,7 +23,7 @@ class PCMF1(Packet):
         Packet.__init__(self, *args, **kwargs)
 
         # Throughput basically means we don't need to do anything.
-        if self.mode != 4:
+        if not self.throughput:
             self.item_label = 'PCM Frame'
             self.item_size = 12  # Two words sync, four data.
             iph_format = '''

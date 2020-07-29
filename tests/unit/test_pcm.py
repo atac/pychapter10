@@ -9,4 +9,4 @@ def test_pcm():
     for packet in C10(PCM):
         if isinstance(packet, pcm.PCMF1):
             break
-    assert packet.mode == 4
+    assert packet.throughput
