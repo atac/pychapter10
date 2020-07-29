@@ -1,2 +1,3 @@
 Sphinx==2.4.4
+bitstruct==8.11.0
 pytest==6.0.0
