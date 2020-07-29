@@ -2,7 +2,7 @@
 PyChapter10
 ===========
 
-|StatusImage|_
+|StatusImage|_ |DocsImage|_
 
 PyChapter10 is an open source pure Python library for reading and writing IRIG 106 
 Chapter 10 (now 11) files. Tested on all 3 major platforms with Python 3.6+.
@@ -37,3 +37,5 @@ The generated HTML will be in build/sphinx/html
 .. _Python: http://python.org
 .. |StatusImage| image:: https://dev.azure.com/atac-bham/pychapter10/_apis/build/status/atac.pychapter10?branchName=master
 .. _StatusImage: https://dev.azure.com/atac-bham/pychapter10/_build/latest?definitionId=7&branchName=master
+.. |DocsImage| image:: https://readthedocs.org/projects/pychapter10/badge/?version=latest
+.. _DocsImage: https://pychapter10.readthedocs.io/en/latest/?badge=latest
