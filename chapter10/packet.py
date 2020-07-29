@@ -2,7 +2,7 @@
 from io import BytesIO
 from array import array
 
-from .util import compile_fmt
+from .util import BitFormat
 
 
 class InvalidPacket(Exception):
@@ -77,7 +77,7 @@ class Packet(object):
 
     """
 
-    FORMAT = compile_fmt('''
+    FORMAT = BitFormat('''
         u16 sync_pattern
         u16 channel_id
         u32 packet_length
@@ -94,7 +94,7 @@ class Packet(object):
         u48 rtc
         u16 header_checksum''')
 
-    SECONDARY_FORMAT = compile_fmt('''
+    SECONDARY_FORMAT = BitFormat('''
         u64 secondary_time
         p16 reserved
         u16 secondary_checksum''')

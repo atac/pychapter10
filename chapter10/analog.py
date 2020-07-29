@@ -1,10 +1,10 @@
 
-from .util import compile_fmt
+from .util import BitFormat
 from .packet import Packet, Item
 
 
 class AnalogF1(Packet):
-    csdw_format = compile_fmt('''
+    csdw_format = BitFormat('''
         u2 mode
         u6 length
         u8 subchannel

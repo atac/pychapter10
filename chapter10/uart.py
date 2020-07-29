@@ -1,10 +1,10 @@
 
-from .util import compile_fmt
+from .util import BitFormat
 from .packet import Packet
 
 
 class UARTF0(Packet):
-    csdw_format = compile_fmt('''
+    csdw_format = BitFormat('''
         p31
         u1 iph''')
     item_label = 'UART Data'
@@ -15,7 +15,7 @@ class UARTF0(Packet):
         iph_format = ''
         if self.iph:
             iph_format = 'u64 ipts'
-        self.iph_format = compile_fmt(iph_format + '''
+        self.iph_format = BitFormat(iph_format + '''
             u16 length
             u14 subchannel
             p1

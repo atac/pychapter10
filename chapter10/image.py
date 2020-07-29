@@ -1,5 +1,5 @@
 
-from .util import compile_fmt
+from .util import BitFormat
 from .packet import Packet
 
 
@@ -14,7 +14,7 @@ class Image(Packet):
 
 
 class ImageF0(Image):
-    csdw_format = compile_fmt('''
+    csdw_format = BitFormat('''
         u27 segment_length
         u1 iph
         u3 sum
@@ -24,11 +24,11 @@ class ImageF0(Image):
         Image.__init__(self, *args, **kwargs)
 
         self.item_length = self.segment_length
-        self.iph_format = compile_fmt(self.iph_format)
+        self.iph_format = BitFormat(self.iph_format)
 
 
 class ImageF1(Image):
-    csdw_format = compile_fmt('''
+    csdw_format = BitFormat('''
         p23
         u4 format
         u1 iph
@@ -37,11 +37,11 @@ class ImageF1(Image):
 
     def __init__(self, *args, **kwargs):
         Image.__init__(self, *args, **kwargs)
-        self.iph_format = compile_fmt(self.iph_format + 'u32 length')
+        self.iph_format = BitFormat(self.iph_format + 'u32 length')
 
 
 class ImageF2(Image):
-    csdw_format = compile_fmt('''
+    csdw_format = BitFormat('''
         p21
         u6 format
         u1 iph
@@ -50,4 +50,4 @@ class ImageF2(Image):
 
     def __init__(self, *args, **kwargs):
         Image.__init__(self, *args, **kwargs)
-        self.iph_format = compile_fmt(self.iph_format + 'u32 length')
+        self.iph_format = BitFormat(self.iph_format + 'u32 length')

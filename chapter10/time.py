@@ -1,12 +1,12 @@
 
 from datetime import datetime, timedelta
 
-from .util import compile_fmt
+from .util import BitFormat
 from .packet import Packet
 
 
 class TimeF1(Packet):
-    csdw_format = compile_fmt('''
+    csdw_format = BitFormat('''
         u4 time_source
         u4 time_format
         u1 leap
@@ -48,7 +48,7 @@ class TimeF1(Packet):
                 p2'''
 
         raw = self.file.read(self.data_length - 4)
-        self.data_format = compile_fmt(self.data_format)
+        self.data_format = BitFormat(self.data_format)
         self.__dict__.update(self.data_format.unpack(raw))
 
         microseconds = ((self.Hmn * 10) + self.Tmn)

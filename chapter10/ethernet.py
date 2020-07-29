@@ -1,18 +1,18 @@
 
-from .util import compile_fmt
+from .util import BitFormat
 from .packet import Packet
 
 
 class EthernetF0(Packet):
     item_label = 'Ethernet Frame'
-    csdw_format = compile_fmt('''
+    csdw_format = BitFormat('''
         u16 count
         p9 reserved
         u3 ttb
         u4 format''')
     # Note: bitfields may need to be listed in reverse of expected
     # order.
-    iph_format = compile_fmt('''
+    iph_format = BitFormat('''
         u64 ipts
         u14 length
         u1 data_length_error
@@ -26,10 +26,10 @@ class EthernetF0(Packet):
 
 class EthernetF1(Packet):
     item_label = 'Ethernet Frame'
-    csdw_format = compile_fmt('''
+    csdw_format = BitFormat('''
         u16 count
         u16 iph_length''')
-    iph_format = compile_fmt('''
+    iph_format = BitFormat('''
         u64 ipts
         u8 flags
         u8 error

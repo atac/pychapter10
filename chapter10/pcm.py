@@ -1,11 +1,11 @@
 
-from .util import compile_fmt
+from .util import BitFormat
 from .packet import Packet
 
 
 class PCMF1(Packet):
 
-    csdw_format = compile_fmt('''
+    csdw_format = BitFormat('''
         u18 sync_offset
         u1 alignment
         u1 throughput
@@ -35,4 +35,4 @@ class PCMF1(Packet):
             if self.iph and self.alignment:
                 iph_format += '\np16'
 
-            self.iph_format = compile_fmt(iph_format)
+            self.iph_format = BitFormat(iph_format)

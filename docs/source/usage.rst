@@ -22,10 +22,11 @@ resources such as help() and dir().
 Data Type Descriptions
 ----------------------
 
-Data formats are specified using bitstruct_. Every data type has a channel
-specific data word (CSDW) that may look something like (for Message format 1)::
+Data formats are specified using a wrapper around bitstruct_. Every data type
+has a channel specific data word (CSDW) that may look something like (for
+Message format 1)::
 
-    csdw_format = compile_fmt('''
+    csdw_format = BitFormat('''
         u16 count
         u2 packet_type
         p14''')
@@ -37,7 +38,7 @@ iph_format, item_label, and item_size. These define the message format for a
 given data type be that 1553, ethernet, etc. Going back to the generic Message
 example::
 
-    iph_format = compile_fmt('''
+    iph_format = BitFormat('''
         u64 ipts
         u16 length
         u14 subchannel
@@ -54,4 +55,3 @@ particular format.
 
 
 .. _bitstruct: https://bitstruct.readthedocs.io/en/latest/
-

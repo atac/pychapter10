@@ -1,5 +1,5 @@
 
-from .util import compile_fmt
+from .util import BitFormat
 from .packet import Packet
 
 
@@ -13,11 +13,11 @@ class Video(Packet):
         Packet.__init__(self, *args, **kwargs)
 
         if self.iph:
-            self.iph_format = compile_fmt('u64 ipts')
+            self.iph_format = BitFormat('u64 ipts')
 
 
 class VideoF0(Video):
-    csdw_format = compile_fmt('''
+    csdw_format = BitFormat('''
         p23
         u1 byte_alignment
         u4 payload
@@ -28,7 +28,7 @@ class VideoF0(Video):
 
 
 class VideoF1(Video):
-    csdw_format = compile_fmt('''
+    csdw_format = BitFormat('''
         u12 count
         u1 type
         u1 mode
@@ -41,7 +41,7 @@ class VideoF1(Video):
 
 
 class VideoF2(Video):
-    csdw_format = compile_fmt('''
+    csdw_format = BitFormat('''
         u12 count
         u1 type
         u1 mode

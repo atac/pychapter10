@@ -56,14 +56,6 @@ class BitFormat:
         return self._compiled.unpack(data)
 
 
-# TODO: remove (replace with bitformat)
-def compile_fmt(src, byteswap=None):
-    """Compile helper that takes a readable string and returns a BitFormat.
-    """
-
-    return BitFormat(src, byteswap)
-
-
 # TODO: is this needed any more?
 class Buffer(object):
     """File wrapper that raises EOF on a short read."""

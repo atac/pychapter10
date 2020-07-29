@@ -1,13 +1,13 @@
 
-from .util import compile_fmt
+from .util import BitFormat
 from .packet import Packet
 
 
 class ARINC429F0(Packet):
-    csdw_format = compile_fmt('''
+    csdw_format = BitFormat('''
         u16 count
         p16''')
-    iph_format = compile_fmt('''
+    iph_format = BitFormat('''
         u20 gap_time
         p1
         u1 bus_speed

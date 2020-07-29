@@ -1,11 +1,11 @@
 
-from .util import compile_fmt
+from .util import BitFormat
 from .packet import Packet
 
 
 class I1394F0(Packet):
     item_label = 'IEEE-1394 Transaction'
-    csdw_format = compile_fmt('''
+    csdw_format = BitFormat('''
         u16 count
         p9
         u4 sync
@@ -16,7 +16,7 @@ class I1394F0(Packet):
 
         # Bus Status
         if self.packet_body_type == 0:
-            self.iph_format = compile_fmt('''
+            self.iph_format = BitFormat('''
                 p31
                 u1''')
 
@@ -28,14 +28,14 @@ class I1394F0(Packet):
         elif self.packet_body_type == 2:
             self.item_size = (
                 (self.packet.data_length - 4) / self.transaction_count) - 8
-            self.iph_format = compile_fmt('u64 ipts')
+            self.iph_format = BitFormat('u64 ipts')
 
 
 class I1394F1(Packet):
-    csdw_format = compile_fmt('''
+    csdw_format = BitFormat('''
         u16 count
         p16''')
-    iph_format = compile_fmt('''
+    iph_format = BitFormat('''
         u64 ipts
         u16 length
         p1

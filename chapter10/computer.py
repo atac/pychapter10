@@ -2,7 +2,7 @@
 from collections import OrderedDict
 import struct
 
-from .util import compile_fmt
+from .util import BitFormat
 from .packet import Packet
 
 
@@ -15,7 +15,7 @@ class ComputerF0(Packet):
 class ComputerF1(Packet):
     """Setup record (TMATS)"""
 
-    csdw_format = compile_fmt('''
+    csdw_format = BitFormat('''
         u8 version
         u1 configuration_change
         u1 format''')
@@ -39,7 +39,7 @@ class ComputerF1(Packet):
 class ComputerF2(Packet):
     """Recording Event."""
 
-    csdw_format = compile_fmt('''
+    csdw_format = BitFormat('''
         u12 count
         p19
         u1 ipdh''')
@@ -61,7 +61,7 @@ class ComputerF2(Packet):
 class ComputerF3(Packet):
     """Index Packet"""
 
-    csdw_format = compile_fmt('''
+    csdw_format = BitFormat('''
         u16 count
         p13
         u1 ipdh
@@ -89,7 +89,7 @@ class ComputerF3(Packet):
                 u8 data_type
                 u8 offset'''
 
-        self.iph_format = compile_fmt(self.iph_format + item_format)
+        self.iph_format = BitFormat(self.iph_format + item_format)
 
         if self.index_type == 0:
             pos = self.file.tell()
