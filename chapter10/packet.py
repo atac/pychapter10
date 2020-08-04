@@ -139,6 +139,9 @@ class Packet(object):
     def __next__(self):
         """Return the next message until the end, then raise StopIteration."""
 
+        if not self.item_label:
+            raise StopIteration
+
         # Exit when we reach the end of the packet body
         end = self.data_length + (self.secondary_header and 36 or 24)
         if self.file.tell() >= end:
