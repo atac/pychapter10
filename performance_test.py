@@ -7,7 +7,8 @@ import sys
 import os
 import time
 
-from chapter10 import C10
+# from chapter10 import C10
+from i106 import C10
 try:
     from tqdm import tqdm
 except ImportError:
@@ -44,11 +45,7 @@ if __name__ == '__main__':
                 percent = (total - bytes_to_go) / total
                 show_progress(percent)
 
-            try:
-                if len(packet):
-                    for msg in packet:
-                        bus = getattr(msg, 'bus', None)
-            except TypeError:
-                continue
+            for msg in packet:
+                bus = getattr(msg, 'bus', None)
     print('\nCompleted in %s' %
           timedelta(seconds=time.perf_counter() - start_time))
