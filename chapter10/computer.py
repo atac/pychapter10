@@ -56,6 +56,7 @@ class ComputerF2(Packet):
         self.iph_format = 'u64 ipts'
         if self.ipdh:
             self.iph_format += '\nu64 ipdh'
+        self.iph_format = BitFormat(self.item_format + self.iph_format)
 
 
 class ComputerF3(Packet):

@@ -154,7 +154,7 @@ class Packet(object):
             iph = self.iph_format.unpack(raw)
 
         # Read the message data
-        length = getattr(self, 'item_size', 0)
+        length = getattr(self, 'item_size', 0) or 0
         if 'length' in iph:
             length = iph['length']
         data = self.file.read(length)
