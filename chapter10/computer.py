@@ -7,13 +7,40 @@ from .packet import Packet
 
 
 class ComputerF0(Packet):
-    """User-defined."""
+    """User-defined"""
 
     pass
 
 
 class ComputerF1(Packet):
-    """Setup record (TMATS)"""
+    """Setup record (TMATS)
+
+    Using dictionary lookup syntax returns an OrderedDict of values that start
+    with the given string::
+
+        >> tmats_packet['G']
+        OrderedDict({'G\\COM': 'Comment'})
+
+    .. py:attribute:: version
+
+        Irig106 release:
+
+        * 7 = 2007
+        * 8 = 2009
+        * 9 = 2010
+        * 10 = 2013
+        * 11 = 2015
+        * 12 = 2017
+
+    .. py:attribute:: configuration_change
+
+        When streaming, indicates if the TMATS configuration has changed from
+        the previous one.
+
+    .. py:attribute:: format
+
+        Indicates ASCII (0) or XML (1)
+    """
 
     csdw_format = BitFormat('''
         u8 version
@@ -37,7 +64,30 @@ class ComputerF1(Packet):
 
 
 class ComputerF2(Packet):
-    """Recording Event."""
+    """Recording Event
+
+    .. py:attribute:: count
+    .. py:attribute:: ipdh
+
+    **Message Format**
+
+    .. py:attribute:: ipts
+    .. py:attribute:: ipdh
+
+        If present (see CSDW), contains the absolute time of the event.
+
+    .. py:attribute:: number
+
+        Event type number
+
+    .. py:attribute:: count
+
+        Number of events of this type as of the packet being written.
+
+    .. py:attribute:: occurrence
+
+        1 if event occurred during .RECORD mode.
+    """
 
     csdw_format = BitFormat('''
         u12 count
@@ -60,7 +110,47 @@ class ComputerF2(Packet):
 
 
 class ComputerF3(Packet):
-    """Index Packet"""
+    """Index Packet
+
+    .. py:attribute:: count
+    .. py:attribute:: ipdh
+    .. py:attribute:: file_size_present
+    .. py:attribute:: index_type
+
+        Index (1) or root index (0).
+
+    .. py:attribute::file_size
+
+        If enabled (see CSDW) indicates file size when packet was written.
+
+    .. py:attribute::root_offset
+
+        For root index, indicates offset to previous root index packet.
+
+    **Root Index Message Format**
+
+    .. py:attribute:: ipts
+    .. py:attribute:: ipdh
+
+        If present (see CSDW), contains the absolute time of the message.
+
+    .. py:attribute:: offset
+
+        Offset to node packet from beginning of file.
+
+    **Node Index Message Format**
+
+    .. py:attribute:: ipts
+    .. py:attribute:: ipdh
+
+        If present (see CSDW), contains the absolute time of the message.
+
+    .. py:attribute:: channel_id
+    .. py:attribute:: data_type
+    .. py:attribute:: offset
+
+        Offset to data packet from beginning of file.
+    """
 
     csdw_format = BitFormat('''
         u16 count
@@ -97,19 +187,3 @@ class ComputerF3(Packet):
             self.file.seek(self.data_length - 8)
             self.root_offset, = struct.unpack('Q', self.file.read(8))
             self.file.seek(pos)
-
-    def __len__(self):
-        data_size = self.data_length - 4
-        if self.file_size_present:
-            data_size -= 8
-
-        # Root index
-        if not self.index_type:
-            msg_size = 16
-            data_size -= 8
-        else:
-            msg_size = 20
-        if self.ipdh:
-            msg_size += 8
-
-        return data_size // msg_size

@@ -10,12 +10,12 @@ class InvalidPacket(Exception):
 
 
 class Packet(object):
-    """Reads header and associates a datatype specific object.
+    """Base class for the various datatypes.
 
     :param file: Source file to read from.
     :type file: file-like
     :param header: Optionally pass in header values (used by C10 class)
-    :type header: tuple (bytes, dict)
+    :type header: tuple of (bytes, dict)
 
     **Chapter 10 Header attributes**
 
