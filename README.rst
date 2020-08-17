@@ -35,7 +35,7 @@ After installing dependencies (or just "pip install sphinx") Build the docs with
 The generated HTML will be in build/sphinx/html
 
 .. _Python: http://python.org
-.. |StatusImage| image:: https://dev.azure.com/atac-bham/pychapter10/_apis/build/status/atac.pychapter10?branchName=master
+.. |StatusImage| image:: https://img.shields.io/azure-devops/build/atac-bham/7e6b2ae2-5609-49c9-9ded-f108e80d8949/7   :alt: Azure DevOps builds
 .. _StatusImage: https://dev.azure.com/atac-bham/pychapter10/_build/latest?definitionId=7&branchName=master
 .. |DocsImage| image:: https://readthedocs.org/projects/pychapter10/badge/?version=latest
 .. _DocsImage: https://pychapter10.readthedocs.io/en/latest/?badge=latest
