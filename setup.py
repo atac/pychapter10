@@ -31,9 +31,10 @@ class Clean(cmd.Command):
             os.remove('MANIFEST')
         except os.error:
             pass
-        for f in glob('junit*') + glob('xunit*'):
+        for f in glob('junit*') + ['coverage.xml']:
             os.remove(f)
         shutil.rmtree('Chapter10.egg-info', True)
+        shutil.rmtree('htmlcov', True)
         shutil.rmtree('docs/build', True)
 
 
