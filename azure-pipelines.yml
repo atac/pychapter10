@@ -23,7 +23,7 @@ steps:
 - script: python -m pip install -e .
   displayName: 'Install library'
 
-- script: tox -p all
+- script: tox
   displayName: 'Run tests'
 
 - task: PublishTestResults@2
