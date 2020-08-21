@@ -31,7 +31,7 @@ class Clean(cmd.Command):
             os.remove('MANIFEST')
         except os.error:
             pass
-        for f in glob('junit*'):
+        for f in glob('junit*') + glob('xunit*'):
             os.remove(f)
         shutil.rmtree('Chapter10.egg-info', True)
         shutil.rmtree('docs/build', True)
