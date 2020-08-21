@@ -10,5 +10,7 @@ bin/*
 MANIFEST
 .DS_store
 .cache
-junit-results.xml
+junit*
 .coverage
+coverage.xml
+htmlcov
