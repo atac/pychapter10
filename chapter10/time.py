@@ -19,24 +19,24 @@ class TimeF1(Packet):
         Packet.__init__(self, *args, **kwargs)
 
         self.data_format = '''
-            u4 Tmn
             u4 Hmn
+            u4 Tmn
+            u4 TSn
             u4 Sn
-            u3 TSn
-            p1
+
+            u4 TMn
             u4 Mn
-            u3 TMn
-            p1
+            u4 THn
             u4 Hn
-            u2 THn
-            p2
-            u4 Dn
+
             u4 TDn
+            u4 Dn
             '''
 
         if not self.date_format:
-            self.data_format += 'u1 HDn\np6'
+            self.data_format += 'u8 HDn'
         else:
+            # TODO: not thoroughly tested
             self.data_format += '''
                 u4 On
                 u1 Ton
@@ -47,8 +47,8 @@ class TimeF1(Packet):
                 u2 OYn
                 p2'''
 
-        raw = self.file.read(self.data_length - 4)
         self.data_format = BitFormat(self.data_format)
+        raw = self.file.read(self.data_length - 4)
         self.__dict__.update(self.data_format.unpack(raw))
 
         microseconds = ((self.Hmn * 10) + self.Tmn)
