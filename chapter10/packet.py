@@ -250,6 +250,9 @@ class Item(object):
     def __repr__(self):
         return '<%s %s bytes>' % (self.label, len(self.data))
 
+    def __bytes__(self):
+        return self.pack()
+
     def pack(self, format=None):
         """Return bytes() containing the item's IPH and data."""
 
