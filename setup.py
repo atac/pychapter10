@@ -2,8 +2,9 @@
 
 from distutils import cmd
 from distutils.core import setup
-import shutil
+from glob import glob
 import os
+import shutil
 
 cmdclass = {}
 try:
@@ -30,6 +31,8 @@ class Clean(cmd.Command):
             os.remove('MANIFEST')
         except os.error:
             pass
+        for f in glob('junit*'):
+            os.remove(f)
         shutil.rmtree('Chapter10.egg-info', True)
         shutil.rmtree('docs/build', True)
 
