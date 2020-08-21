@@ -41,13 +41,13 @@ steps:
     versionSpec: $(pythonVersion)
     architecture: 'x64'
 
-- script: python -m pip install -U mock pytest
+- script: python -m pip install -U pytest pytest-azurepipelines pytest-cov
   displayName: 'Install dependencies'
 
 - script: python -m pip install -e .
   displayName: 'Install library'
 
-- script: pytest tests --junitxml=test-results.xml
+- script: pytest tests --junitxml=test-results.xml --cov chapter10 --cov-report html
   displayName: 'Run tests'
 
 - task: PublishTestResults@2
