@@ -7,8 +7,14 @@ import sys
 import os
 import time
 
-# from chapter10 import C10
-from i106 import C10
+try:
+    from i106 import C10
+except ImportError:
+    from chapter10 import C10
+
+if os.environ.get('LIBRARY', None) == 'c10':
+    from chapter10 import C10
+
 try:
     from tqdm import tqdm
 except ImportError:
