@@ -28,7 +28,7 @@ steps:
 
 - task: PublishTestResults@2
   inputs:
-    testResultsFormat: 'XUnit'
+    testResultsFormat: 'xUnit'
     testResultsFiles: 'xunit-*.xml'
     testRunTitle: 'Python $(python.version)'
   condition: succeededOrFailed()
