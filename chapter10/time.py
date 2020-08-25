@@ -6,6 +6,57 @@ from .packet import Packet
 
 
 class TimeF1(Packet):
+    """Time Packets
+
+    **Note:** Low level fields such as HSn, TSn, etc. are not documented here
+    nor are they intended to be used directly. Use the .time attribute instead.
+
+    .. py:attribute:: time_source
+
+        * 0 - Internal (recorder clock)
+        * 1 - External
+        * 2 - Internal from RMM
+        * 15 - None
+
+    .. py:attribute:: time_format
+
+        Indicates time data packet format
+
+        * 0 - IRIG-B
+        * 1 - IRIG-A
+        * 2 - IRIG-G
+        * 3 - Real-Time clock
+        * 4 - UTC time from GPS
+        * 5 - Native GPS time
+        * 15 - None (payload invalid)
+
+    .. py:attribute:: leap
+
+        Indicates if this is a leap year.
+
+    .. py:attribute:: date_format
+
+        0 for IRIG day format, 1 for month and year format.
+
+    .. py:attribute:: irig_source
+
+        IRIG time source
+
+        * 0 - TCG freewheeling (no/lost time source)
+        * 1 - TCG freewheeling from .TIME command
+        * 2 - TCG freewheeling from RMM time
+        * 3 - TCG locked to external IRIG time signal
+        * 4 - TCG locked to external GPS
+        * 5 - TCG locked to external Network Time Protocol (NTP)
+        * 6 - TCG locked to external Precision Time Protocol (PTP)
+        * 7 - TCG locked to external embedded time from input track/channel\
+such as PCM or 1553
+
+    .. py:attribute:: time
+
+        Python datetime object representing the packet payload.
+    """
+
     csdw_format = BitFormat('''
         u4 time_source
         u4 time_format
