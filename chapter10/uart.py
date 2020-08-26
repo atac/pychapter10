@@ -4,6 +4,23 @@ from .packet import Packet
 
 
 class UARTF0(Packet):
+    """
+    .. py:attribute:: iph
+
+    **Message Format**
+
+    .. py:attribute:: ipts
+
+        If enabled (see above), contains intra-packet timestamp
+
+    .. py:attribute:: length
+
+        Message length (bytes)
+
+    .. py:attribute:: subchannel
+    .. py:attribute:: parity_error
+    """
+
     csdw_format = BitFormat('''
         p31
         u1 iph''')

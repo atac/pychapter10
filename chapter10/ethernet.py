@@ -4,10 +4,51 @@ from .packet import Packet
 
 
 class EthernetF0(Packet):
+    """Ethernet data
+    .. py:attribute:: count
+    .. py:attribute:: ttb
+
+        Time tag bits:
+
+        * 0 - First bit of the frame destination address
+        * 0 - Last bit of the frame check sequence
+        * 0 - First bit of the frame payload data
+        * 0 - Last bit of the frame payload data
+
+    .. py:attribute:: format
+
+        Should be 0 (IEEE 802.3 MAC frame)
+
+    **Message Format**
+
+    .. py:attribute:: ipts
+    .. py:attribute:: length
+
+        Payload length (bytes)
+
+    .. py:attribute:: data_length_error
+    .. py:attribute:: data_crc_error
+    .. py:attribute:: network_id
+    .. py:attribute:: crc_error
+    .. py:attribute:: frame_error
+    .. py:attribute:: content
+
+        * 0 - Full MAC frame
+        * 1 - Payload only (14 bytes from the destination address)
+
+    .. py:attribute:: ethernet_speed
+
+        * 0 - Auto
+        * 1 - 10 Mbps
+        * 2 - 100 Mbps
+        * 3 - 1 Gbps
+        * 4 - 10 Gbps
+    """
+
     item_label = 'Ethernet Frame'
     csdw_format = BitFormat('''
         u16 count
-        p9 reserved
+        p9
         u3 ttb
         u4 format''')
     # Note: bitfields may need to be listed in reverse of expected
@@ -25,6 +66,47 @@ class EthernetF0(Packet):
 
 
 class EthernetF1(Packet):
+    """ARINC-664
+
+    .. py:attribute:: count
+    .. py:attribute:: iph_length
+
+        Fixed at 28
+
+    **Message Format**
+
+    .. py:attribute:: ipts
+    .. py:attribute:: flags
+
+        * 0 - Actual data
+        * 1 - Simulated data
+
+    .. py:attribute:: error
+    .. py:attribute:: length
+
+        Message length (bytes)
+
+    .. py:attribute:: virtual_link
+
+        Lower 16 bits of the destination MAC address
+
+    .. py:attribute:: src_ip
+
+        Source IP address from ARINC IP header
+
+    .. py:attribute:: dst_ip
+
+        Destination IP address from ARINC IP header
+
+    .. py:attribute:: dst_port
+
+        Destination port from the ARINC UDP header
+
+    .. py:attribute:: src_port
+
+        Source port from the ARINC UDP header
+    """
+
     item_label = 'Ethernet Frame'
     csdw_format = BitFormat('''
         u16 count
