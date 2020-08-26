@@ -4,6 +4,37 @@ from .packet import Packet, Item
 
 
 class AnalogF1(Packet):
+    """
+    .. py:attribute:: mode
+
+        Indicates packing and aligmnent mode.
+
+        * 0 - Packed
+        * 1 - Unpacked, lsb padded
+        * 3 - Unpacked, msb padded
+
+    .. py:attribute:: length
+
+        Bit length of samples.
+
+    .. py:attribute:: subchannel
+
+        Subchannel ID
+
+    .. py:attribute:: channel_count
+
+        Number of subchannels (and CSDWs) in the packet.
+
+    .. py:attribute:: factor
+
+        Exponent of power of 2 sampling rate factor denominator.
+
+    .. py:attribute:: same
+
+        Indicates whether this CSDW applies to all subchannels.
+
+    """
+
     csdw_format = BitFormat('''
         u2 mode
         u6 length

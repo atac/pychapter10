@@ -88,6 +88,41 @@ word and the second status word.
 
 
 class MS1553F2(Packet):
+    """16PP194 Weapons Bus Data
+
+    **Note:** the specifics of the data word format (bus ID, etc.) are not \
+implemented here (yet).
+
+    .. py:attribute:: count
+
+    **Message Format**
+
+    .. py:attribute:: ipts
+    .. py:attribute:: length
+
+        IPDH length. Fixed at 24 bytes.
+
+    .. py:attribute:: se
+
+        Status error
+
+    .. py:attribute:: ee
+
+        Echo error
+
+    .. py:attribute:: te
+
+        Transaction error
+
+    .. py:attribute:: re
+
+        Master reset
+
+    .. py:attribute:: tm
+
+        Timeout
+    """
+
     csdw_format = BitFormat('u32 count')
     item_label = '16PP194 Message'
     iph_format = BitFormat('''
