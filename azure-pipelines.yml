@@ -37,3 +37,26 @@ steps:
   inputs:
       codeCoverageTool: Cobertura
       summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
+
+
+# Package dependencies (runs on linux only)
+- script: python -m pip download . -d deps --no-binary :all:
+    condition: eq( variables['Agent.OS'], 'Linux' )
+    displayName: 'Download dependencies'
+
+- task: ArchiveFiles@2
+    displayName: 'Zip dependencies'
+    condition: eq( variables['Agent.OS'], 'Linux' )
+    inputs:
+        rootFolderOrFile: 'deps' 
+        includeRootFolder: true 
+        archiveType: 'zip'
+        archiveFile: 'deps.zip' 
+        replaceExistingArchive: true 
+
+- task: PublishPipelineArtifact@0
+    condition: eq( variables['Agent.OS'], 'Linux' )
+    displayName: 'Publish dependencies'
+    inputs:
+        artifactName: 'dependencies'
+        targetPath: 'deps.zip'
