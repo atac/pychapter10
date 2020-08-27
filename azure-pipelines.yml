@@ -54,9 +54,14 @@ steps:
       archiveFile: 'deps.zip' 
       replaceExistingArchive: true 
 
-- task: PublishPipelineArtifact@0
-  condition: eq( variables['Agent.OS'], 'Linux' )
-  displayName: 'Publish dependencies'
+- task: PublishBuildArtifacts@1
   inputs:
-      artifactName: 'dependencies'
-      targetPath: 'deps.zip'
+    pathToPublish: 'deps.zip'
+    artifactName: dependencies
+
+# - task: PublishPipelineArtifact@0
+#   condition: eq( variables['Agent.OS'], 'Linux' )
+#   displayName: 'Publish dependencies'
+#   inputs:
+#       artifactName: 'dependencies'
+#       targetPath: 'deps.zip'
