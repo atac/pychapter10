@@ -12,13 +12,14 @@
 #
 import os
 import sys
+from datetime import datetime
 sys.path.insert(0, os.path.abspath('../..'))
 
 
 # -- Project information -----------------------------------------------------
 
 project = 'PyChapter10'
-copyright = '2019, ATAC'
+copyright = datetime.now().strftime('%Y, ATAC')
 author = 'ATAC'
 
 # The full version, including alpha/beta/rc tags

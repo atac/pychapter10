@@ -14,3 +14,4 @@ junit*
 .coverage
 coverage.xml
 htmlcov
+deps
