@@ -61,7 +61,7 @@ jobs:
     displayName: 'Zip full package'
     condition: eq( variables['Agent.OS'], 'Linux' )
     inputs:
-      rootFolderOrFile: 's' 
+      rootFolderOrFile: '$(Build.SourcesDirectory)' 
       includeRootFolder: true 
       archiveType: 'zip'
       archiveFile: 'pychapter10-$(Build.BuildNumber)-full.zip' 
