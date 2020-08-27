@@ -1,4 +1,7 @@
 
+trigger:
+- master
+
 jobs:
 
 - job: tests
@@ -10,9 +13,6 @@ jobs:
         imageName: 'macos-latest'
       windows:
         imageName: 'windows-latest'
-
-  trigger:
-  - master
 
   steps:
   - task: UsePythonVersion@0
