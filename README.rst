@@ -16,6 +16,10 @@ To install the library run::
 
     python setup.py install
 
+To install offline from "full" zip, first install bitstruct with pip as in::
+
+    pip install deps/bitstructXX.tar.gz
+
 Running Tests
 -------------
 
