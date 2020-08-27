@@ -4,12 +4,12 @@ jobs:
 - job: tests
   strategy:
     matrix:
-    ubuntu:
-      imageName: 'ubuntu-latest'
-    macos:
-      imageName: 'macos-latest'
-    windows:
-      imageName: 'windows-latest'
+      ubuntu:
+        imageName: 'ubuntu-latest'
+      macos:
+        imageName: 'macos-latest'
+      windows:
+        imageName: 'windows-latest'
 
   trigger:
   - master
