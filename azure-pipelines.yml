@@ -1,65 +1,69 @@
 
-strategy:
-  matrix:
-    ubuntu:
+jobs:
+
+- job: tests
+	strategy:
+	matrix:
+		ubuntu:
       imageName: 'ubuntu-latest'
-    macos:
+		macos:
       imageName: 'macos-latest'
-    windows:
+		windows:
       imageName: 'windows-latest'
 
-trigger:
-- master
+  trigger:
+	- master
 
-steps:
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: "3.8"
-    architecture: 'x64'
+	steps:
+	- task: UsePythonVersion@0
+	inputs:
+		versionSpec: "3.8"
+		architecture: 'x64'
 
-- script: python -m pip install -U tox pytest-azurepipelines
-  displayName: 'Install dependencies'
+	- script: python -m pip install -U tox pytest-azurepipelines
+	displayName: 'Install dependencies'
 
-- script: python -m pip install -e .
-  displayName: 'Install library'
+	- script: python -m pip install -e .
+	displayName: 'Install library'
 
-- script: tox
-  displayName: 'Run tests'
+	- script: tox
+	displayName: 'Run tests'
 
-- task: PublishTestResults@2
-  inputs:
-    testResultsFormat: 'JUnit'
-    testResultsFiles: 'junit-*.xml'
-    testRunTitle: 'Python $(python.version)'
+	- task: PublishTestResults@2
+	inputs:
+		testResultsFormat: 'JUnit'
+		testResultsFiles: 'junit-*.xml'
+		testRunTitle: 'Python $(python.version)'
   condition: succeededOrFailed()
 
-- task: PublishCodeCoverageResults@1
-  inputs:
-      codeCoverageTool: Cobertura
-      summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
+	- task: PublishCodeCoverageResults@1
+	inputs:
+		codeCoverageTool: Cobertura
+		summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
 
 
 # Package dependencies and docs with source code (runs on linux only)
-- script: "python -m pip download . -d . --no-binary :all:"
-  condition: eq( variables['Agent.OS'], 'Linux' )
-  displayName: 'Download dependencies'
+- job: package
+  - script: "python -m pip download . -d . --no-binary :all:"
+    condition: eq( variables['Agent.OS'], 'Linux' )
+    displayName: 'Download dependencies'
 
-- script: "python -m pip install -r requirements.txt && python setup.py build_docs"
-  condition: eq( variables['Agent.OS'], 'Linux' )
-  displayName: 'Build documentation'
+  - script: "python -m pip install -r requirements.txt && python setup.py build_docs"
+    condition: eq( variables['Agent.OS'], 'Linux' )
+    displayName: 'Build documentation'
 
-- task: ArchiveFiles@2
-  displayName: 'Zip full package'
-  condition: eq( variables['Agent.OS'], 'Linux' )
-  inputs:
-      rootFolderOrFile: '.' 
-      includeRootFolder: true 
-      archiveType: 'zip'
-      archiveFile: 'pychapter10-full.zip' 
-      replaceExistingArchive: true 
+  - task: ArchiveFiles@2
+    displayName: 'Zip full package'
+    condition: eq( variables['Agent.OS'], 'Linux' )
+    inputs:
+        rootFolderOrFile: '.' 
+        includeRootFolder: true 
+        archiveType: 'zip'
+        archiveFile: 'pychapter10-full.zip' 
+        replaceExistingArchive: true 
 
-- task: PublishBuildArtifacts@1
-  condition: eq( variables['Agent.OS'], 'Linux' )
-  inputs:
-    pathToPublish: 'pychapter10-full.zip'
-    artifactName: complete-library
+  - task: PublishBuildArtifacts@1
+    condition: eq( variables['Agent.OS'], 'Linux' )
+    inputs:
+      pathToPublish: 'pychapter10-full.zip'
+      artifactName: complete-library
