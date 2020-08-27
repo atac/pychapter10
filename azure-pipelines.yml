@@ -39,29 +39,27 @@ steps:
       summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
 
 
-# Package dependencies (runs on linux only)
-- script: "python -m pip download . -d deps --no-binary :all:"
+# Package dependencies and docs with source code (runs on linux only)
+- script: "python -m pip download . -d . --no-binary :all:"
   condition: eq( variables['Agent.OS'], 'Linux' )
   displayName: 'Download dependencies'
 
+- script: "python -m pip install -r requirements.txt && python setup.py build_docs"
+  condition: eq( variables['Agent.OS'], 'Linux' )
+  displayName: 'Build documentation'
+
 - task: ArchiveFiles@2
-  displayName: 'Zip dependencies'
+  displayName: 'Zip full package'
   condition: eq( variables['Agent.OS'], 'Linux' )
   inputs:
-      rootFolderOrFile: 'deps' 
+      rootFolderOrFile: '.' 
       includeRootFolder: true 
       archiveType: 'zip'
-      archiveFile: 'deps.zip' 
+      archiveFile: 'pychapter10-full.zip' 
       replaceExistingArchive: true 
 
 - task: PublishBuildArtifacts@1
+  condition: eq( variables['Agent.OS'], 'Linux' )
   inputs:
-    pathToPublish: 'deps.zip'
-    artifactName: dependencies
-
-# - task: PublishPipelineArtifact@0
-#   condition: eq( variables['Agent.OS'], 'Linux' )
-#   displayName: 'Publish dependencies'
-#   inputs:
-#       artifactName: 'dependencies'
-#       targetPath: 'deps.zip'
+    pathToPublish: 'pychapter10-full.zip'
+    artifactName: complete-library
