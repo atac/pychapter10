@@ -70,5 +70,5 @@ jobs:
   - task: PublishBuildArtifacts@1
     condition: eq( variables['Agent.OS'], 'Linux' )
     inputs:
-      pathToPublish: 'pychapter10-full.zip'
+      pathToPublish: 'pychapter10-$(Build.BuildNumber)-full.zip'
       artifactName: complete-library
