@@ -6,6 +6,7 @@ jobs:
 
 - job: Test
   strategy:
+    maxParallel: 5
     matrix:
       Ubuntu-py3.6:
         imageName: 'ubuntu-latest'
@@ -68,12 +69,13 @@ jobs:
 
 # Package dependencies and docs with source code (runs on linux only)
 - job: Package
+  dependsOn: 'Test'
   steps:
   - task: UsePythonVersion@0
     inputs:
       versionSpec: "3.8"
       architecture: 'x64'
-  - script: "python -m pip download . -d deps --no-binary :all:"
+  - script: "python -m pip download . -d dependencies --no-binary :all:"
     condition: eq( variables['Agent.OS'], 'Linux' )
     displayName: 'Download dependencies'
 
@@ -85,7 +87,7 @@ jobs:
     displayName: 'Zip full package'
     condition: eq( variables['Agent.OS'], 'Linux' )
     inputs:
-      rootFolderOrFile: '$(Build.SourcesDirectory)' 
+      rootFolderOrFile: '$(Build.SourcesDirectory)/s' 
       includeRootFolder: true 
       archiveType: 'zip'
       archiveFile: 'pychapter10-$(Build.BuildNumber)-full.zip' 

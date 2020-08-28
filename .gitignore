@@ -15,3 +15,5 @@ junit*
 coverage.xml
 htmlcov
 deps
+docs/html
+docs/doctrees

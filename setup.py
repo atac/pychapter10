@@ -49,5 +49,10 @@ setup(
     description='A parser library for the IRIG 106 Chapter 10 data format.',
     install_requires=['bitstruct==8.11.0'],
     packages=['chapter10'],
-    cmdclass=cmdclass
+    cmdclass=cmdclass,
+    command_options={
+        'build_docs': {
+            'build_dir': ('setup.py', 'docs',),
+        }
+    }
 )
