@@ -7,17 +7,41 @@ jobs:
 - job: Test
   strategy:
     matrix:
-      ubuntu:
+      Ubuntu-py3.6:
         imageName: 'ubuntu-latest'
-      macos:
+        python.version: '3.6'
+      Ubuntu-py3.7:
+        imageName: 'ubuntu-latest'
+        python.version: '3.7'
+      Ubuntu-py3.8:
+        imageName: 'ubuntu-latest'
+        python.version: '3.8'
+      macOS-py3.6:
         imageName: 'macos-latest'
-      windows:
+        python.version: '3.6'
+      macOS-py3.7:
+        imageName: 'macos-latest'
+        python.version: '3.7'
+      macOS-py3.8:
+        imageName: 'macos-latest'
+        python.version: '3.8'
+      Windows-py3.6:
         imageName: 'windows-latest'
+        python.version: '3.6'
+      Windows-py3.7:
+        imageName: 'windows-latest'
+        python.version: '3.7'
+      Windows-py3.8:
+        imageName: 'windows-latest'
+        python.version: '3.8'
+
+  pool:
+    vmImage: $(imageName)
 
   steps:
   - task: UsePythonVersion@0
     inputs:
-      versionSpec: "3.8"
+      versionSpec: "$(python.version)"
       architecture: 'x64'
 
   - script: python -m pip install -U tox pytest-azurepipelines
