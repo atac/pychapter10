@@ -35,7 +35,8 @@ class Clean(cmd.Command):
             os.remove(f)
         shutil.rmtree('Chapter10.egg-info', True)
         shutil.rmtree('htmlcov', True)
-        shutil.rmtree('docs/build', True)
+        shutil.rmtree('docs/html', True)
+        shutil.rmtree('docs/doctrees', True)
 
 
 cmdclass['clean'] = Clean
