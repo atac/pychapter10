@@ -2,18 +2,18 @@
 Contributing
 ============
 
+Questions or Comments
+---------------------
+
+Commits, issues, and pull requests can all host comments & discussion to better
+coordinate efforts. Constructive discussion is always welcome.
+
 Code Standards
 --------------
 
 Adhere to relevant code style & testing constraints. For Python refer to
 PEP8_. Automated tools are available for the various editors to autorun style
 checking, etc.
-
-Comments
---------
-
-Commits, issues, and pull requests can all host comments & discussion to better
-coordinate efforts. Constructive discussion is always welcome.
 
 Issues
 ------
