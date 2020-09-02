@@ -1,5 +1,5 @@
 *.pyc
-Chapter10.egg-info
+*.egg-info
 *.c10
 build
 dist

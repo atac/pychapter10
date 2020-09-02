@@ -38,6 +38,7 @@ def show_progress(percent):
 
 if __name__ == '__main__':
     start_time = time.perf_counter()
+    print('Running with %s' % (os.environ.get('LIBRARY', 'i106')))
     if tqdm:
         progress = tqdm(
             total=total, unit='bytes', unit_scale=True, leave=False)
