@@ -38,7 +38,7 @@ After installing dependencies (or just "pip install sphinx") Build the docs with
 
     python setup.py build_docs
 
-The generated HTML will be in build/sphinx/html
+The generated HTML will be in docs/html
 
 .. _Python: http://python.org
 .. |StatusImage| image:: https://img.shields.io/azure-devops/build/atac-bham/7e6b2ae2-5609-49c9-9ded-f108e80d8949/7
