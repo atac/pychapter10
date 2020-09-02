@@ -17,8 +17,8 @@ class CleanCommand(Command):
     user_options = []
 
     CLEAN_FILES = '''
-        build dist *.pyc *.tgz *.egg-info __pycache__
-        htmlcov docs/html docs/doctrees MANIFEST coverage.xml
+        build dist *.pyc *.tgz *.egg-info __pycache__ dependencies
+        htmlcov docs/html docs/doctrees MANIFEST coverage.xml junit*.xml
     '''
 
     def initialize_options(self):
@@ -37,7 +37,11 @@ class CleanCommand(Command):
                     raise ValueError("%s is not a path inside %s"
                                      % (path, here))
                 print('removing %s' % os.path.relpath(path))
-                shutil.rmtree(path)
+                if os.path.isdir(path):
+                    shutil.rmtree(path, True)
+                else:
+                    with suppress(os.error):
+                        os.remove(path)
 
 
 cmdclass['clean'] = CleanCommand
