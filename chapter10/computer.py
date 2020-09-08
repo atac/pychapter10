@@ -1,8 +1,7 @@
 
 from collections import OrderedDict
-import struct
 
-from .util import BitFormat
+from .util import BitFormat, bitstruct
 from .packet import Packet
 
 
@@ -164,7 +163,7 @@ class ComputerF3(Packet):
         Packet.__init__(self, *args, **kwargs)
 
         if self.file_size_present:
-            self.file_size, = struct.unpack('Q', self.file.read(8))
+            self.file_size = bitstruct.unpack('u64<', self.file.read(8))
 
         self.iph_format = 'u64 ipts'
         if self.ipdh:
@@ -185,5 +184,5 @@ class ComputerF3(Packet):
         if self.index_type == 0:
             pos = self.file.tell()
             self.file.seek(self.data_length - 8)
-            self.root_offset, = struct.unpack('Q', self.file.read(8))
+            self.root_offset = bitstruct.unpack('u64<', self.file.read(8))
             self.file.seek(pos)

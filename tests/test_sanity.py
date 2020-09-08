@@ -1,9 +1,7 @@
 
-import struct
-
 import pytest
 
-from chapter10 import Packet, C10
+from chapter10 import C10
 from chapter10.packet import InvalidPacket
 from fixtures import dummy_packet
 
@@ -16,5 +14,5 @@ def test_sanity(data_type, size):
     raw = dummy_packet(data_type, size)
     try:
         C10.from_string(raw)
-    except (NotImplementedError, struct.error, InvalidPacket, TypeError):
+    except (NotImplementedError, InvalidPacket, TypeError):
         return
