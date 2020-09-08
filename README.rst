@@ -6,7 +6,7 @@ PyChapter10
 |CoverageImage|
 |DocsImage|_
 |LicenseImage|
-|PyPiVersion|
+|PyPiVersion|_
 |PythonVersion|
 
 PyChapter10 is an open source pure Python library for reading and writing IRIG 106 
@@ -57,6 +57,7 @@ See CONTRIBUTING_
 .. _DocsImage: https://pychapter10.readthedocs.io/en/latest/?badge=latest
 .. |CoverageImage| image:: https://img.shields.io/azure-devops/coverage/atac-bham/pychapter10/7
 .. |LicenseImage| image:: https://img.shields.io/pypi/l/pychapter10
+.. _PyPiVersion: https://pypi.org/project/pychapter10/
 .. |PyPiVersion| image:: https://img.shields.io/pypi/v/pychapter10
 .. |PythonVersion| image:: https://img.shields.io/pypi/pyversions/pychapter10
 .. _CONTRIBUTING: CONTRIBUTING.rst
