@@ -36,6 +36,8 @@ class BitFormat:
         if not byteswap and fmt_str[-1] not in '<>':
             fmt_str += '<'
 
+        self.fmt_str = fmt_str
+
         self._compiled = bitstruct.compile(fmt_str, names=names)
 
     def __getattr__(self, name, default=None):
