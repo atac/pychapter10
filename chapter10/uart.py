@@ -21,9 +21,7 @@ class UARTF0(Packet):
     .. py:attribute:: parity_error
     """
 
-    csdw_format = BitFormat('''
-        p31
-        u1 iph''')
+    csdw_format = BitFormat('''<u32 iph''')
     item_label = 'UART Data'
 
     def __init__(self, *args, **kwargs):

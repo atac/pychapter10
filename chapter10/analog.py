@@ -21,7 +21,7 @@ class AnalogF1(Packet):
 
         Subchannel ID
 
-    .. py:attribute:: channel_count
+    .. py:attribute:: subchannel_count
 
         Number of subchannels (and CSDWs) in the packet.
 
@@ -36,13 +36,14 @@ class AnalogF1(Packet):
     """
 
     csdw_format = BitFormat('''
-        u2 mode
         u6 length
+        u2 mode
         u8 subchannel
-        u8 channel_count
-        u4 factor
+        u8 subchannel_count
+        p3
         u1 same
-        p2''')
+        u4< factor
+    ''')
     item_label = 'Analog Sample'
 
     def __init__(self, *args, **kwargs):
@@ -50,18 +51,23 @@ class AnalogF1(Packet):
 
         self._subchannel = 0
 
+        if self.length == 0:
+            self.length = 16
+
         keys = (
-            'mode', 'length', 'subchannel', 'channel_count', 'factor', 'same')
-        self.subchannels = [[getattr(self, k) for k in keys]]
+            'mode',
+            'length',
+            'subchannel',
+            'subchannel_count',
+            'factor',
+            'same')
+        self.subchannels = [{k: getattr(self, k) for k in keys}]
 
         # Read CSDWs for subchannels if applicable.
         if not self.same:
             for i in range(len(self)):
                 self.subchannels.append(
                     self.csdw_format.unpack(self.file.read(4)))
-
-    def __len__(self):
-        return self.channel_count or 256
 
     def __next__(self):
         subchannel = self._subchannel
@@ -75,6 +81,8 @@ class AnalogF1(Packet):
         length = length // 8 + (length % 16 and 1 or 0)
 
         data = self.file.read(length)
+        if len(data) < length:
+            raise StopIteration
 
         # Account for filler byte when length is odd.
         if length % 2:

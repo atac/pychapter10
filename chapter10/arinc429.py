@@ -31,11 +31,23 @@ bus) to the beginning of the current bus word in 0.1-us increments.
         u16 count
         p16''')
     iph_format = BitFormat('''
-        u20 gap_time
-        p1
-        u1 bus_speed
-        u1 parity_error
+        u16 gap_time
+
         u1 format_error
-        u8 bus''', '22')
+        u1 parity_error
+        u1 bus_speed
+        p1
+
+        u4 gap_upper
+
+        u8 bus
+    ''', '211')
     item_size = 4
     item_label = 'ARINC-429 Data Word'
+
+    # TODO: there should be a neater way to do this with bitstruct, but I
+    # haven't found it yet.
+    def __next__(self):
+        item = Packet.__next__(self)
+        item.gap_time += (item.gap_upper << 16)
+        return item

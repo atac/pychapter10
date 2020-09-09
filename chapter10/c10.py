@@ -87,7 +87,6 @@ class C10(object):
             except EOFError:
                 raise StopIteration
             except InvalidPacket:
-                # @TODO: search for sync pattern and start from there.
                 self.file.seek(pos + 1)
 
     def __repr__(self):
