@@ -32,10 +32,6 @@ class CleanCommand(Command):
         for path_spec in self.CLEAN_FILES.split():
             abs_paths = glob(os.path.normpath(os.path.join(here, path_spec)))
             for path in abs_paths:
-                if not path.startswith(here):
-                    # Die if path outside this directory
-                    raise ValueError("%s is not a path inside %s"
-                                     % (path, here))
                 print('removing %s' % os.path.relpath(path))
                 if os.path.isdir(path):
                     shutil.rmtree(path, True)
@@ -64,7 +60,6 @@ setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
         "Topic :: Software Development :: Libraries",
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
