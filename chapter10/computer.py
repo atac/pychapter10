@@ -2,16 +2,16 @@
 from collections import OrderedDict
 
 from .util import BitFormat, bitstruct
-from .packet import Packet
+from . import packet
 
 
-class ComputerF0(Packet):
+class ComputerF0(packet.Packet):
     """User-defined"""
 
     pass
 
 
-class ComputerF1(Packet):
+class ComputerF1(packet.Packet):
     """Setup record (TMATS)
 
     Using dictionary lookup syntax returns an OrderedDict of values that start
@@ -47,8 +47,8 @@ class ComputerF1(Packet):
         u1 format''')
 
     def __init__(self, *args, **kwargs):
-        Packet.__init__(self, *args, **kwargs)
-        self.data = self.file.read(self.data_length - 4)
+        packet.Packet.__init__(self, *args, **kwargs)
+        self.data = self.buffer.read(self.data_length - 4)
 
     def __getitem__(self, key):
         key = bytearray(key, 'utf-8')
@@ -62,7 +62,7 @@ class ComputerF1(Packet):
         return d
 
 
-class ComputerF2(Packet):
+class ComputerF2(packet.Packet):
     """Recording Event
 
     .. py:attribute:: count
@@ -92,23 +92,26 @@ class ComputerF2(Packet):
         u12 count
         p19
         u1 ipdh''')
-    item_label = 'Recording Event'
-    item_format = '''
-        u12 number
-        u16 count
-        u1 occurrence
-        p3'''
 
     def __init__(self, *args, **kwargs):
-        Packet.__init__(self, *args, **kwargs)
+        packet.Packet.__init__(self, *args, **kwargs)
 
-        self.iph_format = 'u64 ipts'
+        fmt = 'u64 ipts'
         if self.ipdh:
-            self.iph_format += '\nu64 ipdh'
-        self.iph_format = BitFormat(self.item_format + self.iph_format)
+            fmt += '\nu64 ipdh'
+        fmt += '''
+            u12 number
+            u16 count
+            u1 occurrence
+            p3'''
+        self.Message.FORMAT = BitFormat(fmt)
+
+    class Message(packet.Message):
+        def __repr__(self):
+            return '<Recording event>'
 
 
-class ComputerF3(Packet):
+class ComputerF3(packet.Packet):
     """Index Packet
 
     .. py:attribute:: count
@@ -157,32 +160,34 @@ class ComputerF3(Packet):
         u1 ipdh
         u1 file_size_present
         u1 index_type''')
-    item_size = 0
+
+    class Message(packet.Message):
+        def __repr__(self):
+            return '<%s Index>' % (
+                'Node' if self.parent.index_type else 'Root')
 
     def __init__(self, *args, **kwargs):
-        Packet.__init__(self, *args, **kwargs)
+        packet.Packet.__init__(self, *args, **kwargs)
 
         if self.file_size_present:
-            self.file_size = bitstruct.unpack('u64<', self.file.read(8))
+            self.file_size = bitstruct.unpack('u64<', self.buffer.read(8))
 
-        self.iph_format = 'u64 ipts'
+        fmt = 'u64 ipts'
         if self.ipdh:
-            self.iph_format += '\nu64 ipdh'
+            fmt += '\nu64 ipdh'
 
         if self.index_type == 0:
-            self.item_label = 'Root Index'
-            item_format = '\nu64 offset'
+            fmt = '\nu64 offset'
         elif self.index_type == 1:
-            self.item_label = 'Node Index'
-            item_format = '''
+            fmt = '''
                 u16 channel_id
                 u8 data_type
                 u8 offset'''
 
-        self.iph_format = BitFormat(self.iph_format + item_format)
+        self.Message.FORMAT = BitFormat(fmt)
 
         if self.index_type == 0:
-            pos = self.file.tell()
-            self.file.seek(self.data_length - 8)
-            self.root_offset = bitstruct.unpack('u64<', self.file.read(8))
-            self.file.seek(pos)
+            pos = self.buffer.tell()
+            self.buffer.seek(self.data_length - 8)
+            self.root_offset = bitstruct.unpack('u64<', self.buffer.read(8))
+            self.buffer.seek(pos)

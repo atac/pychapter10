@@ -1,9 +1,9 @@
 
 from .util import BitFormat
-from .packet import Packet
+from . import packet
 
 
-class DiscreteF1(Packet):
+class DiscreteF1(packet.Packet):
     """Discrete Format 1
 
     .. py:attribute:: mode
@@ -14,16 +14,18 @@ class DiscreteF1(Packet):
     .. py:attribute:: length
 
         Bit length of data or 0 (32 bits)
-
-    **Message Format**
-
-    .. py:attribute:: ipts
     """
 
     csdw_format = BitFormat('''
         u3 mode
         u5 length
         p24''')
-    item_label = 'Discrete data'
-    item_size = 4
-    iph_format = BitFormat('u64 ipts')
+
+    length = 4
+    FORMAT = BitFormat('u64 ipts')
+
+    class Message(packet.Message):
+        """.. py:attribute:: ipts"""
+
+        def __repr__(self):
+            return '<Discrete Data %s bytes>' % len(self.data)

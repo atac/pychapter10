@@ -1,9 +1,9 @@
 
 from .util import BitFormat
-from .packet import Packet
+from . import packet
 
 
-class PCMF1(Packet):
+class PCMF1(packet.Packet):
     """IRIG 106 Chapter 4/8 PCM data.
 
     .. py:attribute:: sync_offset
@@ -49,14 +49,6 @@ class PCMF1(Packet):
     .. py:attribute:: iph
 
         Indicates presence of Intra-Packet Header (IPTS and IPDH)
-
-    **Message Format**
-
-    .. py:attribute:: ipts
-
-        Provided if IPH is true (see above).
-
-    .. py:attribute:: lock_status
     """
 
     csdw_format = BitFormat('''
@@ -73,20 +65,35 @@ class PCMF1(Packet):
         u1 iph
         p1''')
 
+    class Message(packet.Message):
+        """
+        .. py:attribute:: ipts
+
+            Provided if IPH is true (see above).
+
+        .. py:attribute:: lock_status
+        """
+
+        length = 12  # Two words sync, four data.
+
+        def __repr__(self):
+            return '<PCM Frame>'
+
     def __init__(self, *args, **kwargs):
-        Packet.__init__(self, *args, **kwargs)
+        packet.Packet.__init__(self, *args, **kwargs)
 
         # Throughput basically means we don't need to do anything.
-        if not self.throughput:
-            self.item_label = 'PCM Frame'
-            self.item_size = 12  # Two words sync, four data.
-            iph_format = '''
+        if self.throughput:
+            self.Message = None
+
+        else:
+            fmt = '''
                 u64 ipts
                 p12
                 u4 lock_status'''
 
             # Extra IPH word in 32 bit alignment.
             if self.iph and self.alignment:
-                iph_format += '\np16'
+                fmt += '\np16'
 
-            self.iph_format = BitFormat(iph_format)
+            self.Message.FORMAT = BitFormat(fmt)

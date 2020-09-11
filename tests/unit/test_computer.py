@@ -24,7 +24,7 @@ def test_index():
         if packet.data_type == 3:
             if packet.index_type:
                 for part in packet:
-                    assert part.label == 'Node Index'
+                    assert repr(part) == '<Node Index>'
             else:
                 for part in packet:
-                    assert part.label == 'Root Index'
+                    assert repr(part) == '<Root Index>'

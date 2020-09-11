@@ -1,24 +1,18 @@
 
 from .util import BitFormat
-from .packet import Packet
+from . import packet
 
 
 __all__ = ('ImageF0', 'ImageF1', 'ImageF2')
 
 
-class Image(Packet):
-    """Generic Image superclass."""
+class ImageMessage:
 
-    item_label = 'Image Segment'
-
-    def __init__(self, *args, **kwargs):
-        Packet.__init__(self, *args, **kwargs)
-
-        if self.iph:
-            self.iph_format = 'u64 ipts\n'
+    def __repr__(self):
+        return '<Image Segment>'
 
 
-class ImageF0(Image):
+class ImageF0(packet.Packet):
     """Image data
 
     .. py:attribute:: segment_length
@@ -33,28 +27,29 @@ class ImageF0(Image):
     .. py:attribute:: parts
 
         Indicates which piece[s] are of the frame are contained in the packet:
-
-    **Message Format**
-
-    .. py:attribute:: ipts
-
-        If IPH is true (see above), containts intra-packet timestamp
     """
 
     csdw_format = BitFormat('''
-        u27 segment_length
+        u27 length
         u1 iph
         u3 sum
         u3 parts''')
 
+    class Message(packet.Message, ImageMessage):
+        """
+        .. py:attribute:: ipts
+
+            If IPH is true (see above), containts intra-packet timestamp
+        """
+
     def __init__(self, *args, **kwargs):
-        Image.__init__(self, *args, **kwargs)
+        packet.Packet.__init__(self, *args, **kwargs)
 
-        self.item_length = self.segment_length
-        self.iph_format = BitFormat(self.iph_format)
+        if self.iph:
+            self.Message.FORMAT = BitFormat('u64 ipts')
 
 
-class ImageF1(Image):
+class ImageF1(packet.Packet):
     """Still imagery
 
     .. py:attribute:: format
@@ -78,16 +73,6 @@ class ImageF1(Image):
         * 1 - Contains first segment of image
         * 2 - Contains multiple complete messages
         * 3 - Contains both first and last segment of image
-
-    **Message Format**
-
-    .. py:attribute:: ipts
-
-        If IPH is true (see above), containts intra-packet timestamp
-
-    .. py:attribute:: length
-
-        Length of image or segment (bytes)
     """
 
     csdw_format = BitFormat('''
@@ -97,12 +82,25 @@ class ImageF1(Image):
         u2 sum
         u2 parts''')
 
+    class Message(packet.Message, ImageMessage):
+        """
+        .. py:attribute:: ipts
+
+            If IPH is true (see above), containts intra-packet timestamp
+
+        .. py:attribute:: length
+
+            Length of image or segment (bytes)
+        """
+
     def __init__(self, *args, **kwargs):
-        Image.__init__(self, *args, **kwargs)
-        self.iph_format = BitFormat(self.iph_format + 'u32 length')
+        fmt = ''
+        if self.iph:
+            fmt = 'u64 ipts\n'
+        self.Message.FORMAT = BitFormat(fmt + 'u32 length')
 
 
-class ImageF2(Image):
+class ImageF2(packet.Packet):
     """Dynamic Imagery
 
     .. py:attribute:: format
@@ -121,16 +119,6 @@ class ImageF2(Image):
         * 0 - Doesn't contain first or last segment of the image
         * 1 - Contains first segment of image
         * 2 - Contains last segment of image
-
-    **Message Format**
-
-    .. py:attribute:: ipts
-
-        If IPH is true (see above), containts intra-packet timestamp
-
-    .. py:attribute:: length
-
-        Image segment length (bytes)
     """
 
     csdw_format = BitFormat('''
@@ -140,6 +128,19 @@ class ImageF2(Image):
         u2 sum
         u2 parts''')
 
+    class Message(packet.Message, ImageMessage):
+        """
+        .. py:attribute:: ipts
+
+            If IPH is true (see above), containts intra-packet timestamp
+
+        .. py:attribute:: length
+
+            Length of image or segment (bytes)
+        """
+
     def __init__(self, *args, **kwargs):
-        Image.__init__(self, *args, **kwargs)
-        self.iph_format = BitFormat(self.iph_format + 'u32 length')
+        fmt = ''
+        if self.iph:
+            fmt = 'u64 ipts\n'
+        self.Message.FORMAT = BitFormat(fmt + 'u32 length')

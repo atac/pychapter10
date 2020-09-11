@@ -1,9 +1,9 @@
 
 from .util import BitFormat
-from .packet import Packet
+from . import packet
 
 
-class MessageF0(Packet):
+class MessageF0(packet.Packet):
     """
     .. py:attribute:: count
 
@@ -16,27 +16,31 @@ messages contained in the packet.
         * 1 - Beginning of a long message
         * 2 - Last part of a long message
         * 3 - Middle part of a long message
-
-    **Message Format**
-
-    .. py:attribute:: ipts
-    .. py:attribute:: length
-
-        Message length (bytes)
-
-    .. py:attribute:: subchannel
-    .. py:attribute:: format_error
-    .. py:attribute:: data_error
     """
 
     csdw_format = BitFormat('''
         u16 count
         u2 packet_type
         p14''')
-    iph_format = BitFormat('''
-        u64 ipts
-        u16 length
-        u14 subchannel
-        u1 format_error
-        u1 data_error''')
-    item_label = 'Message Data'
+
+    class Message(packet.Message):
+        """
+        .. py:attribute:: ipts
+        .. py:attribute:: length
+
+            Message length (bytes)
+
+        .. py:attribute:: subchannel
+        .. py:attribute:: format_error
+        .. py:attribute:: data_error
+        """
+
+        FORMAT = BitFormat('''
+            u64 ipts
+            u16 length
+            u14 subchannel
+            u1 format_error
+            u1 data_error''')
+
+        def __repr__(self):
+            return '<Generic Message data %s bytes>' % len(self.data)

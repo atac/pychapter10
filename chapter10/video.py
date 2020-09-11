@@ -1,22 +1,25 @@
 
 from .util import BitFormat
-from .packet import Packet
+from . import packet
 
 
 __all__ = ('VideoF0', 'VideoF1', 'VideoF2')
 
 
-class Video(Packet):
+class Video(packet.Packet):
     """Generic video superclass."""
 
-    item_label = 'MPEG Packet'
-    item_size = 188
+    class Message(packet.Message):
+        length = 188
+
+        def __repr__(self):
+            return '<MPEG Frame %s bytes>' % len(self.data)
 
     def __init__(self, *args, **kwargs):
-        Packet.__init__(self, *args, **kwargs)
+        packet.Packet.__init__(self, *args, **kwargs)
 
         if self.iph:
-            self.iph_format = BitFormat('u64 ipts')
+            self.Message.FORMAT = BitFormat('u64 ipts')
 
 
 class VideoF0(Video):
@@ -46,13 +49,6 @@ class VideoF0(Video):
     .. py:attribute:: embedded_time
 
         Indicates time embedded in MPEG-2 stream.
-
-    **Message Format**
-
-    .. py:attribute:: ipts
-
-        If indicated by iph flag in CSDW (see above)
-
     """
 
     csdw_format = BitFormat('''
@@ -63,6 +59,13 @@ class VideoF0(Video):
         u1 scr_rtc_sync
         u1 iph
         u1 embedded_time''')
+
+    class Message(Video.Message):
+        """
+        .. py:attribute:: ipts
+
+            If indicated by iph flag in CSDW (see above)
+        """
 
 
 class VideoF1(Video):
@@ -120,6 +123,13 @@ class VideoF1(Video):
         u1 key_length
         p10''')
 
+    class Message(Video.Message):
+        """
+        .. py:attribute:: ipts
+
+            If indicated by iph flag in CSDW (see above)
+        """
+
 
 class VideoF2(Video):
     csdw_format = BitFormat('''
@@ -134,3 +144,10 @@ class VideoF2(Video):
         u4 encoding_level
         u1 audio_encoding_type
         p5''')
+
+    class Message(Video.Message):
+        """
+        .. py:attribute:: ipts
+
+            If indicated by iph flag in CSDW (see above)
+        """

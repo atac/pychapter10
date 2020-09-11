@@ -36,36 +36,47 @@ Data Type Descriptions
 ----------------------
 
 Data formats are specified using a wrapper around bitstruct_. Every data type
-has a channel specific data word (CSDW) that may look something like (for
-Message format 1)::
+has a channel specific data word (CSDW) that may look something like this
+(Ethernet given as an example)::
 
-    csdw_format = BitFormat('''
-        u16 count
-        u2 packet_type
-        p14''')
+    class EthernetF0(packet.Packet):
+        # ...
+
+        csdw_format = BitFormat('''
+            u16 count
+            p9
+            u3 ttb
+            u4 format''')
 
 Similar to a C struct fields are specified with a type (uint by default) and
 bit length. "p" signifies padding or "reserved" as the chapter 10 standard
-may call it. Various data types will also specify some combination of
-iph_format, item_label, and item_size. These define the message format for a
-given data type be that 1553, ethernet, etc. Going back to the generic Message
+may call it. Various data types will also specify the format of the messages
+they contain be that 1553, ethernet, etc. Going back to the Ethernet 
 example::
 
-    iph_format = BitFormat('''
-        u64 ipts
-        u16 length
-        u14 subchannel
-        u1 format_error
-        u1 data_error''')
-    item_label = 'Message Data'
+    class EthernetF0(packet.Packet):
+        # ...
+
+        class Message(packet.Message):
+            # ...
+
+            def __repr__(self):
+                return '<Ethernet frame %s bytes>' % len(self.data)
+
+            FORMAT = BitFormat('''
+                u64 ipts
+                u14 length
+                u1 data_length_error
+                u1 data_crc_error
+                u8 network_id
+                u1 crc_error
+                u1 frame_error
+                u2 content
+                u4 ethernet_speed''')
 
 Now we have the intra-packet/message header defined and since it includes a
 "length" field the appropriate number of bytes are read each time we get a new
-message. Also the "item_label" attribute gives us a human-readable message
-label as well as indicating clearly that this datatype includes messages. For
-some datatypes such as time, there may be a custom constructor to parse that
-particular format.
-
+message. We also define a "\__repr\__" function to help with debugging.
 
 Contributing
 ============

@@ -99,7 +99,7 @@ such as PCM or 1553
                 p2'''
 
         self.data_format = BitFormat(self.data_format)
-        raw = self.file.read(self.data_length - 4)
+        raw = self.buffer.read(self.data_length - 4)
         self.__dict__.update(self.data_format.unpack(raw))
 
         microseconds = ((self.Hmn * 10) + self.Tmn)

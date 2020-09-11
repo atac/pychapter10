@@ -14,8 +14,7 @@ class Packet(object):
 
     :param file: Source file to read from.
     :type file: file-like
-    :param header: Optionally pass in header values (used by C10 class)
-    :type header: tuple of (bytes, dict)
+    :param header: Initial header values. Read from file if not provided.
 
     **Chapter 10 Header attributes**
 
@@ -55,26 +54,6 @@ class Packet(object):
 
         Describes a datatype's channel specific data word (CSDW)
 
-    .. py:attribute:: iph_format
-        :type: BitFormat
-        :value: None
-
-        Describes a datatype's intra-packet header (IPH)
-
-    .. py:attribute:: item_label
-        :type: str
-        :value: None
-
-        Human-readable label for messages. A not None value indicates a
-        datatype contains messages.
-
-    .. py:attribute:: item_size
-        :type: int
-        :value: None
-
-        Byte size of message body. If not specified will look for a 'length'
-        field in the IPH.
-
     """
 
     FORMAT = BitFormat('''
@@ -99,21 +78,20 @@ class Packet(object):
         p16 reserved
         u16 secondary_checksum''')
 
-    csdw_format = None
-    iph_format = None
-    item_label = None
-    item_size = None
+    csdw_format = BitFormat('u32 csdw')
 
-    def __init__(self, file, header=None):
-        # Read the packet header and save header sums for later.
-        if header:
-            header, values = header
+    def __init__(self, file, **header):
+
+        # Read header if not done already.
+        if not header:
+            raw_header = file.read(24)
+            header = self.FORMAT.unpack(raw_header)
         else:
-            header = file.read(24)
-            values = self.FORMAT.unpack(header)
+            raw_header = self.FORMAT.pack(header)
 
-        self.header_sums = sum(array('H', header)[:-1]) & 0xffff
-        self.__dict__.update(values)
+        # Compute checksum and update attributes with header values.
+        self.header_sums = sum(array('H', raw_header)[:-1]) & 0xffff
+        self.__dict__.update(header)
 
         # Read the secondary header (if any).
         self.time = None
@@ -123,50 +101,26 @@ class Packet(object):
             self.secondary_sums = sum(array('H', secondary)[:-1]) & 0xffff
             self.__dict__.update(self.SECONDARY_FORMAT.unpack(file.read(12)))
 
-        header_size = len(header + secondary)
+        # Read from the file or buffer into our own personal buffer.
+        header_size = len(raw_header + secondary)
         body = file.read(self.packet_length - header_size)
-        self.file = BytesIO(header + secondary + body)
-        self.file.seek(header_size)
+        self.buffer = BytesIO(raw_header + secondary + body)
+        self.buffer.seek(header_size)
 
         error = self.get_errors()
         if error:
             raise error
 
-        if self.csdw_format:
-            raw = self.file.read(4)
-            self.__dict__.update(self.csdw_format.unpack(raw))
+        # Read channel specific data word (CSDW)
+        self.__dict__.update(self.csdw_format.unpack(self.buffer.read(4)))
 
     def __next__(self):
         """Return the next message until the end, then raise StopIteration."""
 
-        if not self.item_label:
+        if not self.Message:
             raise StopIteration
 
-        # Exit when we reach the end of the packet body
-        end = self.data_length + (self.secondary_header and 36 or 24)
-        if self.file.tell() >= end:
-            raise StopIteration
-
-        # Read and parse the IPH
-        iph = {}
-        if self.iph_format:
-            iph_size = self.iph_format.calcsize() // 8
-            raw = self.file.read(iph_size)
-            if len(raw) < iph_size:
-                raise StopIteration
-            iph = self.iph_format.unpack(raw)
-
-        # Read the message data
-        length = getattr(self, 'item_size', 0) or 0
-        if 'length' in iph:
-            length = iph['length']
-        data = self.file.read(length)
-
-        # Account for filler byte when length is odd.
-        if length % 2:
-            self.file.seek(1, 1)
-
-        return Item(data, self.item_label, self.iph_format, **iph)
+        return self.Message.from_packet(self)
 
     def __iter__(self):
         return self
@@ -194,17 +148,17 @@ class Packet(object):
 
         if hasattr(self, 'count'):
             return self.count
-        elif self.item_size:
-            msg_size = self.item_size
-            if self.iph_format:
-                msg_size += self.iph_format.calcsize() // 8
+        elif self.Message.length:
+            msg_size = self.Message.length
+            if getattr(self.Message, 'FORMAT', None):
+                msg_size += self.Message.FORMAT.calcsize() // 8
             return (self.data_length - 4) // msg_size
         raise TypeError("object of type '%s' has no len()" % self.__class__)
 
     def __bytes__(self):
         """Returns the entire packet as raw bytes."""
 
-        return self.file.getvalue()
+        return self.buffer.getvalue()
 
     def __repr__(self):
         return '<{} {} bytes>'.format(
@@ -224,38 +178,76 @@ class Packet(object):
         return state
 
 
-class Item(object):
+class Message:
     """The base container for packet message data.
 
     :param bytes data: The binary data to be stored. May be empty (for
-        instance, if item_format fully describes the format).
-    :param str label: Human-readable label for this type. Will be used for
-        repr()
-    :param item_format: Describes the IPH and/or data format.
-    :type item_format: BitFormat or None
+        instance, if FORMAT fully describes the format).
+    :param Packet parent: The Packet object this message belongs to.
     :param kwargs: Arbitrary key-value pairs to add as attributes to the item
         instance. Used for IPH values.
+
+    **Class Attributes**
+
+    .. py:attribute:: FORMAT
+        :type: BitFormat
+        :value: None
+
+        Describes the intra-packet header (IPH) or message format in general.
+
+    .. py:attribute:: length
+        :type: int
+        :value: None
+
+        Byte size of message body. If not specified will look for a 'length'
+        field in the IPH.
+
+    **Instance Attributes**
 
     .. py:attribute:: data
         :type: bytes
 
-        Raw data not identified in item_format
+        Raw data not identified in FORMAT
     """
 
-    def __init__(self, data, label="Packet Data", item_format=None, **kwargs):
+    length = 0
+
+    def __init__(self, data, parent=None, **kwargs):
         self.__dict__.update(kwargs)
-        self.item_format = item_format
-        self.data, self.label = data, label
+        self.parent = parent
+        self.data = data
+
+    @classmethod
+    def from_packet(cls, packet):
+
+        # Exit when we reach the end of the packet body
+        end = packet.data_length + (packet.secondary_header and 36 or 24)
+        if packet.buffer.tell() >= end:
+            raise StopIteration
+
+        # Read and parse the IPH
+        iph = {}
+        if getattr(cls, 'FORMAT', None):
+            iph_size = cls.FORMAT.calcsize() // 8
+            raw = packet.buffer.read(iph_size)
+            if len(raw) < iph_size:
+                raise StopIteration
+            iph = cls.FORMAT.unpack(raw)
+
+        # Read the message data
+        length = iph.get('length', cls.length)
+        data = packet.buffer.read(length)
+
+        # Account for filler byte when length is odd.
+        if length % 2:
+            packet.buffer.seek(1, 1)
+
+        return packet.Message(data, parent=packet, **iph)
 
     def __repr__(self):
-        return '<%s %s bytes>' % (self.label, len(self.data))
+        return '<Packet Data %s bytes>' % len(self.data)
 
     def __bytes__(self):
-        return self.pack()
+        """Return bytes() containing any IPH and data."""
 
-    def pack(self, format=None):
-        """Return bytes() containing the item's IPH and data."""
-
-        if format is None:
-            format = self.item_format
-        return format.pack(self.__dict__) + self.data
+        return self.FORMAT.pack(self.__dict__) + self.data

@@ -76,14 +76,13 @@ class C10(object):
         while True:
             pos = self.file.tell()
             try:
-                raw = self.file.read(24)
-                header = Packet.FORMAT.unpack(raw)
+                header = Packet.FORMAT.unpack(self.file.read(24))
                 handler = TYPES.get(header['data_type'], None)
                 if handler:
-                    return handler(self.file, (raw, header))
-                else:
-                    raise NotImplementedError('Type %s not implemented',
-                                              hex(header['data_type'])[2:])
+                    return handler(self.file, **header)
+
+                raise NotImplementedError('Type %s not implemented',
+                                          hex(header['data_type']))
             except EOFError:
                 raise StopIteration
             except InvalidPacket:

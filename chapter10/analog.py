@@ -1,9 +1,9 @@
 
 from .util import BitFormat
-from .packet import Packet, Item
+from . import packet
 
 
-class AnalogF1(Packet):
+class AnalogF1(packet.Packet):
     """
     .. py:attribute:: mode
 
@@ -44,10 +44,13 @@ class AnalogF1(Packet):
         u1 same
         u4< factor
     ''')
-    item_label = 'Analog Sample'
+
+    class Message(packet.Message):
+        def __repr__(self):
+            return '<Analog Sample %s bytes>' % len(self.data)
 
     def __init__(self, *args, **kwargs):
-        Packet.__init__(self, *args, **kwargs)
+        packet.Packet.__init__(self, *args, **kwargs)
 
         self._subchannel = 0
 
@@ -67,7 +70,7 @@ class AnalogF1(Packet):
         if not self.same:
             for i in range(len(self)):
                 self.subchannels.append(
-                    self.csdw_format.unpack(self.file.read(4)))
+                    self.csdw_format.unpack(self.buffer.read(4)))
 
     def __next__(self):
         subchannel = self._subchannel
@@ -80,7 +83,7 @@ class AnalogF1(Packet):
         length = csdw['length'] or 64  # Length 0 = 64 bits
         length = length // 8 + (length % 16 and 1 or 0)
 
-        data = self.file.read(length)
+        data = self.buffer.read(length)
         if len(data) < length:
             raise StopIteration
 
@@ -90,4 +93,4 @@ class AnalogF1(Packet):
 
         self._subchannel += 1
 
-        return Item(data, self.item_label, **csdw)
+        return self.Message(data, parent=self, **csdw)
