@@ -53,7 +53,6 @@ class Packet(object):
         :value: None
 
         Describes a datatype's channel specific data word (CSDW)
-
     """
 
     FORMAT = BitFormat('''
@@ -117,10 +116,13 @@ class Packet(object):
     def __next__(self):
         """Return the next message until the end, then raise StopIteration."""
 
-        if not self.Message:
+        if not getattr(self, 'Message', None):
             raise StopIteration
 
-        return self.Message.from_packet(self)
+        try:
+            return self.Message.from_packet(self)
+        except EOFError:
+            raise StopIteration
 
     def __iter__(self):
         return self
@@ -204,6 +206,11 @@ class Message:
 
     **Instance Attributes**
 
+    .. py:attribute:: parent
+        :type: Packet
+
+        The Packet object this message is attached to.
+
     .. py:attribute:: data
         :type: bytes
 
@@ -223,7 +230,7 @@ class Message:
         # Exit when we reach the end of the packet body
         end = packet.data_length + (packet.secondary_header and 36 or 24)
         if packet.buffer.tell() >= end:
-            raise StopIteration
+            raise EOFError
 
         # Read and parse the IPH
         iph = {}
@@ -231,7 +238,7 @@ class Message:
             iph_size = cls.FORMAT.calcsize() // 8
             raw = packet.buffer.read(iph_size)
             if len(raw) < iph_size:
-                raise StopIteration
+                raise EOFError
             iph = cls.FORMAT.unpack(raw)
 
         # Read the message data
@@ -243,9 +250,6 @@ class Message:
             packet.buffer.seek(1, 1)
 
         return packet.Message(data, parent=packet, **iph)
-
-    def __repr__(self):
-        return '<Packet Data %s bytes>' % len(self.data)
 
     def __bytes__(self):
         """Return bytes() containing any IPH and data."""
