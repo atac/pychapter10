@@ -67,25 +67,6 @@ class ComputerF2(packet.Packet):
 
     .. py:attribute:: count
     .. py:attribute:: ipdh
-
-    **Message Format**
-
-    .. py:attribute:: ipts
-    .. py:attribute:: ipdh
-
-        If present (see CSDW), contains the absolute time of the event.
-
-    .. py:attribute:: number
-
-        Event type number
-
-    .. py:attribute:: count
-
-        Number of events of this type as of the packet being written.
-
-    .. py:attribute:: occurrence
-
-        1 if event occurred during .RECORD mode.
     """
 
     csdw_format = BitFormat('''
@@ -107,6 +88,24 @@ class ComputerF2(packet.Packet):
         self.Message.FORMAT = BitFormat(fmt)
 
     class Message(packet.Message):
+        """
+        .. py:attribute:: ipts
+        .. py:attribute:: ipdh
+
+            If present (see CSDW), contains the absolute time of the event.
+
+        .. py:attribute:: number
+
+            Event type number
+
+        .. py:attribute:: count
+
+            Number of events of this type as of the packet being written.
+
+        .. py:attribute:: occurrence
+
+            1 if event occurred during .RECORD mode.
+        """
         def __repr__(self):
             return '<Recording event>'
 
@@ -119,7 +118,8 @@ class ComputerF3(packet.Packet):
     .. py:attribute:: file_size_present
     .. py:attribute:: index_type
 
-        Index (1) or root index (0).
+        * 0 - Root Index
+        * 1 - Node Index
 
     .. py:attribute::file_size
 
@@ -128,30 +128,6 @@ class ComputerF3(packet.Packet):
     .. py:attribute::root_offset
 
         For root index, indicates offset to previous root index packet.
-
-    **Root Index Message Format**
-
-    .. py:attribute:: ipts
-    .. py:attribute:: ipdh
-
-        If present (see CSDW), contains the absolute time of the message.
-
-    .. py:attribute:: offset
-
-        Offset to node packet from beginning of file.
-
-    **Node Index Message Format**
-
-    .. py:attribute:: ipts
-    .. py:attribute:: ipdh
-
-        If present (see CSDW), contains the absolute time of the message.
-
-    .. py:attribute:: channel_id
-    .. py:attribute:: data_type
-    .. py:attribute:: offset
-
-        Offset to data packet from beginning of file.
     """
 
     csdw_format = BitFormat('''
@@ -162,6 +138,19 @@ class ComputerF3(packet.Packet):
         u1 index_type''')
 
     class Message(packet.Message):
+        """
+        .. py:attribute:: ipts
+        .. py:attribute:: ipdh
+        .. py:attribute:: offset
+
+            Offset to packet from beginning of file.
+
+        **Node Index Only**
+
+        .. py:attribute:: channel_id
+        .. py:attribute:: data_type
+        """
+
         def __repr__(self):
             return '<%s Index>' % (
                 'Node' if self.parent.index_type else 'Root')

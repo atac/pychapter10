@@ -16,7 +16,7 @@ class Packet(object):
     :type file: file-like
     :param header: Initial header values. Read from file if not provided.
 
-    **Chapter 10 Header attributes**
+    **Chapter 10 Header**
 
     .. py:attribute:: sync_pattern
     .. py:attribute:: channel_id
@@ -34,7 +34,12 @@ class Packet(object):
     .. py:attribute:: rtc
     .. py:attribute:: header_checksum
 
-    **Constants**
+    **Secondary Header (if present)**
+
+    .. py:attribute:: time
+    .. py:attribute:: secondary_checksum
+
+    **Other Attributes**
 
     .. py:attribute:: FORMAT
         :type: BitFormat
@@ -45,8 +50,6 @@ class Packet(object):
         :type: BitFormat
 
         Describes the secondary header
-
-    **Format Specification**
 
     .. py:attribute:: csdw_format
         :type: BitFormat

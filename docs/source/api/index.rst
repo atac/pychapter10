@@ -7,7 +7,6 @@ API Reference
 
 .. toctree::
     :maxdepth: 1
-    :caption: Submodules:
 
     datatypes
     util
@@ -15,5 +14,6 @@ API Reference
 .. automodule:: chapter10.c10
     :members:
 
-.. automodule:: chapter10.packet
-    :members:
+.. autoclass:: chapter10.packet.Packet
+.. autoexception:: chapter10.packet.InvalidPacket
+.. autoclass:: chapter10.packet.Message
