@@ -202,7 +202,7 @@ class Message:
 
     .. py:attribute:: length
         :type: int
-        :value: None
+        :value: 0
 
         Byte size of message body. If not specified will look for a 'length'
         field in the IPH.
@@ -220,6 +220,7 @@ class Message:
         Raw data not identified in FORMAT
     """
 
+    FORMAT = None
     length = 0
 
     def __init__(self, data, parent=None, **kwargs):
@@ -244,11 +245,9 @@ class Message:
                 raise EOFError
             iph = cls.FORMAT.unpack(raw)
 
-        # Read the message data
+        # Read the message data and account for filler if length is odd.
         length = iph.get('length', cls.length)
         data = packet.buffer.read(length)
-
-        # Account for filler byte when length is odd.
         if length % 2:
             packet.buffer.seek(1, 1)
 
