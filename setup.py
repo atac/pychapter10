@@ -44,7 +44,7 @@ cmdclass['clean'] = CleanCommand
 
 setup(
     name='pychapter10',
-    version='0.1',
+    version='0.2',
     author='Micah Ferrill',
     author_email='ferrillm@avtest.com',
     description='A parser library for the IRIG 106 Chapter 10 data format.',
