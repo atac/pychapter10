@@ -84,6 +84,9 @@ jobs:
   - script: "python -m pip install -U pip setuptools wheel"
     displayName: "Install dependencies"
 
+  - script: 'echo "version = ''$(name)''" > chapter10/version.py'
+    displayName: "Update version # to match build"
+
   - script: "python setup.py sdist bdist_wheel"
     displayName: "Build source & wheel distributions"
 

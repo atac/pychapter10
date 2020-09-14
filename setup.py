@@ -3,9 +3,13 @@
 from contextlib import suppress
 from glob import glob
 from setuptools import setup, Command
-from chapter10 import version
 import os
 import shutil
+import sys
+
+sys.path.insert(0, 'chapter10')
+from version import version
+sys.path.remove('chapter10')
 
 cmdclass = {}
 with suppress(ImportError):
