@@ -93,7 +93,7 @@ jobs:
       artifactName: build
 
 # Package dependencies and docs with source code
-- job: Bundle Dependencies
+- job: Bundle
   dependsOn: 'Test'
   steps:
   - task: UsePythonVersion@0
