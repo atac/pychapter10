@@ -5,7 +5,6 @@ trigger:
 variables:
   major: 0
   minor: 2
-  build: $(major).$(minor)$(Rev:.r)
 
 name: $(major).$(minor)$(Rev:.r)
 
@@ -85,7 +84,7 @@ jobs:
   - script: "python -m pip install -U pip setuptools wheel"
     displayName: "Install dependencies"
 
-  - script: "echo \"version = '$(build)'\" > chapter10/version.py"
+  - script: "echo \"version = '$(Build.BuildNumber)'\" > chapter10/version.py"
     displayName: "Update version # to match build"
 
   - script: "python setup.py sdist bdist_wheel"
@@ -93,7 +92,7 @@ jobs:
 
   - task: PublishBuildArtifacts@1
     inputs:
-      pathToPublish: 'dist/*'
+      pathToPublish: '$(System.DefaultWorkingDirectory)/dist/*'
       artifactName: build
 
 # Package dependencies and docs with source code
@@ -117,10 +116,10 @@ jobs:
       rootFolderOrFile: '$(Build.SourcesDirectory)' 
       includeRootFolder: false
       archiveType: 'zip'
-      archiveFile: 'pychapter10-$(build)-full.zip' 
+      archiveFile: 'pychapter10-$(Build.BuildNumber)-full.zip' 
       replaceExistingArchive: true 
 
   - task: PublishBuildArtifacts@1
     inputs:
-      pathToPublish: 'pychapter10-$(build)-full.zip'
+      pathToPublish: 'pychapter10-$(Build.BuildNumber)-full.zip'
       artifactName: complete-library
