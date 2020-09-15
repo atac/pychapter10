@@ -92,7 +92,7 @@ jobs:
 
   - task: PublishBuildArtifacts@1
     inputs:
-      pathToPublish: '$(System.DefaultWorkingDirectory)/**/dist/*'
+      pathToPublish: '**/dist/*'
       artifactName: build
 
 # Package dependencies and docs with source code
