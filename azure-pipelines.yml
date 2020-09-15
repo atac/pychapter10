@@ -92,8 +92,8 @@ jobs:
 
   - task: PublishBuildArtifacts@1
     inputs:
-      pathToPublish: '**/dist/*'
-      artifactName: build
+      pathToPublish: 'dist'
+      artifactName: dist
 
 # Package dependencies and docs with source code
 - job: Bundle
