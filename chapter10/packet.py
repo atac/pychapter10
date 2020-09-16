@@ -9,35 +9,36 @@ class InvalidPacket(Exception):
     pass
 
 
-class Packet(object):
-    """Base class for the various datatypes.
+class Packet:
+    """Base class for the various datatypes. May be created from a file-like
+    object or started from scratch.
 
     :param file: Source file to read from.
     :type file: file-like
-    :param header: Initial header values. Read from file if not provided.
+    :param kwargs: Initial header values. Read from file if not provided.
 
-    **Chapter 10 Header**
+    **Chapter 10 Header Attributes**
 
-    .. py:attribute:: sync_pattern
-    .. py:attribute:: channel_id
-    .. py:attribute:: packet_length
-    .. py:attribute:: data_length
-    .. py:attribute:: header_version
-    .. py:attribute:: sequence_number
-    .. py:attribute:: secondary_header
-    .. py:attribute:: ipts_source
-    .. py:attribute:: rtc_sync_error
-    .. py:attribute:: data_overflow_error
-    .. py:attribute:: secondary_format
-    .. py:attribute:: data_checksum_present
-    .. py:attribute:: data_type
-    .. py:attribute:: rtc
-    .. py:attribute:: header_checksum
+    - sync_pattern
+    - channel_id
+    - packet_length
+    - data_length
+    - header_version
+    - sequence_number
+    - secondary_header
+    - ipts_source
+    - rtc_sync_error
+    - data_overflow_error
+    - secondary_format
+    - data_checksum_present
+    - data_type
+    - rtc
+    - header_checksum
 
     **Secondary Header (if present)**
 
-    .. py:attribute:: time
-    .. py:attribute:: secondary_checksum
+    - time
+    - secondary_checksum
 
     **Other Attributes**
 
@@ -82,18 +83,30 @@ class Packet(object):
 
     csdw_format = BitFormat('u32 csdw')
 
-    def __init__(self, file, **header):
+    def __init__(self, file=None, **kwargs):
+
+        self.__dict__.update(kwargs)
+
+        # If file is not given, start from scratch.
+        if not file:
+            self._messages = []
+            for name in self.FORMAT.names:
+                setattr(self, name, 0)
+            self.sync_pattern = 0xeb25
+            return
+
+        self._messages = None
 
         # Read header if not done already.
-        if not header:
+        if not kwargs:
             raw_header = file.read(24)
-            header = self.FORMAT.unpack(raw_header)
+            kwargs = self.FORMAT.unpack(raw_header)
+            self.__dict__.update(kwargs)
         else:
-            raw_header = self.FORMAT.pack(header)
+            raw_header = self.FORMAT.pack(kwargs)
 
         # Compute checksum and update attributes with header values.
         self.header_sums = sum(array('H', raw_header)[:-1]) & 0xffff
-        self.__dict__.update(header)
 
         # Read the secondary header (if any).
         self.time = None
@@ -103,21 +116,32 @@ class Packet(object):
             self.secondary_sums = sum(array('H', secondary)[:-1]) & 0xffff
             self.__dict__.update(self.SECONDARY_FORMAT.unpack(file.read(12)))
 
-        # Read from the file or buffer into our own personal buffer.
-        header_size = len(raw_header + secondary)
+        # Read into our own personal buffer.
+        header_size = 36 if self.secondary_header else 24
         body = file.read(self.packet_length - header_size)
         self.buffer = BytesIO(raw_header + secondary + body)
         self.buffer.seek(header_size)
 
-        error = self.get_errors()
-        if error:
-            raise error
+        self.validate()
 
         # Read channel specific data word (CSDW)
         self.__dict__.update(self.csdw_format.unpack(self.buffer.read(4)))
 
+    def _read_messages(self):
+        """Internal: read all messages in order to manipulate data in an
+        internal list.
+        """
+
+        if self._messages is None:
+            header_size = 36 if self.secondary_header else 24
+            self.buffer.seek(header_size + 4)
+            self._messages = list(self)
+
     def __next__(self):
         """Return the next message until the end, then raise StopIteration."""
+
+        if self._messages is not None:
+            return next(self._messages)
 
         if not getattr(self, 'Message', None):
             raise StopIteration
@@ -128,32 +152,38 @@ class Packet(object):
             raise StopIteration
 
     def __iter__(self):
-        return self
+        if self._messages is None:
+            return self
+        else:
+            return iter(self._messages)
 
-    def get_errors(self):
+    def validate(self, silent=False):
         """Validate the packet using checksums and verifying fields."""
 
+        err = None
         if self.sync_pattern != 0xeb25:
-            return InvalidPacket('Incorrect sync pattern!')
+            err = InvalidPacket('Incorrect sync pattern!')
         elif self.header_sums != self.header_checksum:
-            return InvalidPacket('Header checksum mismatch!')
+            err = InvalidPacket('Header checksum mismatch!')
         elif self.secondary_header:
             if self.secondary_sums != self.secondary_checksum:
-                return InvalidPacket('Secondary header checksum mismatch!')
+                err = InvalidPacket('Secondary header checksum mismatch!')
         elif self.data_length > 524288:
-            return InvalidPacket('Data length larger than allowed!')
+            err = InvalidPacket('Data length larger than allowed!')
 
-    def check(self):
-        """Return validity boolean. See get_errors method."""
+        if err and not silent:
+            raise err
 
-        return self.get_errors() is None
+        return err
 
     def __len__(self):
         """Return length if we can find one, else raise TypeError."""
 
+        if self._messages is not None:
+            return len(self._messages)
         if hasattr(self, 'count'):
             return self.count
-        elif self.Message.length:
+        elif hasattr(self, 'Message') and self.Message.length:
             msg_size = self.Message.length
             if getattr(self.Message, 'FORMAT', None):
                 msg_size += self.Message.FORMAT.calcsize() // 8
@@ -163,20 +193,39 @@ class Packet(object):
     def __bytes__(self):
         """Returns the entire packet as raw bytes."""
 
-        return self.buffer.getvalue()
+        if self._messages is None:
+            return self.buffer.getvalue()
+
+        # Pack messages into body
+        body = b''.join(bytes(m) for m in self._messages)
+
+        # Pack header (with updated checksum) and secondary header if needed.
+        self.data_length = len(body) + 4
+        header_length = 36 if self.secondary_header else 24
+        self.packet_length = self.data_length + header_length
+        raw = self.FORMAT.pack(self.__dict__)
+        self.header_checksum = sum(array('H', raw)[:-1]) & 0xffff
+        raw = self.FORMAT.pack(self.__dict__)
+        if self.secondary_header:
+            raw += self.SECONDARY_FORMAT.pack(self.__dict__)
+
+        # Add CSDW and body
+        raw += self.csdw_format.pack(self.__dict__) + body
+
+        return raw
 
     def __repr__(self):
         return '<{} {} bytes>'.format(
-            self.__class__.__name__, len(bytes(self)))
+            self.__class__.__name__, getattr(self, 'packet_length', '?'))
 
     # Pickle compatability.
     def __setstate__(self, state):
-        state['file'] = BytesIO(state['file'])
+        state['buffer'] = BytesIO(state['file'])
         self.__dict__.update(state)
 
     def __getstate__(self):
         state = self.__dict__.copy()
-        state['file'] = bytes(self)
+        state['buffer'] = bytes(self)
         for k, v in list(state.items()):
             if callable(v):
                 del state[k]
@@ -256,4 +305,7 @@ class Message:
     def __bytes__(self):
         """Return bytes() containing any IPH and data."""
 
-        return self.FORMAT.pack(self.__dict__) + self.data
+        raw = bytes()
+        if self.FORMAT is not None:
+            raw += self.FORMAT.pack(self.__dict__)
+        return raw + self.data
