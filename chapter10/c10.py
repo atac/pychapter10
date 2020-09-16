@@ -81,7 +81,7 @@ class C10(object):
                 if handler:
                     return handler(self.file, **header)
 
-                raise NotImplementedError('Type %s not implemented',
+                raise NotImplementedError('Type %s not implemented' %
                                           hex(header['data_type']))
             except EOFError:
                 raise StopIteration
