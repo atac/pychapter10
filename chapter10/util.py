@@ -15,6 +15,16 @@ class BitFormat:
     :param str byteswap: Optional bitstruct style byteswap description. See
         bitstruct docs
     :value byteswap: None
+
+    .. py:attribute:: fmt_str
+        :type: string
+
+        The original format string.
+
+    .. py:attribute:: names
+        :type: list
+
+        A list of the field names from the format string.
     """
 
     def __init__(self, src, byteswap=None):
