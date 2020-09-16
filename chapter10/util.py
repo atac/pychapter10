@@ -19,8 +19,8 @@ class BitFormat:
 
     def __init__(self, src, byteswap=None):
         self.byteswap = byteswap
-        fmt_str = ''
-        names = []
+        self.fmt_str = ''
+        self.names = []
         for line in src.strip().splitlines():
             line = line.strip().split()
             if not line:
@@ -29,19 +29,17 @@ class BitFormat:
                 fmt = line[0]
             else:
                 fmt, name = line
-                names.append(name)
-            fmt_str += fmt
+                self.names.append(name)
+            self.fmt_str += fmt
 
         # Default to little endian if we're not explicitly defining swapping
-        if not byteswap and fmt_str[-1] not in '<>':
-            fmt_str += '<'
+        if not byteswap and self.fmt_str[-1] not in '<>':
+            self.fmt_str += '<'
 
-        self.fmt_str = fmt_str
-
-        self._compiled = bitstruct.compile(fmt_str, names=names)
+        self._compiled = bitstruct.compile(self.fmt_str, names=self.names)
 
     def __getattr__(self, name, default=None):
-        if name in ('byteswap', 'unpack', 'raw'):
+        if name in ('byteswap', 'unpack', 'raw', 'fmt_str', 'names'):
             return object.__getattr__(self, name, default)
         return getattr(self._compiled, name, default)
 
