@@ -1,4 +1,5 @@
 
+from array import array
 from datetime import datetime, timedelta
 
 from .util import BitFormat
@@ -128,3 +129,52 @@ such as PCM or 1553
             minute=minutes,
             hour=hours,
             tzinfo=None)
+
+    def __bytes__(self):
+        self.Hmn = self.time.microsecond // 10
+        self.Tmn = self.time.microsecond - (self.Hmn * 10)
+        self.TSn = self.time.second // 10
+        self.Sn = self.time.second - (self.TSn * 10)
+        self.TMn = self.time.minute // 10
+        self.Mn = self.time.minute - (self.TMn * 10)
+        self.THn = self.time.hour // 10
+        self.Hn = self.time.hour - (self.THn * 10)
+
+        # Month and year format
+        if self.date_format:
+            year = self.time.year
+            self.OYn = year // 1000
+            year -= self.OYn * 1000
+            self.HYn = year // 100
+            year -= self.HYn * 100
+            self.TYn // 10
+            year -= self.TYn * 10
+            self.Yn = year
+
+        else:
+            day = int(self.time.strftime('%j'))
+            self.HDn = day // 100
+            day -= self.HDn * 100
+            self.TDn = day // 10
+            day -= self.TDn * 10
+            self.Dn = day
+
+        body = self.data_format.pack(self.__dict__)
+
+        # Copied from Packet class #
+        self.data_length = len(body) + 4
+        header_length = 36 if self.secondary_header else 24
+        self.packet_length = self.data_length + header_length
+        raw = self.FORMAT.pack(self.__dict__)
+        self.header_checksum = sum(array('H', raw)[:-1]) & 0xffff
+        raw = self.FORMAT.pack(self.__dict__)
+        if self.secondary_header:
+            raw += self.SECONDARY_FORMAT.pack(self.__dict__)
+
+        # Add CSDW and body
+        raw += self.csdw_format.pack(self.__dict__) + body
+
+        if len(raw) % 2:
+            raw += b'\0'
+
+        return raw
