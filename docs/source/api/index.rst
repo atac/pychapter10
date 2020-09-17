@@ -15,5 +15,9 @@ API Reference
     :members:
 
 .. autoclass:: chapter10.packet.Packet
+    :members:
+
 .. autoexception:: chapter10.packet.InvalidPacket
+
 .. autoclass:: chapter10.packet.Message
+    :members:

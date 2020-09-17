@@ -37,10 +37,10 @@ class Packet:
 
     **Secondary Header (if present)**
 
-    - time
+    - secondary_time
     - secondary_checksum
 
-    **Other Attributes**
+    **Other Members**
 
     .. py:attribute:: FORMAT
         :type: BitFormat
@@ -85,17 +85,19 @@ class Packet:
 
     def __init__(self, file=None, **kwargs):
 
+        # Set defaults
+        for name in self.FORMAT.names + self.SECONDARY_FORMAT.names:
+            setattr(self, name, 0)
+        self.sync_pattern = 0xeb25
+
         self.__dict__.update(kwargs)
+        self._messages = []
+        self.buffer = None
 
         # If file is not given, start from scratch.
         if not file:
-            self._messages = []
-            for name in self.FORMAT.names:
-                setattr(self, name, 0)
-            self.sync_pattern = 0xeb25
+            self.clear()
             return
-
-        self._messages = None
 
         # Read header if not done already.
         if not kwargs:
@@ -109,7 +111,6 @@ class Packet:
         self.header_sums = sum(array('H', raw_header)[:-1]) & 0xffff
 
         # Read the secondary header (if any).
-        self.time = None
         secondary = bytes()
         if self.secondary_header:
             secondary = file.read(12)
@@ -117,7 +118,7 @@ class Packet:
             self.__dict__.update(self.SECONDARY_FORMAT.unpack(file.read(12)))
 
         # Read into our own personal buffer.
-        header_size = 36 if self.secondary_header else 24
+        header_size = 24 + len(secondary)
         body = file.read(self.packet_length - header_size)
         self.buffer = BytesIO(raw_header + secondary + body)
         self.buffer.seek(header_size)
@@ -128,37 +129,43 @@ class Packet:
         self.__dict__.update(self.csdw_format.unpack(self.buffer.read(4)))
 
     def _read_messages(self):
-        """Internal: read all messages in order to manipulate data in an
-        internal list.
+        """Internal: ensure all messages are read in order to manipulate data
+        in an internal list.
         """
 
-        if self._messages is None:
+        if self.buffer:
             header_size = 36 if self.secondary_header else 24
             self.buffer.seek(header_size + 4)
             self._messages = list(self)
+            self.buffer = None
 
     def __next__(self):
         """Return the next message until the end, then raise StopIteration."""
 
-        if self._messages is not None:
+        if self.buffer is None:
             return next(self._messages)
 
         if not getattr(self, 'Message', None):
             raise StopIteration
 
         try:
-            return self.Message.from_packet(self)
+            msg = self.Message.from_packet(self)
+            self._messages.append(msg)
+            return msg
         except EOFError:
+            self.buffer = None
             raise StopIteration
 
     def __iter__(self):
-        if self._messages is None:
+        if self.buffer:
             return self
         else:
             return iter(self._messages)
 
     def validate(self, silent=False):
-        """Validate the packet using checksums and verifying fields."""
+        """Validate the packet using checksums and verifying fields. If silent
+        = False raises InvalidPacket.
+        """
 
         err = None
         if self.sync_pattern != 0xeb25:
@@ -179,7 +186,7 @@ class Packet:
     def __len__(self):
         """Return length if we can find one, else raise TypeError."""
 
-        if self._messages is not None:
+        if self.buffer is None and self._messages is not None:
             return len(self._messages)
         if hasattr(self, 'count'):
             return self.count
@@ -193,7 +200,7 @@ class Packet:
     def __bytes__(self):
         """Returns the entire packet as raw bytes."""
 
-        if self._messages is None:
+        if self.buffer:
             return self.buffer.getvalue()
 
         # Pack messages into body
@@ -212,28 +219,52 @@ class Packet:
         # Add CSDW and body
         raw += self.csdw_format.pack(self.__dict__) + body
 
+        if len(raw) % 2:
+            raw += b'\0'
+
         return raw
 
     def __repr__(self):
         return '<{} {} bytes>'.format(
             self.__class__.__name__, getattr(self, 'packet_length', '?'))
 
+    def append(self, *messages):
+        """Add one or more messages to the packet."""
+
+        self._read_messages()
+        for message in messages:
+            self._messages.append(message)
+
+    def clear(self):
+        """Remove all messages."""
+
+        self._read_messages()
+        self._messages = []
+
+    def copy(self):
+        """Duplicate this packet."""
+
+        return self.__class__(**self.__dict__.copy())
+
+    def remove(self, i):
+        """Remove message at index 'i'"""
+
+        self._read_messages()
+        del self._messages[i]
+
     # Pickle compatability.
     def __setstate__(self, state):
-        state['buffer'] = BytesIO(state['file'])
         self.__dict__.update(state)
 
     def __getstate__(self):
-        state = self.__dict__.copy()
-        state['buffer'] = bytes(self)
-        for k, v in list(state.items()):
-            if callable(v):
-                del state[k]
-        return state
+        self._read_messages()
+        return {k: v for k, v in self.__dict__.items() if not callable(v)}
 
 
 class Message:
-    """The base container for packet message data.
+    """The base class for packet message data. Subclasses define FORMAT,
+    length, etc. to give the format and can be instantiated empty or from a
+    packet using the from_packet method.
 
     :param bytes data: The binary data to be stored. May be empty (for
         instance, if FORMAT fully describes the format).
@@ -259,7 +290,7 @@ class Message:
     **Instance Attributes**
 
     .. py:attribute:: parent
-        :type: Packet
+        :type: Packet or None
 
         The Packet object this message is attached to.
 
@@ -272,13 +303,16 @@ class Message:
     FORMAT = None
     length = 0
 
-    def __init__(self, data, parent=None, **kwargs):
+    def __init__(self, data=b'', parent=None, **kwargs):
+        if self.FORMAT:
+            self.__dict__.update({name: 0 for name in self.FORMAT.names})
         self.__dict__.update(kwargs)
         self.parent = parent
         self.data = data
 
     @classmethod
     def from_packet(cls, packet):
+        """Helper method to read a message from packet."""
 
         # Exit when we reach the end of the packet body
         end = packet.data_length + (packet.secondary_header and 36 or 24)
@@ -308,4 +342,7 @@ class Message:
         raw = bytes()
         if self.FORMAT is not None:
             raw += self.FORMAT.pack(self.__dict__)
-        return raw + self.data
+        raw += self.data
+        if len(raw) % 2:
+            raw += b'\0'
+        return raw

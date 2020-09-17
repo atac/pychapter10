@@ -33,26 +33,9 @@ Make 1553 Data Single-Bus
         with open(dst, 'wb') as out:
             for packet in C10(src):
 
-                raw = bytes(packet)
-
                 # Write non-1553 out as-is.
-                if packet.data_type != 0x19:
-                    out.write(raw)
-                    continue
+                if packet.data_type == 0x19:
+                    for msg in packet:
+                        msg.bus = bus
 
-                # Write out packet secondary header if applicable) and CSDW.
-                offset = 28
-                if packet.secondary_header:
-                    offset += 12
-                out.write(raw[:offset])
-
-                # Walk through messages and update bus ID as needed.
-                for msg in packet:
-                    msg.bus = bus
-                    packed = msg.pack()
-                    out.write(packed)
-                    offset += len(packed)
-
-                # Write filler if needed.
-                for i in range(packet.packet_length - offset):
-                    out.write(b'0')
+                out.write(bytes(packet))
