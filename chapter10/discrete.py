@@ -21,11 +21,11 @@ class DiscreteF1(packet.Packet):
         u5 length
         p24''')
 
-    length = 4
-    FORMAT = BitFormat('u64 ipts')
-
     class Message(packet.Message):
         """.. py:attribute:: ipts"""
+
+        length = 4
+        FORMAT = BitFormat('u64 ipts')
 
         def __repr__(self):
             return '<Discrete Data %s bytes>' % len(self.data)
