@@ -178,10 +178,11 @@ class Packet:
         elif self.data_length > 524288:
             err = InvalidPacket('Data length larger than allowed!')
 
-        if err and not silent:
-            raise err
-
-        return err
+        if err:
+            if not silent:
+                raise err
+            return False
+        return True
 
     def __len__(self):
         """Return length if we can find one, else raise TypeError."""
