@@ -129,8 +129,12 @@ such as PCM or 1553
             minute=minutes,
             hour=hours,
             tzinfo=None)
+        self._initial_time = self.time
 
     def __bytes__(self):
+        if self._initial_time == self.time:
+            return self.buffer.getvalue()
+
         self.Hmn = self.time.microsecond // 10
         self.Tmn = self.time.microsecond - (self.Hmn * 10)
         self.TSn = self.time.second // 10
