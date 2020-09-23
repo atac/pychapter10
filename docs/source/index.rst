@@ -25,15 +25,43 @@ data as in the following example::
         for message in packet:
             print(message.rtc)
 
-The top-level C10 object represents a given Chapter 10 file or stream. C10
-objects contain Packet objects of various data types. Packets often consist of
-a number of messages which can also be iterated over.
+The top-level C10 object represents a given Chapter 10 file or stream and can
+be initialized from file or filename (default) or from bytes/string using the
+from_string method. C10 objects contain Packet objects of various data types
+(see API reference above). Packets attributes containing parsed/generated packet
+information and generally consist of a number of messages which can be iterated
+over and modified in turn.
 
 All of these types and classes respond to the usual python introspection
 resources such as help() and dir().
 
-Data Type Descriptions
-----------------------
+Modifying Data
+--------------
+
+Calling bytes() on a packet will compile the packet header, CSDW
+(channel specific data word), and body (including messages) to raw bytes. You
+can modify packets and messages before dumping to bytes and those changes will
+be reflected in the resulting bytes object. For example::
+
+    for msg in ethernet_packet:
+        msg.ethernet_speed = 3
+
+    out_file.write(bytes(ethernet_packet))
+
+Generating Data from Scratch
+----------------------------
+
+You can also generate your own data. By creating a packet object of the
+intended type and passing header values (or even CSDW and data) as keyword
+arguments::
+
+    messages = ...
+    p = EthernetF0(count=10)
+    for message in messages:
+        p.append(EthernetF0.Message(data=message, length=len(message)))
+
+Defining Data Types
+-------------------
 
 Data formats are specified using a wrapper around bitstruct_. Every data type
 has a channel specific data word (CSDW) that may look something like this
