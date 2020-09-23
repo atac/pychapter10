@@ -23,6 +23,9 @@ To install offline from "full" zip, install the included dependencies and the li
 
     pip install dependencies/* .
 
+**Note:** you may also install cbitstruct (included in requirements.txt, see
+below) for a performance improvement.
+
 Running Tests
 -------------
 
