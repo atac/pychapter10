@@ -11,9 +11,9 @@ class EthernetF0(packet.Packet):
         Time tag bits:
 
         * 0 - First bit of the frame destination address
-        * 0 - Last bit of the frame check sequence
-        * 0 - First bit of the frame payload data
-        * 0 - Last bit of the frame payload data
+        * 1 - Last bit of the frame check sequence
+        * 2 - First bit of the frame payload data
+        * 3 - Last bit of the frame payload data
 
     .. py:attribute:: format
 
