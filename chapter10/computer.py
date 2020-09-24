@@ -1,4 +1,5 @@
 
+from array import array
 from collections import OrderedDict
 
 from .util import BitFormat, bitstruct
@@ -48,7 +49,30 @@ class ComputerF1(packet.Packet):
 
     def __init__(self, *args, **kwargs):
         packet.Packet.__init__(self, *args, **kwargs)
-        self.data = self.buffer.read(self.data_length - 4)
+        if self.buffer:
+            self.data = self.buffer.read(self.data_length - 4)
+        elif not self.data:
+            self.data = ''
+
+    def __bytes__(self):
+        body = bytes(self.data, 'utf8')
+        if len(body) % 2:
+            body += b'\0'
+
+        # Copied from Packet class #
+        self.data_length = len(body) + 4
+        header_length = 36 if self.secondary_header else 24
+        self.packet_length = self.data_length + header_length
+        raw = self.FORMAT.pack(self.__dict__)
+        self.header_checksum = sum(array('H', raw)[:-1]) & 0xffff
+        raw = self.FORMAT.pack(self.__dict__)
+        if self.secondary_header:
+            raw += self.SECONDARY_FORMAT.pack(self.__dict__)
+
+        # Add CSDW and body
+        raw += self.csdw_format.pack(self.__dict__) + body
+
+        return raw
 
     def __getitem__(self, key):
         key = bytearray(key, 'utf-8')
