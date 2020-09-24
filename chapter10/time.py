@@ -100,10 +100,19 @@ such as PCM or 1553
                 p2'''
 
         self.data_format = BitFormat(self.data_format)
+
+        if not self.buffer:
+            for name in self.data_format.names:
+                setattr(self, name, 0)
+            self._initial_time = 0
+            if not self.time:
+                self.time = datetime.now()
+            return
+
         raw = self.buffer.read(self.data_length - 4)
         self.__dict__.update(self.data_format.unpack(raw))
 
-        microseconds = ((self.Hmn * 10) + self.Tmn)
+        ms = ((self.Hmn * 10) + self.Tmn)
         seconds = self.Sn + (self.TSn * 10)
         minutes = self.Mn + (self.TMn * 10)
         hours = self.Hn + (self.THn * 10)
@@ -124,7 +133,7 @@ such as PCM or 1553
             self.time = datetime(year, month, day)
 
         self.time = self.time.replace(
-            microsecond=microseconds,
+            microsecond=ms * 1000,
             second=seconds,
             minute=minutes,
             hour=hours,
@@ -132,11 +141,13 @@ such as PCM or 1553
         self._initial_time = self.time
 
     def __bytes__(self):
-        if self._initial_time == self.time:
+        if self.buffer and self._initial_time == self.time:
             return self.buffer.getvalue()
 
-        self.Hmn = self.time.microsecond // 10
-        self.Tmn = self.time.microsecond - (self.Hmn * 10)
+        ms = self.time.microsecond // 1000
+        self.Hmn = ms // 100
+        self.Tmn = (ms - (self.Hmn * 100)) // 10
+
         self.TSn = self.time.second // 10
         self.Sn = self.time.second - (self.TSn * 10)
         self.TMn = self.time.minute // 10
@@ -164,6 +175,8 @@ such as PCM or 1553
             self.Dn = day
 
         body = self.data_format.pack(self.__dict__)
+        if len(body) % 2:
+            body += b'\0'
 
         # Copied from Packet class #
         self.data_length = len(body) + 4
@@ -177,8 +190,5 @@ such as PCM or 1553
 
         # Add CSDW and body
         raw += self.csdw_format.pack(self.__dict__) + body
-
-        if len(raw) % 2:
-            raw += b'\0'
-
+        
         return raw
