@@ -86,8 +86,9 @@ class Packet:
     def __init__(self, file=None, **kwargs):
 
         # Set defaults
-        for name in self.FORMAT.names + self.SECONDARY_FORMAT.names:
-            setattr(self, name, 0)
+        for fmt in (self.FORMAT, self.SECONDARY_FORMAT, self.csdw_format):
+            for name in fmt.names:
+                setattr(self, name, 0)
         self.sync_pattern = 0xeb25
 
         self.__dict__.update(kwargs)
