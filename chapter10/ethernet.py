@@ -5,6 +5,7 @@ from . import packet
 
 class EthernetF0(packet.Packet):
     """Ethernet data
+
     .. py:attribute:: count
     .. py:attribute:: ttb
 
