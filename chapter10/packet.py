@@ -207,6 +207,8 @@ class Packet:
 
         # Pack messages into body
         body = b''.join(bytes(m) for m in self._messages)
+        if len(body) % 2:
+            body += b'\0'
 
         # Pack header (with updated checksum) and secondary header if needed.
         self.data_length = len(body) + 4
@@ -220,9 +222,6 @@ class Packet:
 
         # Add CSDW and body
         raw += self.csdw_format.pack(self.__dict__) + body
-
-        if len(raw) % 2:
-            raw += b'\0'
 
         return raw
 
