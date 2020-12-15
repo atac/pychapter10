@@ -68,7 +68,7 @@ class AnalogF1(packet.Packet):
 
         # Read CSDWs for subchannels if applicable.
         if not self.same:
-            for i in range(len(self)):
+            for i in range(self.subchannel_count):
                 self.subchannels.append(
                     self.csdw_format.unpack(self.buffer.read(4)))
 
