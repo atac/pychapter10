@@ -59,12 +59,15 @@ such as PCM or 1553
     """
 
     csdw_format = BitFormat('''
-        u4 time_source
         u4 time_format
-        u1 leap
-        u1 date_format
-        p2
+        u4 time_source
+
         u4 irig_source
+
+        p2
+        u1 date_format
+        u1 leap
+
         p16''')
 
     def __init__(self, *args, **kwargs):
@@ -88,16 +91,17 @@ such as PCM or 1553
         if not self.date_format:
             self.data_format += 'u8 HDn'
         else:
-            # TODO: not thoroughly tested
             self.data_format += '''
-                u4 On
-                u1 Ton
                 p3
-                u4 Yn
+                u1 TOn
+                u4 On
+
                 u4 TYn
-                u4 HYn
+                u4 Yn
+                p2
                 u2 OYn
-                p2'''
+                u4 HYn
+                '''
 
         self.data_format = BitFormat(self.data_format)
 
