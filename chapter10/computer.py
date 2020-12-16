@@ -55,12 +55,19 @@ class ComputerF1(packet.Packet):
             self.data = ''
 
     def __bytes__(self):
-        body = bytes(self.data, 'utf8')
+        # Copied from Packet class
+        if self.buffer:
+            return self.buffer.getvalue()
+
+        body = self.csdw_format.pack(self.__dict__)
+        if isinstance(self.data, str):
+            body += bytes(self.data, 'utf8')
+        else:
+            body += self.data
         if len(body) % 2:
             body += b'\0'
 
-        # Copied from Packet class #
-        self.data_length = len(body) + 4
+        self.data_length = len(body)
         header_length = 36 if self.secondary_header else 24
         self.packet_length = self.data_length + header_length
         raw = self.FORMAT.pack(self.__dict__)
@@ -69,10 +76,7 @@ class ComputerF1(packet.Packet):
         if self.secondary_header:
             raw += self.SECONDARY_FORMAT.pack(self.__dict__)
 
-        # Add CSDW and body
-        raw += self.csdw_format.pack(self.__dict__) + body
-
-        return raw
+        return raw + body
 
     def __getitem__(self, key):
         key = bytearray(key, 'utf-8')
