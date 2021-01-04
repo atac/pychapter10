@@ -59,7 +59,7 @@ See CONTRIBUTING_
 .. |DocsImage| image:: https://readthedocs.org/projects/pychapter10/badge/?version=latest
 .. _DocsImage: https://pychapter10.readthedocs.io/en/latest/?badge=latest
 .. |CoverageImage| image:: https://img.shields.io/azure-devops/coverage/atac-bham/pychapter10/7
-.. |LicenseImage| image:: https://img.shields.io/pypi/l/pychapter10
+.. |LicenseImage| image:: https://img.shields.io/github/license/atac/pychapter10
 .. _PyPiVersion: https://pypi.org/project/pychapter10/
 .. |PyPiVersion| image:: https://img.shields.io/pypi/v/pychapter10
 .. |PythonVersion| image:: https://img.shields.io/pypi/pyversions/pychapter10
