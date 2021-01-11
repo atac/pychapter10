@@ -1,5 +1,4 @@
 
-from array import array
 from collections import OrderedDict
 
 from .util import BitFormat, bitstruct
@@ -45,38 +44,21 @@ class ComputerF1(packet.Packet):
     csdw_format = BitFormat('''
         u8 version
         u1 configuration_change
-        u1 format''')
+        u1 format
+        p22''')
 
     def __init__(self, *args, **kwargs):
         packet.Packet.__init__(self, *args, **kwargs)
         if self.buffer:
             self.data = self.buffer.read(self.data_length - 4)
         elif not self.data:
-            self.data = ''
+            self.data = bytes()
 
-    def __bytes__(self):
-        # Copied from Packet class
-        if self.buffer:
-            return self.buffer.getvalue()
-
-        body = self.csdw_format.pack(self.__dict__)
+    def _raw_body(self):
+        csdw = self.csdw_format.pack(self.__dict__)
         if isinstance(self.data, str):
-            body += bytes(self.data, 'utf8')
-        else:
-            body += self.data
-        if len(body) % 2:
-            body += b'\0'
-
-        self.data_length = len(body)
-        header_length = 36 if self.secondary_header else 24
-        self.packet_length = self.data_length + header_length
-        raw = self.FORMAT.pack(self.__dict__)
-        self.header_checksum = sum(array('H', raw)[:-1]) & 0xffff
-        raw = self.FORMAT.pack(self.__dict__)
-        if self.secondary_header:
-            raw += self.SECONDARY_FORMAT.pack(self.__dict__)
-
-        return raw + body
+            return csdw + bytes(self.data, 'utf8')
+        return csdw + self.data
 
     def __getitem__(self, key):
         key = bytearray(key, 'utf-8')

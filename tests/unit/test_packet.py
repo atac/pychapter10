@@ -5,7 +5,7 @@ from io import BytesIO
 
 import pytest
 
-from chapter10 import packet
+from chapter10 import packet, computer
 from chapter10.util import BitFormat
 from fixtures import SAMPLE
 
@@ -51,7 +51,7 @@ class TestPacket:
     # __bytes__
     def test_bytes_file(self):
         with open(SAMPLE, 'rb') as f:
-            p = packet.Packet(f)
+            p = computer.ComputerF1(f)
             f.seek(0)
             assert f.read(p.packet_length) == bytes(p)
 

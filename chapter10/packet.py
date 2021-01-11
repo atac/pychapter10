@@ -1,6 +1,7 @@
 
 from io import BytesIO
 from array import array
+import struct
 
 from .util import BitFormat
 
@@ -30,7 +31,7 @@ class Packet:
     - rtc_sync_error
     - data_overflow_error
     - secondary_format
-    - data_checksum_present
+    - data_checksum
     - data_type
     - rtc
     - header_checksum
@@ -71,7 +72,7 @@ class Packet:
         u1 rtc_sync_error
         u1 data_overflow_error
         u2 secondary_format
-        u2 data_checksum_present
+        u2 data_checksum
         u8 data_type
         u48 rtc
         u16 header_checksum''')
@@ -199,29 +200,44 @@ class Packet:
             return (self.data_length - 4) // msg_size
         raise TypeError("object of type '%s' has no len()" % self.__class__)
 
-    def __bytes__(self):
-        """Returns the entire packet as raw bytes."""
-
-        if self.buffer:
-            return self.buffer.getvalue()
+    def _raw_body(self):
+        """Returns the raw bytes of the packet body, including the CSDW."""
 
         # Pack messages into body
         body = b''.join(bytes(m) for m in self._messages)
-        if len(body) % 2:
+        return self.csdw_format.pack(self.__dict__) + body
+
+    def __bytes__(self):
+        """Returns the entire packet as raw bytes."""
+
+        body = self._raw_body()
+        self.data_length = len(body)
+
+        # Add filler to maintain 32 bit alignment
+        checksum_size = (0, 1, 2, 4)[self.data_checksum]
+        while (checksum_size + len(body)) % 4:
             body += b'\0'
 
+        # Compute the data checksum
+        if self.data_checksum:
+            fmt = 'xBHI'[self.data_checksum]
+            checksum = sum(array(fmt, body))
+            checksum &= (0, 0xff, 0xffff, 0xffffffff)[self.data_checksum]
+            body += struct.pack(fmt, checksum)
+
         # Pack header (with updated checksum) and secondary header if needed.
-        self.data_length = len(body) + 4
         header_length = 36 if self.secondary_header else 24
-        self.packet_length = self.data_length + header_length
+        self.packet_length = header_length + len(body)
         raw = self.FORMAT.pack(self.__dict__)
         self.header_checksum = sum(array('H', raw)[:-1]) & 0xffff
         raw = self.FORMAT.pack(self.__dict__)
         if self.secondary_header:
             raw += self.SECONDARY_FORMAT.pack(self.__dict__)
 
-        # Add CSDW and body
-        raw += self.csdw_format.pack(self.__dict__) + body
+        # Add body and filler
+        raw += body
+
+        print(self.packet_length, len(raw))
 
         return raw
 
