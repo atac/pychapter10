@@ -26,6 +26,60 @@ To install offline from "full" zip, install the included dependencies and the li
 **Note:** you may also install cbitstruct (included in requirements.txt, see
 below) for a performance improvement.
 
+Basic Usage
+-----------
+
+PyChapter10 provides a pythonic API to read, write, and update Chapter 10 data.
+
+.. code-block:: python
+
+    # Find all 1553 messages in a file
+    for packet in C10('<filename>'):
+        if packet.data_type == 0x19:
+            for msg in packet:
+                # do something with the message
+
+Supported Datatypes
+-------------------
+====  ==================================================    =========
+Type  Name                                                  Supported                      
+====  ==================================================    =========
+0x00  Computer-Generated F0 - User-Defined                  User-Defined
+0x01  Computer-Generated F1 - Setup Record (TMATS)          Yes
+0x02  Computer-Generated F2 - Recording Events              Yes
+0x03  Computer-Generated F3 - Recording Index               Yes
+0x04  Computer-Generated F4 - Streaming Config (TMATS)      No
+0x09  PCM F1                                                Yes
+0x11  Time Data F1                                          Yes 
+0x12  Time Data F2                                          No
+0x19  1553 F1                                               Yes
+0x1A  1553 F2 - 16PP194                                     Yes
+0x21  Analog F1                                             Yes
+0x29  Discrete F1                                           Yes
+0x30  Message F0                                            Yes
+0x38  ARINC-429 F0                                          Yes
+0x40  Video F0                                              Yes
+0x41  Video F1                                              Yes
+0x42  Video F2                                              Yes
+0x43  Video F3                                              No
+0x44  Video F4                                              No
+0x48  Image F0                                              Yes (untested)
+0x49  Image F1                                              Yes (untested)
+0x4A  Image F2                                              Yes (untested)
+0x50  UART F0                                               Yes
+0x58  IEEE 1394 F0                                          Yes (untested)
+0x59  IEEE 1394 F1                                          Yes (untested)
+0x60  Parallel F0                                           Yes (untested)
+0x68  Ethernet F0 - Ethernet Data                           Yes
+0x69  Ethernet F1 - UDP Payload                             Yes
+0x70  TSPI/CTS F0 - GPS NMEA-RTCM                           No
+0x71  TSPI/CTS F1 - EAG ACMI                                No
+0x72  TSPI/CTS F2 - ACTTS                                   No
+0x78  Controller Area Network Bus                           No
+0x79  Fibre Channel F0                                      No
+0x7A  Fibre Channel F1                                      No
+====  ==================================================    =========
+
 Running Tests
 -------------
 
