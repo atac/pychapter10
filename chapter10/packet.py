@@ -235,11 +235,7 @@ class Packet:
             raw += self.SECONDARY_FORMAT.pack(self.__dict__)
 
         # Add body and filler
-        raw += body
-
-        print(self.packet_length, len(raw))
-
-        return raw
+        return raw + body
 
     def __repr__(self):
         return '<{} {} bytes>'.format(
