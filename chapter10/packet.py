@@ -139,7 +139,6 @@ class Packet:
             header_size = 36 if self.secondary_header else 24
             self.buffer.seek(header_size + 4)
             self._messages = list(self)
-            self.buffer = None
 
     def __next__(self):
         """Return the next message until the end, then raise StopIteration."""
