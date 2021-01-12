@@ -12,6 +12,7 @@ PCM = os.path.join(BASEDIR, 'pcm.c10')
 SAMPLE = os.path.join(BASEDIR, 'sample.c10')
 ANALOG = os.path.join(BASEDIR, 'analog.ch10')
 UART = os.path.join(BASEDIR, 'uart.c10')
+DISCRETE = os.path.join(BASEDIR, 'discrete.c10')
 
 
 def dummy_packet(type, size):
