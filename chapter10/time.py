@@ -1,5 +1,4 @@
 
-from array import array
 from datetime import datetime, timedelta
 
 from .util import BitFormat
@@ -144,10 +143,7 @@ such as PCM or 1553
             tzinfo=None)
         self._initial_time = self.time
 
-    def __bytes__(self):
-        if self.buffer and self._initial_time == self.time:
-            return self.buffer.getvalue()
-
+    def _raw_body(self):
         ms = self.time.microsecond // 1000
         self.Hmn = ms // 100
         self.Tmn = (ms - (self.Hmn * 100)) // 10
@@ -182,17 +178,5 @@ such as PCM or 1553
         if len(body) % 2:
             body += b'\0'
 
-        # Copied from Packet class #
-        self.data_length = len(body) + 4
-        header_length = 36 if self.secondary_header else 24
-        self.packet_length = self.data_length + header_length
-        raw = self.FORMAT.pack(self.__dict__)
-        self.header_checksum = sum(array('H', raw)[:-1]) & 0xffff
-        raw = self.FORMAT.pack(self.__dict__)
-        if self.secondary_header:
-            raw += self.SECONDARY_FORMAT.pack(self.__dict__)
-
         # Add CSDW and body
-        raw += self.csdw_format.pack(self.__dict__) + body
-        
-        return raw
+        return self.csdw_format.pack(self.__dict__) + body
