@@ -6,11 +6,11 @@ import struct
 
 BASEDIR = os.path.dirname(os.path.abspath(__file__))
 ETHERNET = os.path.join(BASEDIR, 'eth.c10')
-EVENTS = os.path.join(BASEDIR, 'event.c10')
-INDEX = os.path.join(BASEDIR, 'index.c10')
 PCM = os.path.join(BASEDIR, 'pcm.c10')
 SAMPLE = os.path.join(BASEDIR, 'sample.c10')
-ANALOG = os.path.join(BASEDIR, 'analog.ch10')
+ANALOG = os.path.join(BASEDIR, 'analog.c10')
+EVENTS = ANALOG
+INDEX = ANALOG
 UART = os.path.join(BASEDIR, 'uart.c10')
 DISCRETE = os.path.join(BASEDIR, 'discrete.c10')
 
