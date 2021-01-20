@@ -14,7 +14,7 @@ def packet():
 
 def test_csdw(packet):
     assert packet.mode == 0
-    assert packet.length == 16
+    assert packet.length == 8
     assert packet.subchannel == 0
     assert packet.factor == 0
     assert packet.same == 1
@@ -25,8 +25,7 @@ def test_count(packet):
 
 
 def test_next(packet):
-    expected = [b'\xff\xf2', b'\xdf\xed', b'e\xec']
     for i, sample in enumerate(packet):
-        assert sample.data == expected[i]
+        assert sample.data == b'\xfc\xfc'
         if i >= 2:
             break

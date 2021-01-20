@@ -21,7 +21,7 @@ except ImportError:
     tqdm = None
 
 RUNS = 100
-SOURCE_FILE = 'tests/eth.c10'
+SOURCE_FILE = 'tests/ethernet.c10'
 
 file_size = os.stat(SOURCE_FILE).st_size
 total = file_size * RUNS
