@@ -8,7 +8,14 @@ from . import packet
 class ComputerF0(packet.Packet):
     """User-defined"""
 
-    pass
+    def __init__(self, *args, **kwargs):
+        self.data = bytes()
+        packet.Packet.__init__(self, *args, **kwargs)
+        if self.buffer:
+            self.data = self.buffer.read(self.data_length - 4)
+
+    def _raw_body(self):
+        return (b'\0' * 4) + self.data
 
 
 class ComputerF1(packet.Packet):
