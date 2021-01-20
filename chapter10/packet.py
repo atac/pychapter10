@@ -209,6 +209,8 @@ class Packet:
     def __bytes__(self):
         """Returns the entire packet as raw bytes."""
 
+        self._read_messages()
+
         body = self._raw_body()
         self.data_length = len(body)
 
