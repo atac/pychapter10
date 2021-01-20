@@ -33,6 +33,8 @@ PyChapter10 provides a pythonic API to read, write, and update Chapter 10 data.
 
 .. code-block:: python
 
+    from chapter10 import C10
+
     # Find all 1553 messages in a file
     for packet in C10('<filename>'):
         if packet.data_type == 0x19:
