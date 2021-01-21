@@ -49,7 +49,7 @@ class BitFormat:
         self._compiled = bitstruct.compile(self.fmt_str, names=self.names)
 
     def __getattr__(self, name, default=None):
-        if name in ('byteswap', 'unpack', 'raw', 'fmt_str', 'names'):
+        if name in ('byteswap', 'pack', 'unpack', 'raw', 'fmt_str', 'names'):
             return object.__getattr__(self, name, default)
         return getattr(self._compiled, name, default)
 
@@ -64,6 +64,12 @@ class BitFormat:
             data = bitstruct.byteswap(self.byteswap, data)
         self.raw = data
         return self._compiled.unpack(data)
+
+    def pack(self, values):
+        raw = self._compiled.pack(values)
+        if self.byteswap:
+            raw = bitstruct.byteswap(self.byteswap, raw)
+        return raw
 
 
 # TODO: is this needed any more?
