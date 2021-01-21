@@ -51,5 +51,13 @@ of bus) to the beginning of the current bus word in 0.1-us increments.
             packet.Message.__init__(self, *args, **kwargs)
             self.gap_time += (self.gap_upper << 16)
 
+        def __bytes__(self):
+            old_gap = self.gap_time
+            self.gap_upper = self.gap_time >> 16
+            self.gap_time &= 0xffff
+            b = packet.Message.__bytes__(self)
+            self.gap_time = old_gap
+            return b
+
         def __repr__(self):
             return '<ARINC-429 Data Word>'

@@ -30,3 +30,10 @@ def test_gap(packet):
             assert (msg.gap_time, msg.bus, msg.bus_speed) == expected[i]
         else:
             break
+
+
+def test_bytes(packet):
+    for msg in packet:
+        packet.buffer.seek(-8, 1)
+        raw = packet.buffer.read(8)
+        assert bytes(msg) == raw
