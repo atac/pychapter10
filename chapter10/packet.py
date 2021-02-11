@@ -144,7 +144,9 @@ class Packet:
         """Return the next message until the end, then raise StopIteration."""
 
         if self.buffer is None:
-            return next(self._messages)
+            if not getattr(self, '_message_iterator', None):
+                self._message_iterator = iter(self._messages)
+            return next(self._message_iterator)
 
         if not getattr(self, 'Message', None):
             raise StopIteration
