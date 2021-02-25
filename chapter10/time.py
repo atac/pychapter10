@@ -162,7 +162,7 @@ such as PCM or 1553
             year -= self.OYn * 1000
             self.HYn = year // 100
             year -= self.HYn * 100
-            self.TYn // 10
+            self.TYn = year // 10
             year -= self.TYn * 10
             self.Yn = year
 
