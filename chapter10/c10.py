@@ -55,12 +55,18 @@ class C10(object):
 
     :param f: A file like object or file path to read from.
     :type f: file or str
+
+    .. py:attribute:: last_time
+        :type: time.TimeF1
+
+        Most recently parsed (or generated) time packet.
     """
 
     def __init__(self, f):
         if isinstance(f, str):
             f = open(f, 'rb')
         self.file = Buffer(f)
+        self.last_time = None
 
     @classmethod
     def from_string(cls, s):
@@ -79,7 +85,10 @@ class C10(object):
                 header = Packet.FORMAT.unpack(self.file.read(24))
                 handler = TYPES.get(header['data_type'], None)
                 if handler:
-                    return handler(self.file, **header)
+                    packet = handler(self.file, parent=self, **header)
+                    if packet.data_type == 0x11:
+                        self.last_time = packet
+                    return packet
 
                 raise NotImplementedError('Type %s not implemented' %
                                           hex(header['data_type']))

@@ -1,6 +1,7 @@
 
-from io import BytesIO
 from array import array
+from datetime import timedelta, datetime
+from io import BytesIO
 import struct
 
 from .util import BitFormat
@@ -84,7 +85,9 @@ class Packet:
 
     csdw_format = BitFormat('u32 csdw')
 
-    def __init__(self, file=None, **kwargs):
+    def __init__(self, file=None, parent=None, **kwargs):
+
+        self.parent = parent
 
         # Set defaults
         for fmt in (self.FORMAT, self.SECONDARY_FORMAT, self.csdw_format):
@@ -129,6 +132,19 @@ class Packet:
 
         # Read channel specific data word (CSDW)
         self.__dict__.update(self.csdw_format.unpack(self.buffer.read(4)))
+
+    def get_time(self):
+        """Return a timestamp for this packet. Depends on parent C10 object."""
+
+        if self.parent.last_time:
+            t = self.parent.last_time.time
+            rtc = self.rtc - self.parent.last_time.rtc
+            mask = 0xffffffffffff
+            while rtc > mask:
+                rtc -= mask
+            return t + timedelta(seconds=rtc / 10_000_000)
+        else:
+            return datetime.now()
 
     def _read_messages(self):
         """Internal: ensure all messages are read in order to manipulate data
