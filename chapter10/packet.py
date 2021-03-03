@@ -136,7 +136,7 @@ class Packet:
     def get_time(self):
         """Return a timestamp for this packet. Depends on parent C10 object."""
 
-        if self.parent.last_time:
+        if self.parent and self.parent.last_time is not None:
             t = self.parent.last_time.time
             rtc = self.rtc - self.parent.last_time.rtc
             mask = 0xffffffffffff
