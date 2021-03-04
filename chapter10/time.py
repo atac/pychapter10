@@ -180,3 +180,6 @@ such as PCM or 1553
 
         # Add CSDW and body
         return self.csdw_format.pack(self.__dict__) + body
+
+    def __bool__(self):
+        return bool(self.time)
