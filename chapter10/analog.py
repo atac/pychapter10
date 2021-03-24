@@ -2,6 +2,8 @@
 from .util import BitFormat
 from . import packet
 
+from bitstring import Bits
+
 
 class AnalogF1(packet.Packet):
     """
@@ -35,26 +37,21 @@ class AnalogF1(packet.Packet):
 
     """
 
-    # u4 factor
-    # u1 same
-    # p3
-
-    # u6 length
-    # u2 mode
-
-    # u8 subchannel_count
-
-    # u8 subchannel
     csdw_format = BitFormat('''
-        u8 one
-        u8 two
-        u8 three
-        u8 four
+        u6 length
+        u2 mode
+
+        u8 subchannel
+        u8 subchannel_count
+
+        p3
+        u1 same
+        u4 factor
     ''')
 
     class Message(packet.Message):
         def __repr__(self):
-            return '<Analog Sample %s bytes>' % len(self.data)
+            return '<Analog Sample %s bits>' % len(self.length)
 
         @classmethod
         def from_packet(cls, packet):
@@ -66,21 +63,21 @@ class AnalogF1(packet.Packet):
 
             # Find the sample size in bytes (16 bit aligned).
             length = csdw['length'] or 64  # Length 0 = 64 bits
-            length = length // 8 + (length % 16 and 1 or 0)
 
-            data = packet.buffer.read(length)
-            if len(data) < length:
+            if packet.bit_offset > len(packet.data):
                 raise EOFError
 
-            # Account for filler byte when length is odd.
-            if length % 2:
-                packet.buffer.seek(1, 1)
+            data = packet.data[packet.bit_offset:packet.bit_offset + length]
+            packet.bit_offset += length
 
             packet._subchannel += 1
             if packet._subchannel >= len(packet.subchannels):
                 packet._subchannel = 0
 
-            return packet.Message(data, parent=packet, **csdw)
+            return packet.Message(data.bytes, parent=packet, **csdw)
+
+        def __bytes__(self):
+            return self.data
 
     def __init__(self, *args, **kwargs):
         packet.Packet.__init__(self, *args, **kwargs)
@@ -101,18 +98,19 @@ class AnalogF1(packet.Packet):
 
         # Read CSDWs for additional subchannels if applicable.
         if not self.same:
-            for i in range(self.subchannel_count):
-                raw = self.buffer.read(4)
-                print('parse: ', raw)
-                # assert 0
+            for i in range(self.subchannel_count - 1):
                 self.subchannels.append(
-                    self.csdw_format.unpack(raw))
+                    self.csdw_format.unpack(self.buffer.read(4)))
+
+        # Get the raw bytes of data since samples are specified in bit length
+        raw = self.buffer.read(
+            self.data_length - (4 * len(self.subchannels)))
+        self.data = Bits(raw)
+        self.bit_offset = 0
 
     def _raw_body(self):
         raw = bytes()
         for channel in self.subchannels:
-            print(channel)
-            csdw = self.csdw_format.pack(channel)
-            raw += csdw
-        raw += b''.join([bytes(msg) for msg in list(self)])
+            raw += self.csdw_format.pack(channel)
+        raw += b''.join(bytes(msg) for msg in self._messages)
         return raw

@@ -131,9 +131,7 @@ class Packet:
         self.validate()
 
         # Read channel specific data word (CSDW)
-        csdw = self.csdw_format.unpack(self.buffer.read(4))
-        print(csdw)
-        self.__dict__.update(csdw)
+        self.__dict__.update(self.csdw_format.unpack(self.buffer.read(4)))
 
     def get_time(self):
         """Return a timestamp for this packet. Depends on parent C10 object."""

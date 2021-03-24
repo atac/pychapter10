@@ -55,7 +55,7 @@ setup(
     description='A parser library for the IRIG 106 Chapter 10 data format.',
     long_description=open('README.rst').read(),
     url='https://github.com/atac/pychapter10',
-    install_requires=['bitstruct>=8.11.0'],
+    install_requires=['bitstruct>=8.11.0', 'bitstring>=3.1.7'],
     packages=['chapter10'],
     cmdclass=cmdclass,
     python_requires='>=py3.6',

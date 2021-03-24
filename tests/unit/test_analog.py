@@ -26,7 +26,7 @@ def test_count(packet):
 
 def test_next(packet):
     for i, sample in enumerate(packet):
-        assert sample.data == b'\xfc\xfc'
+        assert sample.data == b'\xfc'
         if i >= 2:
             break
 
