@@ -29,3 +29,7 @@ def test_next(packet):
         assert sample.data == b'\xfc\xfc'
         if i >= 2:
             break
+
+
+def test_bytes(packet):
+    assert packet.buffer.getvalue() == bytes(packet)
