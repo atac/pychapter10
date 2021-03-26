@@ -235,7 +235,7 @@ class Packet:
         # Add filler to maintain 32 bit alignment
         checksum_size = (0, 1, 2, 4)[self.data_checksum]
         while (checksum_size + len(body)) % 4:
-            body += b'\0'
+            body += b'\x00'
 
         # Compute the data checksum
         if self.data_checksum:
@@ -376,5 +376,5 @@ class Message:
             raw += self.FORMAT.pack(self.__dict__)
         raw += self.data
         if len(raw) % 2:
-            raw += b'\0'
+            raw += b'\x00'
         return raw
