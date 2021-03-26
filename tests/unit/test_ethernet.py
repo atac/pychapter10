@@ -22,3 +22,10 @@ def test_format_1_count():
             break
     assert i+1 == len(packet)
     assert len(packet) == 2
+
+
+def test_bytes():
+    for packet in C10(ETHERNET):
+        if packet.data_type == 0x68:
+            break
+    assert packet.buffer.getvalue() == bytes(packet)

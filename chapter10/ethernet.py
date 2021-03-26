@@ -60,14 +60,25 @@ class EthernetF0(packet.Packet):
         # order.
         FORMAT = BitFormat('''
             u64 ipts
-            u14 length
-            u1 data_length_error
-            u1 data_crc_error
+
+            u16 length
+
             u8 network_id
             u1 crc_error
             u1 frame_error
             u2 content
-            u4 ethernet_speed''')
+            u4 ethernet_speed
+        ''')
+
+        def __init__(self, *args, **kwargs):
+            packet.Message.__init__(self, *args, **kwargs)
+            self.length_error = self.length >> 14 & 0b1
+            self.data_error = self.length >> 15
+            self.length &= 0b11111111111111
+
+        def __bytes__(self):
+            self.length |= (self.length_error << 14) | (self.data_error << 15)
+            return packet.Message.__bytes__(self)
 
 
 class EthernetF1(packet.Packet):
