@@ -51,13 +51,13 @@ jobs:
       versionSpec: "$(python.version)"
       architecture: 'x64'
 
-  - script: python -m pip install -U tox pytest-azurepipelines
+  - script: python -m pip install -r requirements.txt
     displayName: 'Install dependencies'
 
   - script: python -m pip install -e .
     displayName: 'Install library'
 
-  - script: tox
+  - script: pytest --junitxml=junit-$(imageName)-$(python.version).xml --cov chapter10 --cov-report xml --cov-report html --cov-append
     displayName: 'Run tests'
 
   - task: PublishTestResults@2
