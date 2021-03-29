@@ -110,7 +110,7 @@ jobs:
   - script: "python -m pip download . -r requirements.txt -d dependencies --no-binary :all:"
     displayName: 'Download dependencies'
 
-  - script: "python -m pip install -r requirements.txt && python setup.py build_docs"
+  - script: "python -m pip install . -r requirements.txt && python setup.py build_docs"
     displayName: 'Build documentation'
 
   - task: ArchiveFiles@2
