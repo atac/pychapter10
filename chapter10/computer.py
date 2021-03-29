@@ -149,10 +149,12 @@ class ComputerF3(packet.Packet):
 
     csdw_format = BitFormat('''
         u16 count
-        p13
-        u1 ipdh
+        p8
+        u1 index_type
         u1 file_size_present
-        u1 index_type''')
+        u1 ipdh
+        p5
+    ''')
 
     class Message(packet.Message):
         """
@@ -176,24 +178,42 @@ class ComputerF3(packet.Packet):
         packet.Packet.__init__(self, *args, **kwargs)
 
         if self.file_size_present:
-            self.file_size = bitstruct.unpack('u64<', self.buffer.read(8))
+            self.file_size, = bitstruct.unpack('u64<', self.buffer.read(8))
 
         fmt = 'u64 ipts'
         if self.ipdh:
             fmt += '\nu64 ipdh'
 
         if self.index_type == 0:
-            fmt = '\nu64 offset'
+            fmt += '\nu64 offset'
         elif self.index_type == 1:
-            fmt = '''
+            fmt += '''
                 u16 channel_id
                 u8 data_type
-                u8 offset'''
+                p8
+                u64 offset'''
 
         self.Message.FORMAT = BitFormat(fmt)
 
         if self.index_type == 0:
             pos = self.buffer.tell()
             self.buffer.seek(self.data_length - 8)
-            self.root_offset = bitstruct.unpack('u64<', self.buffer.read(8))
+            self.root_offset, = bitstruct.unpack('u64<', self.buffer.read(8))
             self.buffer.seek(pos)
+
+    def _read_messages(self):
+        if self.buffer:
+            offset = 36 if self.secondary_header else 24
+            if self.file_size_present:
+                offset += 8
+            self.buffer.seek(offset + 4)
+            self._messages = list(self)
+
+    def _raw_body(self):
+        raw = self.csdw_format.pack(self.__dict__)
+        if self.file_size_present:
+            raw += bitstruct.pack('u64<', self.file_size)
+        raw += b''.join(bytes(m) for m in self._messages)
+        if self.index_type == 0:
+            raw += bitstruct.pack('u64<', self.root_offset)
+        return raw

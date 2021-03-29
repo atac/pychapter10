@@ -19,12 +19,42 @@ def test_events():
             assert len(packet) == packet.count
 
 
-def test_index():
+def test_index_csdw():
+    for packet in C10(INDEX):
+        if packet.data_type == 3:
+            break
+    assert (packet.count,
+            packet.ipdh,
+            packet.file_size_present,
+            packet.index_type) == (5, 0, 1, 1)
+
+
+def test_index_node():
     for packet in C10(INDEX):
         if packet.data_type == 3:
             if packet.index_type:
-                for part in packet:
-                    assert repr(part) == '<Node Index>'
-            else:
-                for part in packet:
-                    assert repr(part) == '<Root Index>'
+                break
+    for node in packet:
+        break
+    assert node.ipts == 28892518346
+    assert node.channel_id == 1
+    assert node.data_type == 17
+    assert node.offset == 28160
+
+
+def test_index_root():
+    for packet in C10(INDEX):
+        if packet.data_type == 3:
+            if not packet.index_type:
+                break
+    for part in packet:
+        break
+    assert part.ipts == 28892518346
+    assert part.offset == 952252
+
+
+def test_index_bytes():
+    for packet in C10(INDEX):
+        if packet.data_type == 3:
+            break
+    assert packet.buffer.getvalue() == bytes(packet)
