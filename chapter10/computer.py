@@ -58,8 +58,8 @@ class ComputerF1(packet.Packet):
         packet.Packet.__init__(self, *args, **kwargs)
         if self.buffer:
             self.data = self.buffer.read(self.data_length - 4)
-        elif not self.data:
-            self.data = bytes()
+        elif not getattr(self, 'data', None):
+            self.data = kwargs.get('data', bytes())
 
     def _raw_body(self):
         csdw = self.csdw_format.pack(self.__dict__)
