@@ -94,6 +94,7 @@ class ImageF1(packet.Packet):
         """
 
     def __init__(self, *args, **kwargs):
+        packet.Packet.__init__(self, *args, **kwargs)
         fmt = ''
         if self.iph:
             fmt = 'u64 ipts\n'
@@ -140,6 +141,7 @@ class ImageF2(packet.Packet):
         """
 
     def __init__(self, *args, **kwargs):
+        packet.Packet.__init__(self, *args, **kwargs)
         fmt = ''
         if self.iph:
             fmt = 'u64 ipts\n'
