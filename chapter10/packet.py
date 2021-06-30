@@ -132,6 +132,11 @@ class Packet:
 
         # Read channel specific data word (CSDW)
         self.__dict__.update(self.csdw_format.unpack(self.buffer.read(4)))
+        
+    def get_header_sum(self):
+        raw_header = self.FORMAT.pack(self.__dict__)
+        self.header_sums = sum(array('H', raw_header)[:-1]) & 0xffff
+        return self.header_sums
 
     def get_time(self):
         """Return a timestamp for this packet. Depends on parent C10 object."""
@@ -189,13 +194,13 @@ class Packet:
         err = None
         if self.sync_pattern != 0xeb25:
             err = InvalidPacket('Incorrect sync pattern!')
-        elif self.header_sums != self.header_checksum:
+        elif self.get_header_sum() != self.header_checksum:
             err = InvalidPacket('Header checksum mismatch!')
         elif self.secondary_header:
             if self.secondary_sums != self.secondary_checksum:
                 err = InvalidPacket('Secondary header checksum mismatch!')
         elif self.data_length > 524288:
-            err = InvalidPacket('Data length larger than allowed!')
+            err = InvalidPacket(f'Data length {self.data_length} larger than allowed!')
 
         if err:
             if not silent:
@@ -235,7 +240,7 @@ class Packet:
         # Add filler to maintain 32 bit alignment
         checksum_size = (0, 1, 2, 4)[self.data_checksum]
         while (checksum_size + len(body)) % 4:
-            body += b'\x00'
+            body += b'\0'
 
         # Compute the data checksum
         if self.data_checksum:
@@ -247,8 +252,7 @@ class Packet:
         # Pack header (with updated checksum) and secondary header if needed.
         header_length = 36 if self.secondary_header else 24
         self.packet_length = header_length + len(body)
-        raw = self.FORMAT.pack(self.__dict__)
-        self.header_checksum = sum(array('H', raw)[:-1]) & 0xffff
+        self.header_checksum = self.get_header_sum()
         raw = self.FORMAT.pack(self.__dict__)
         if self.secondary_header:
             raw += self.SECONDARY_FORMAT.pack(self.__dict__)
