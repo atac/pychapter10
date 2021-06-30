@@ -177,7 +177,7 @@ class ComputerF3(packet.Packet):
     def __init__(self, *args, **kwargs):
         packet.Packet.__init__(self, *args, **kwargs)
 
-        if self.file_size_present:
+        if self.file_size_present and self.buffer:
             self.file_size, = bitstruct.unpack('u64<', self.buffer.read(8))
 
         fmt = 'u64 ipts'
@@ -195,7 +195,7 @@ class ComputerF3(packet.Packet):
 
         self.Message.FORMAT = BitFormat(fmt)
 
-        if self.index_type == 0:
+        if self.index_type == 0 and self.buffer:
             pos = self.buffer.tell()
             self.buffer.seek(self.data_length - 8)
             self.root_offset, = bitstruct.unpack('u64<', self.buffer.read(8))
