@@ -132,7 +132,7 @@ class Packet:
 
         # Read channel specific data word (CSDW)
         self.__dict__.update(self.csdw_format.unpack(self.buffer.read(4)))
-        
+
     def get_header_sum(self):
         raw_header = self.FORMAT.pack(self.__dict__)
         self.header_sums = sum(array('H', raw_header)[:-1]) & 0xffff
@@ -200,7 +200,8 @@ class Packet:
             if self.secondary_sums != self.secondary_checksum:
                 err = InvalidPacket('Secondary header checksum mismatch!')
         if self.data_length > 524288:
-            err = InvalidPacket(f'Data length {self.data_length} larger than allowed!')
+            err = InvalidPacket(
+                f'Data length {self.data_length} larger than allowed!')
 
         if err:
             if not silent:
@@ -346,10 +347,23 @@ class Message:
         self.parent = parent
         self.data = data
 
+    def get_time(self):
+        """Return a timestamp for this message based on parent packet."""
+
+        if self.parent is None or not hasattr(self, 'ipts'):
+            raise AttributeError(
+                'Must have parent packet and IPTS to get time.')
+
+        rtc = self.ipts - self.parent.rtc
+        mask = 0xffffffffffff
+        while rtc > mask:
+            rtc -= mask
+        return self.parent.get_time() + timedelta(seconds=rtc / 10_000_000)
+
     @classmethod
     def from_packet(cls, packet):
         """Helper method to read a message from packet."""
-        
+
         # Exit if we've read all messages.
         if hasattr(packet, 'count') and packet.count == len(packet._messages):
             raise EOFError
