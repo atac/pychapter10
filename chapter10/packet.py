@@ -199,7 +199,7 @@ class Packet:
         elif self.secondary_header:
             if self.secondary_sums != self.secondary_checksum:
                 err = InvalidPacket('Secondary header checksum mismatch!')
-        elif self.data_length > 524288:
+        if self.data_length > 524288:
             err = InvalidPacket(f'Data length {self.data_length} larger than allowed!')
 
         if err:
@@ -349,6 +349,10 @@ class Message:
     @classmethod
     def from_packet(cls, packet):
         """Helper method to read a message from packet."""
+        
+        # Exit if we've read all messages.
+        if hasattr(packet, 'count') and packet.count == len(packet._messages):
+            raise EOFError
 
         # Exit when we reach the end of the packet body
         end = packet.data_length + (packet.secondary_header and 36 or 24)
