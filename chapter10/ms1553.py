@@ -47,6 +47,10 @@ class MS1553F1(packet.Packet):
 
             Message error
 
+        .. py:attribute:: rt2rt
+
+            Boolean: indicates RT to RT message
+
         .. py:attribute:: fe
 
             Format error
@@ -81,7 +85,7 @@ last data word and the second status word.
             p2
             u1 bus
             u1 me
-            p1
+            p1 rt2rt
             u1 fe
             u1 timeout
             p1
