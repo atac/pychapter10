@@ -58,7 +58,7 @@ setup(
     install_requires=['bitstruct>=8.11.0', 'bitstring>=3.1.7'],
     packages=['chapter10'],
     cmdclass=cmdclass,
-    python_requires='>=py3.6',
+    python_requires='>=3.6',
     classifiers=[
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3 :: Only",
