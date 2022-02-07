@@ -75,6 +75,8 @@ jobs:
 # Create dist files for PyPI release
 - job: Build
   dependsOn: 'Test'
+  pool:
+    vmImage: 'ubuntu-latest'
   steps:
   - task: UsePythonVersion@0
     inputs:
@@ -98,6 +100,8 @@ jobs:
 # Package dependencies and docs with source code
 - job: Bundle
   dependsOn: 'Test'
+  pool:
+    vmImage: 'ubuntu-latest'
   steps:
   - task: UsePythonVersion@0
     inputs:
