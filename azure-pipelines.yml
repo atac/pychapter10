@@ -89,12 +89,12 @@ jobs:
   - script: pdm install --dev
     displayName: 'Install dependencies'
 
-  - script: "pip wheel ."
+  - script: "pip wheel . -w dist"
     displayName: "Build source & wheel distributions"
 
   - task: PublishBuildArtifacts@1
     inputs:
-      pathToPublish: '*.whl'
+      pathToPublish: 'dist'
       artifactName: dist
 
 # Package dependencies and docs with source code
