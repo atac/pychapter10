@@ -94,7 +94,7 @@ jobs:
 
   - task: PublishBuildArtifacts@1
     inputs:
-      pathToPublish: 'dist'
+      pathToPublish: '*.whl'
       artifactName: dist
 
 # Package dependencies and docs with source code

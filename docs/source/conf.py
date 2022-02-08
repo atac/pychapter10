@@ -13,7 +13,6 @@
 import os
 import sys
 from datetime import datetime
-sys.path.insert(0, os.path.abspath('../..'))
 
 
 # -- Project information -----------------------------------------------------
@@ -23,7 +22,7 @@ copyright = datetime.now().strftime('%Y, ATAC')
 author = 'Micah Ferrill - ATAC'
 
 # The full version, including alpha/beta/rc tags
-from chapter10 import version as release
+release = '1.1'
 
 
 # -- General configuration ---------------------------------------------------
