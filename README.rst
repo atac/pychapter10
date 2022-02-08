@@ -9,7 +9,7 @@ PyChapter10
 |PyPiVersion|_
 |PythonVersion|
 
-PyChapter10 is an open source pure Python library for reading and writing IRIG 106 
+PyChapter10 is an open source pure Python library for reading and writing IRIG 106
 Chapter 10 (now 11) files. Tested on all 3 major platforms with Python 3.6+.
 
 Installation
@@ -23,8 +23,7 @@ To install offline from "full" zip, install the included dependencies and the li
 
     pip install dependencies/* .
 
-**Note:** you may also install cbitstruct (included in requirements.txt, see
-below) for a performance improvement.
+**Note:** you may also install cbitstruct for a performance improvement.
 
 Basic Usage
 -----------
@@ -44,7 +43,7 @@ PyChapter10 provides a pythonic API to read, write, and update Chapter 10 data.
 Supported Datatypes
 -------------------
 ====  ==================================================    =========
-Type  Name                                                  Supported                      
+Type  Name                                                  Supported
 ====  ==================================================    =========
 0x00  Computer-Generated F0 - User-Defined                  User-Defined
 0x01  Computer-Generated F1 - Setup Record (TMATS)          Yes
@@ -52,7 +51,7 @@ Type  Name                                                  Supported
 0x03  Computer-Generated F3 - Recording Index               Yes
 0x04  Computer-Generated F4 - Streaming Config (TMATS)      No
 0x09  PCM F1                                                Yes
-0x11  Time Data F1                                          Yes 
+0x11  Time Data F1                                          Yes
 0x12  Time Data F2                                          No
 0x19  1553 F1                                               Yes
 0x1A  1553 F2 - 16PP194                                     Yes
@@ -85,9 +84,10 @@ Type  Name                                                  Supported
 Running Tests
 -------------
 
-To run the included test suite install dependencies with pip::
+To run the included test suite install pdm and dev dependencies with pip::
 
-    pip install -r requirements.txt
+    pip install pdm
+    pdm install --dev
 
 Then run::
 

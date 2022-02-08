@@ -51,11 +51,11 @@ jobs:
       versionSpec: "$(python.version)"
       architecture: 'x64'
 
-  - script: python -m pip install -r requirements.txt
-    displayName: 'Install dependencies'
+  - script: python -m pip install -U pip pdm
+    displayName: 'Install pdm'
 
-  - script: python -m pip install -e .
-    displayName: 'Install library'
+  - script: pdm install --dev
+    displayName: 'Install dependencies'
 
   - script: pytest --junitxml=junit-$(imageName)-$(python.version).xml --cov chapter10 --cov-report xml --cov-report html --cov-append
     displayName: 'Run tests'
@@ -83,11 +83,11 @@ jobs:
       versionSpec: "3.8"
       architecture: 'x64'
 
-  - script: "python -m pip install -U pip setuptools wheel"
-    displayName: "Install dependencies"
+  - script: python -m pip install -U pip pdm
+    displayName: 'Install pdm'
 
-  - script: "echo \"version = '$(Build.BuildNumber)'\" > chapter10/version.py"
-    displayName: "Update version # to match build"
+  - script: pdm install --dev
+    displayName: 'Install dependencies'
 
   - script: "python setup.py sdist bdist_wheel"
     displayName: "Build source & wheel distributions"
@@ -114,7 +114,13 @@ jobs:
   - script: "python -m pip download . -r requirements.txt -d dependencies --no-binary :all:"
     displayName: 'Download dependencies'
 
-  - script: "python -m pip install . -r requirements.txt && python setup.py build_docs"
+  - script: python -m pip install -U pip pdm
+    displayName: 'Install pdm'
+
+  - script: pdm install --dev
+    displayName: 'Install dependencies'
+
+  - script: "pdm run sphinx-build -b html docs/source docs/html"
     displayName: 'Build documentation'
 
   - task: ArchiveFiles@2

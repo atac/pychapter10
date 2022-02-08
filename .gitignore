@@ -17,3 +17,7 @@ htmlcov
 deps
 docs/html
 docs/doctrees
+.pdm.toml
+.vscode
+*.xml
+__pypackages__

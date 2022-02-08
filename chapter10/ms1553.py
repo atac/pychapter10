@@ -85,7 +85,7 @@ last data word and the second status word.
             p2
             u1 bus
             u1 me
-            p1 rt2rt
+            u1 rt2rt
             u1 fe
             u1 timeout
             p1
