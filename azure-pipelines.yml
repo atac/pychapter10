@@ -57,7 +57,7 @@ jobs:
   - script: pdm install --dev
     displayName: 'Install dependencies'
 
-  - script: pytest --junitxml=junit-$(imageName)-$(python.version).xml --cov chapter10 --cov-report xml --cov-report html --cov-append
+  - script: pdm run pytest --junitxml=junit-$(imageName)-$(python.version).xml --cov chapter10 --cov-report xml --cov-report html --cov-append
     displayName: 'Run tests'
 
   - task: PublishTestResults@2
@@ -80,7 +80,7 @@ jobs:
   steps:
   - task: UsePythonVersion@0
     inputs:
-      versionSpec: "3.8"
+      versionSpec: "3.9"
       architecture: 'x64'
 
   - script: python -m pip install -U pip pdm
@@ -105,7 +105,7 @@ jobs:
   steps:
   - task: UsePythonVersion@0
     inputs:
-      versionSpec: "3.8"
+      versionSpec: "3.9"
       architecture: 'x64'
 
   - script: "echo \"version = '$(Build.BuildNumber)'\" > chapter10/version.py"
