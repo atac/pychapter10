@@ -30,6 +30,11 @@ homepage = "https://github.com/atac/pychapter10"
 repository = "https://github.com/atac/pychapter10"
 documentation = "https://pychapter10.readthedocs.io/"
 
+[project.optional-dependencies]
+docs = [
+    "sphinx>=2.4.4",
+]
+
 [tool]
 [tool.pdm]
 [[tool.pdm.source]]
