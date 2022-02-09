@@ -10,9 +10,8 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-import os
-import sys
 from datetime import datetime
+from chapter10 import version as release
 
 
 # -- Project information -----------------------------------------------------
@@ -22,7 +21,7 @@ copyright = datetime.now().strftime('%Y, ATAC')
 author = 'Micah Ferrill - ATAC'
 
 # The full version, including alpha/beta/rc tags
-release = '1.1'
+# release = '1.1'
 
 
 # -- General configuration ---------------------------------------------------
