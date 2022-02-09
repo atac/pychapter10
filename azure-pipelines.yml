@@ -2,11 +2,7 @@
 trigger:
 - master
 
-variables:
-  major: 1
-  minor: 1
-
-name: $(major).$(minor)$(Rev:.r)
+name: '1.1.15'
 
 jobs:
 
