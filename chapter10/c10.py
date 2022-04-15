@@ -98,7 +98,7 @@ class C10(object):
                 self.file.seek(pos + 1)
 
     def __repr__(self):
-        return '<C10: {}>'.format(os.path.basename(self.file.name))
+        return '<C10: {}>'.format(os.path.basename(self.file.io.name))
 
     def __iter__(self):
         return self

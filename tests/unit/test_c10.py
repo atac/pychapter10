@@ -15,3 +15,8 @@ def test_next():
 def test_next_stop():
     with pytest.raises(StopIteration):
         next(c10.C10(Mock(read=Mock(side_effect=EOFError))))
+
+def test_str_repr():
+    c = c10.C10(SAMPLE)
+    repr(c)
+    str(c)
