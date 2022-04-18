@@ -16,7 +16,7 @@ def test_next_stop():
     with pytest.raises(StopIteration):
         next(c10.C10(Mock(read=Mock(side_effect=EOFError))))
 
-def test_str_repr():
-    c = c10.C10(SAMPLE)
-    repr(c)
-    str(c)
+
+@pytest.mark.parametrize('func', (repr, str))
+def test_repr(func):
+    assert func(c10.C10(SAMPLE)) == '<C10: sample.c10>'
