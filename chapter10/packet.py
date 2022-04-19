@@ -216,7 +216,7 @@ class Packet:
             return len(self._messages)
         if hasattr(self, 'count'):
             return self.count
-        elif hasattr(self, 'Message') and self.Message.length:
+        elif getattr(self, 'Message', None) and self.Message.length:
             msg_size = self.Message.length
             if getattr(self.Message, 'FORMAT', None):
                 msg_size += self.Message.FORMAT.calcsize() // 8

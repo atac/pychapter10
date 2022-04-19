@@ -35,3 +35,8 @@ def test_packed(packet):
 def test_throughput(throughput):
     with pytest.raises(StopIteration):
         next(throughput)
+
+
+def test_throughput_len(throughput):
+    with pytest.raises(TypeError):
+        len(throughput)
