@@ -227,7 +227,13 @@ class Packet:
         """Returns the raw bytes of the packet body, including the CSDW."""
 
         # Pack messages into body
-        body = b''.join(bytes(m) for m in self._messages)
+        if getattr(self, 'Message', None):
+            body = b''.join(bytes(m) for m in self._messages)
+
+        # Pull raw bytes if not a message-based packet
+        else:
+            self.buffer.seek(36 if self.secondary_header else 24)
+            body = self.buffer.read(self.data_length - 4)
         return self.csdw_format.pack(self.__dict__) + body
 
     def __bytes__(self):

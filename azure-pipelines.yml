@@ -2,7 +2,7 @@
 trigger:
 - master
 
-name: '1.1.17'
+name: '1.1.18'
 
 jobs:
 
