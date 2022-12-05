@@ -1,4 +1,5 @@
 
+from datetime import datetime
 import io
 
 from chapter10 import time, C10
@@ -18,3 +19,15 @@ def test_time_bytes():
             break
     raw = bytes(packet)
     assert time.TimeF1(io.BytesIO(raw)).time == packet.time
+
+
+def test_time_bytes_with_ms():
+    t0 = time.TimeF1()
+
+    # Note trailing 0, IRIG 106-15 Time F1 only allows precision
+    # to tenths of ms, but fromisoformat requires specifying to 1-ms.
+    t0.time = datetime.fromisoformat('2022-12-05 01:02:03.450')
+
+    raw = bytes(t0)
+
+    assert time.TimeF1(io.BytesIO(raw)).time == t0.time

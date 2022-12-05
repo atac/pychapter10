@@ -115,7 +115,7 @@ such as PCM or 1553
         raw = self.buffer.read(self.data_length - 4)
         self.__dict__.update(self.data_format.unpack(raw))
 
-        ms = ((self.Hmn * 10) + self.Tmn)
+        ms = (self.Hmn * 100) + (self.Tmn * 10)
         seconds = self.Sn + (self.TSn * 10)
         minutes = self.Mn + (self.TMn * 10)
         hours = self.Hn + (self.THn * 10)
