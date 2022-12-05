@@ -108,7 +108,7 @@ such as PCM or 1553
             for name in self.data_format.names:
                 setattr(self, name, 0)
             self._initial_time = 0
-            if not self.time:
+            if getattr(self, "time", False):
                 self.time = datetime.now()
             return
 
