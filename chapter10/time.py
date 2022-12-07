@@ -108,14 +108,14 @@ such as PCM or 1553
             for name in self.data_format.names:
                 setattr(self, name, 0)
             self._initial_time = 0
-            if not self.time:
+            if getattr(self, "time", True):
                 self.time = datetime.now()
             return
 
         raw = self.buffer.read(self.data_length - 4)
         self.__dict__.update(self.data_format.unpack(raw))
 
-        ms = ((self.Hmn * 10) + self.Tmn)
+        ms = (self.Hmn * 100) + (self.Tmn * 10)
         seconds = self.Sn + (self.TSn * 10)
         minutes = self.Mn + (self.TMn * 10)
         hours = self.Hn + (self.THn * 10)
