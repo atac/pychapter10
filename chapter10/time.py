@@ -157,6 +157,16 @@ such as PCM or 1553
 
         # Month and year format
         if self.date_format:
+            day = self.time.day
+            self.TDn = day // 10
+            day -= self.TDn * 10
+            self.Dn = day
+
+            month = self.time.month
+            self.TOn = month // 10
+            month -= self.TOn * 10
+            self.On = month
+
             year = self.time.year
             self.OYn = year // 1000
             year -= self.OYn * 1000

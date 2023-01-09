@@ -22,7 +22,7 @@ def test_time_bytes():
 
 
 def test_time_bytes_with_ms():
-    t0 = time.TimeF1()
+    t0 = time.TimeF1(date_format=1)
 
     # Note trailing 0, IRIG 106-15 Time F1 only allows precision
     # to tenths of ms, but fromisoformat requires specifying to 1-ms.
