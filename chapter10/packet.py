@@ -85,6 +85,8 @@ class Packet:
 
     csdw_format = BitFormat('u32 csdw')
 
+    _MAX_PACKET_BYTES = 524288
+
     def __init__(self, file=None, parent=None, **kwargs):
 
         self.parent = parent
@@ -199,7 +201,7 @@ class Packet:
         elif self.secondary_header:
             if self.secondary_sums != self.secondary_checksum:
                 err = InvalidPacket('Secondary header checksum mismatch!')
-        if self.data_length > 524288:
+        if self.data_length > self._MAX_PACKET_BYTES:
             err = InvalidPacket(
                 f'Data length {self.data_length} larger than allowed!')
 

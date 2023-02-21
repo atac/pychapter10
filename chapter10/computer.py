@@ -54,6 +54,8 @@ class ComputerF1(packet.Packet):
         u1 format
         p22''')
 
+    _MAX_PACKET_BYTES = 134_217_728
+
     def __init__(self, *args, **kwargs):
         packet.Packet.__init__(self, *args, **kwargs)
         if self.buffer:
