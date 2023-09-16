@@ -33,3 +33,11 @@ def test_next(packet):
 
 def test_bytes(packet):
     assert packet.buffer.getvalue() == bytes(packet)
+
+
+def test_generate():
+    a = analog.AnalogF1(same=1)
+    msg1 = analog.AnalogF1.Message(length=2, data=b'\xbe\xef')
+    a.append(msg1)
+
+    assert b'\xbe\xef' in bytes(a)

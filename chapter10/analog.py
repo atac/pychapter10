@@ -103,9 +103,11 @@ class AnalogF1(packet.Packet):
                     self.csdw_format.unpack(self.buffer.read(4)))
 
         # Get the raw bytes of data since samples are specified in bit length
-        raw = self.buffer.read(
-            self.data_length - (4 * len(self.subchannels)))
-        self.data = Bits(raw)
+        self.data = Bits()
+        if self.buffer:
+            raw = self.buffer.read(
+                self.data_length - (4 * len(self.subchannels)))
+            self.data = Bits(raw)
         self.bit_offset = 0
 
     def _raw_body(self):
