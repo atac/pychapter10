@@ -1,6 +1,6 @@
 [project]
 name = "pychapter10"
-version = "1.1.18"
+version = "1.1.19"
 description = "A parser library for the IRIG 106 Chapter 10 data format."
 authors = [
     {name = "Micah Ferrill", email = "ferrillm@avtest.com"},

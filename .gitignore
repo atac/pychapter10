@@ -21,3 +21,4 @@ docs/doctrees
 .vscode
 *.xml
 __pypackages__
+.pdm-python

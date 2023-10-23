@@ -2,7 +2,7 @@
 trigger:
 - master
 
-name: '1.1.18'
+name: '1.1.19'
 
 jobs:
 
@@ -19,6 +19,12 @@ jobs:
       Ubuntu-py3.9:
         imageName: 'ubuntu-latest'
         python.version: '3.9'
+      Ubuntu-py3.10:
+        imageName: 'ubuntu-latest'
+        python.version: '3.10'
+      Ubuntu-py3.11:
+        imageName: 'ubuntu-latest'
+        python.version: '3.11'
       macOS-py3.7:
         imageName: 'macos-latest'
         python.version: '3.7'
@@ -28,6 +34,12 @@ jobs:
       macOS-py3.9:
         imageName: 'macos-latest'
         python.version: '3.9'
+      macOS-py3.10:
+        imageName: 'macos-latest'
+        python.version: '3.10'
+      macOS-py3.11:
+        imageName: 'macos-latest'
+        python.version: '3.11'
       Windows-py3.7:
         imageName: 'windows-latest'
         python.version: '3.7'
@@ -37,6 +49,12 @@ jobs:
       Windows-py3.9:
         imageName: 'windows-latest'
         python.version: '3.9'
+      Windows-py3.10:
+        imageName: 'windows-latest'
+        python.version: '3.10'
+      Windows-py3.11:
+        imageName: 'windows-latest'
+        python.version: '3.11'
 
   pool:
     vmImage: $(imageName)
@@ -101,7 +119,7 @@ jobs:
   steps:
   - task: UsePythonVersion@0
     inputs:
-      versionSpec: "3.9"
+      versionSpec: "3.11"
       architecture: 'x64'
 
   - script: python -m pip install -U pip pdm
