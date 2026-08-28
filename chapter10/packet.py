@@ -121,7 +121,7 @@ class Packet:
         secondary = bytes()
         if self.secondary_header:
             secondary = file.read(12)
-            self.secondary_sums = sum(array('H', secondary)[:-1]) & 0xffff
+            self.secondary_sums = self.secondary_sum(secondary)
             self.__dict__.update(self.SECONDARY_FORMAT.unpack(file.read(12)))
 
         # Read into our own personal buffer.
@@ -139,6 +139,20 @@ class Packet:
         raw_header = self.FORMAT.pack(self.__dict__)
         self.header_sums = sum(array('H', raw_header)[:-1]) & 0xffff
         return self.header_sums
+
+    @staticmethod
+    def secondary_sum(raw_secondary):
+        """Compute the checksum for a raw packet secondary header.
+
+        The secondary header checksum is a 16 bit arithmetic sum of the
+        secondary header *bytes*, excluding the checksum word itself (IRIG
+        106-19 11.2.1.2.c). Note this differs from the packet header checksum,
+        which sums 16 bit words (11.2.1.1.j).
+
+        :param bytes raw_secondary: The 12 raw secondary header bytes.
+        """
+
+        return sum(raw_secondary[:-2]) & 0xffff
 
     def get_time(self):
         """Return a timestamp for this packet. Depends on parent C10 object."""

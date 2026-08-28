@@ -1,4 +1,5 @@
 
+from array import array
 import pickle
 from unittest.mock import Mock
 from io import BytesIO
@@ -121,6 +122,29 @@ class TestPacket:
         p = packet.Packet(channel_id=12)
         s = pickle.dumps(p)
         assert pickle.loads(s).__dict__ == p.__dict__
+
+    # Secondary header checksum
+    # Secondary headers from two NetAcquire recordings in the irig106.org
+    # sample data (netacquire-3-pcm-sine-waves_20112018.ch10 at offset 34288
+    # and netacquire-pcm-sine-wave-msg_20112018.ch10 at offset 1972).
+    @pytest.mark.parametrize('raw', (
+        bytes.fromhex('0000d1063c79c74e0000a102'),
+        bytes.fromhex('00003c020995c74e0000f101')))
+    def test_secondary_sum(self, raw):
+        """The checksum sums bytes, not 16 bit words (106-19 11.2.1.2.c)."""
+
+        stored = packet.Packet.SECONDARY_FORMAT.unpack(raw)[
+            'secondary_checksum']
+        assert packet.Packet.secondary_sum(raw) == stored
+
+    def test_secondary_sum_is_not_word_sum(self):
+        """Summing 16 bit words (the packet header rule) gives a different,
+        and for a conformant recorder wrong, answer.
+        """
+
+        raw = bytes.fromhex('0000d1063c79c74e0000a102')
+        assert sum(array('H', raw)[:-1]) & 0xffff == 0xced4
+        assert packet.Packet.secondary_sum(raw) == 0x02a1
 
 
 class TestMessage:
