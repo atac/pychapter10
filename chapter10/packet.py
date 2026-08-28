@@ -122,7 +122,7 @@ class Packet:
         if self.secondary_header:
             secondary = file.read(12)
             self.secondary_sums = sum(array('H', secondary)[:-1]) & 0xffff
-            self.__dict__.update(self.SECONDARY_FORMAT.unpack(file.read(12)))
+            self.__dict__.update(self.SECONDARY_FORMAT.unpack(secondary))
 
         # Read into our own personal buffer.
         header_size = 24 + len(secondary)

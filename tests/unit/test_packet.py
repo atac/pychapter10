@@ -5,7 +5,7 @@ from io import BytesIO
 
 import pytest
 
-from chapter10 import packet, computer
+from chapter10 import c10, packet, computer
 from chapter10.util import BitFormat
 from fixtures import SAMPLE
 
@@ -24,6 +24,45 @@ class TestPacket:
 
     def test_construct_blank(self, p):
         assert p._messages == []
+
+    # Secondary header
+    @pytest.fixture
+    def secondary(self):
+        """Raw bytes of a TMATS packet carrying a packet secondary header."""
+
+        p = computer.ComputerF1()
+        p.channel_id, p.data_type = 0, 0x01
+        p.data = b'G\\PN:roundtrip;\r\n'
+        p.secondary_header, p.secondary_format = 1, 0
+
+        # The high byte of every 16 bit word is zero, so this checksums the
+        # same whether summed as bytes or as 16 bit words.
+        p.secondary_time = 0x0004000300020001
+        p.secondary_checksum = 0
+        p.secondary_checksum = sum(
+            p.SECONDARY_FORMAT.pack(p.__dict__)[:-2]) & 0xffff
+
+        return bytes(p)
+
+    def test_secondary_header_values(self, secondary):
+        """Secondary header values come from the secondary header itself."""
+
+        p = packet.Packet(BytesIO(secondary))
+        assert p.secondary_time == 0x0004000300020001
+        assert p.secondary_checksum == 0xa
+
+    def test_secondary_header_length(self, secondary):
+        """Reading a packet consumes the packet and nothing more."""
+
+        f = BytesIO(secondary)
+        packet.Packet(f)
+        assert f.tell() == len(secondary) == 60
+
+    def test_secondary_header_roundtrip(self, secondary):
+        """A packet written with a secondary header can be read back."""
+
+        assert [bytes(p) for p in c10.C10.from_string(secondary)] == [
+            secondary]
 
     # __iter__
     def test_iter_messages(self, p):
